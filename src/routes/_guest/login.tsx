@@ -12,8 +12,14 @@ function LoginPage() {
   const [password, setPassword] = useState('');
   const login = useLogin();
 
+  // Email validation regex
+  const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isValidEmail) {
+      return;
+    }
     login.mutate({ email, password });
   };
 
@@ -76,7 +82,7 @@ function LoginPage() {
           <div>
             <button
               type="submit"
-              disabled={login.isPending}
+              disabled={login.isPending || !isValidEmail}
               className="group relative flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50"
             >
               {login.isPending ? 'Signing in...' : 'Sign in'}

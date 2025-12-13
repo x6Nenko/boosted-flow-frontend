@@ -1,4 +1,5 @@
 import { authStore } from '@/features/auth/auth-store';
+import { API_ENDPOINTS } from './api-endpoints';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
@@ -24,7 +25,7 @@ class ApiError extends Error {
 let refreshPromise: Promise<string> | null = null;
 
 async function refreshAccessToken(): Promise<string> {
-  const response = await fetch(`${API_BASE_URL}/auth/refresh`, {
+  const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.AUTH.REFRESH}`, {
     method: 'POST',
     credentials: 'include',
     headers: { 'Content-Type': 'application/json' },

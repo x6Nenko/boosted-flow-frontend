@@ -14,11 +14,18 @@ function RegisterPage() {
   const [validationError, setValidationError] = useState('');
   const register = useRegister();
 
+  // Email validation regex
+  const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setValidationError('');
 
     // Client-side validation
+    if (!isValidEmail) {
+      setValidationError('Invalid email format');
+      return;
+    }
     if (password.length < 8) {
       setValidationError('Password must be at least 8 characters');
       return;
@@ -113,7 +120,7 @@ function RegisterPage() {
           <div>
             <button
               type="submit"
-              disabled={register.isPending}
+              disabled={register.isPending || !isValidEmail}
               className="group relative flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50"
             >
               {register.isPending ? 'Creating account...' : 'Register'}

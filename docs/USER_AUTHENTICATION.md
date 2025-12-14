@@ -12,12 +12,17 @@ Enables secure user authentication using JWT access tokens (in-memory) and refre
 src/
 ├── main.tsx (App initialization with initializeAuth)
 ├── lib/
-│   └── api-client.ts (HTTP client with auto-refresh)
+│   ├── api-client.ts (HTTP client with auto-refresh)
+│   └── api-endpoints.ts (Centralized API endpoint constants)
 ├── features/auth/
 │   ├── types.ts (TypeScript definitions)
 │   ├── auth-store.ts (In-memory access token store with pub-sub)
-│   ├── api.ts (Auth API endpoints)
+│   ├── api.ts (Auth API endpoints using API_ENDPOINTS)
 │   ├── auth-guard.ts (Route guards & session init)
+│   ├── auth.schema.ts (Zod validation schemas)
+│   ├── components/
+│   │   ├── LoginForm.tsx (Login form with react-hook-form)
+│   │   └── RegisterForm.tsx (Registration form with react-hook-form)
 │   └── hooks/
 │       ├── use-auth.ts (Subscribe to auth state)
 │       ├── use-login.ts (TanStack Mutation)
@@ -28,8 +33,8 @@ src/
 │   ├── _auth.tsx (Layout route with requireAuth guard)
 │   ├── _guest.tsx (Layout route with requireGuest guard)
 │   ├── _auth/dashboard.tsx (Protected page)
-│   ├── _guest/login.tsx (Login form component)
-│   └── _guest/register.tsx (Registration form component)
+│   ├── _guest/login.tsx (Renders LoginForm)
+│   └── _guest/register.tsx (Renders RegisterForm)
 ```
 
 ---
@@ -44,13 +49,14 @@ src/
 5. Render app (TanStack Router evaluates `beforeLoad` guards)
 
 ### **Login Flow**
-1. User enters credentials → `LoginPage` form submission
-2. `useLogin().mutate({ email, password })` triggered
-3. TanStack Mutation → `authApi.login()` → `apiClient` POST to `/auth/login`
-4. Response: `{ accessToken: "..." }` + HttpOnly `refreshToken` cookie
-5. `onSuccess` → `authStore.setAccessToken(token)` → notify subscribers
-6. `navigate({ to: '/dashboard' })` (programmatic redirect)
-7. `_auth.tsx` `beforeLoad` guard passes → dashboard renders
+1. User enters credentials → `LoginForm` component (react-hook-form)
+2. Form validation via Zod schema (`loginSchema`) - email format + password required
+3. On valid submission → `useLogin().mutate({ email, password })` triggered
+4. TanStack Mutation → `authApi.login()` → `apiClient` POST to `API_ENDPOINTS.AUTH.LOGIN`
+5. Response: `{ accessToken: "..." }` + HttpOnly `refreshToken` cookie
+6. `onSuccess` → `authStore.setAccessToken(token)` → notify subscribers
+7. `navigate({ to: '/dashboard' })` (programmatic redirect)
+8. `_auth.tsx` `beforeLoad` guard passes → dashboard renders
 
 ### **Protected Route Access**
 1. User navigates to `/dashboard`
@@ -86,12 +92,20 @@ src/
 - **QueryClient.clear()** on logout to prevent stale data leakage
 - **TanStack Router `beforeLoad`** for route-level guards
 
+### **Form Validation Patterns**
+- **React Hook Form** for form state management and submission
+- **Zod schemas** for type-safe validation (`loginSchema`, `registerSchema`)
+- **@hookform/resolvers/zod** integration for seamless validation
+- **Client-side validation**: Email format, password requirements, confirmation matching
+- **Server-side error display**: Extracted from `ApiError.data.message`
+
 ### **Auth Patterns**
 - **Dual-token strategy**: Access token (in-memory, short-lived) + Refresh token (HttpOnly cookie, long-lived)
 - **Pub-sub reactivity**: `authStore.subscribe()` for cross-component updates
 - **Automatic token refresh**: Transparent retry on 401 with refresh token
 - **Refresh deduplication**: Single refresh promise prevents race conditions
 - **JWT parsing**: Manual Base64 decode for user data extraction (no library)
+- **Centralized endpoints**: `API_ENDPOINTS` constant for all API routes
 
 ### **React Router Patterns**
 - **Layout routes** (`_auth`, `_guest`) for guard encapsulation
@@ -196,9 +210,17 @@ void | throws redirect({ to: '/' })
 - `beforeLoad` runs **before** component render (no flash of unauthorized content)
 
 ### **Form Validation**
-- **Client-side**: Password 8-72 chars, match confirmation
-- **Server errors**: Extract from `ApiError.data.message`
-- **Display**: Show validation errors above server errors
+- **Zod schemas**: `loginSchema` and `registerSchema` in `auth.schema.ts`
+- **Login validation**: Valid email format + password required
+- **Register validation**:
+  - Valid email format
+  - Password 8-72 characters
+  - At least one uppercase letter
+  - At least one lowercase letter
+  - At least one number
+  - Confirmation must match password
+- **Server errors**: Extracted from `ApiError.data.message`
+- **Display priority**: Zod validation errors shown inline, server errors displayed above form
 
 ### **Environment Config**
 - `VITE_API_URL` in `.env.development` / `.env.production`

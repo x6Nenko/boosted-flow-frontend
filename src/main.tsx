@@ -1,6 +1,11 @@
+import { scan } from 'react-scan' // must be imported before React
 import { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
 import { RouterProvider, createRouter } from '@tanstack/react-router'
+
+scan({
+  enabled: import.meta.env.DEV,
+})
 
 import * as TanStackQueryProvider from './integrations/tanstack-query/root-provider.tsx'
 

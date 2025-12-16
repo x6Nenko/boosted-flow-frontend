@@ -9,4 +9,10 @@ export const API_ENDPOINTS = {
     LOGOUT: '/auth/logout',
     REFRESH: '/auth/refresh',
   },
+  TIME_ENTRIES: {
+    START: '/time-entries/start',
+    STOP: '/time-entries/stop',
+    LIST: '/time-entries',
+    CURRENT: '/time-entries/current',
+  },
 } as const;

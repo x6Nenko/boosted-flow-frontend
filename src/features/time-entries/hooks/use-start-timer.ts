@@ -6,7 +6,7 @@ export function useStartTimer() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data?: StartTimeEntryRequest) => timeEntriesApi.start(data),
+    mutationFn: (data: StartTimeEntryRequest) => timeEntriesApi.start(data),
     onSuccess: (entry: TimeEntry) => {
       queryClient.setQueryData<CurrentEntryResponse>(['time-entries', 'current'], {
         entry,

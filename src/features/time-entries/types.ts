@@ -4,9 +4,12 @@
 export type TimeEntry = {
   id: string;
   userId: string;
+  activityId: string;
   description: string | null;
   startedAt: string;
   stoppedAt: string | null;
+  rating: number | null;
+  comment: string | null;
   createdAt: string;
 };
 
@@ -14,6 +17,7 @@ export type TimeEntry = {
  * Request to start a new time entry
  */
 export type StartTimeEntryRequest = {
+  activityId: string;
   description?: string;
 };
 
@@ -22,6 +26,14 @@ export type StartTimeEntryRequest = {
  */
 export type StopTimeEntryRequest = {
   id: string;
+};
+
+/**
+ * Request to update a finished time entry
+ */
+export type UpdateTimeEntryRequest = {
+  rating?: number;
+  comment?: string;
 };
 
 /**

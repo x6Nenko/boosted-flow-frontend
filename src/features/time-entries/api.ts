@@ -4,12 +4,13 @@ import type {
   TimeEntry,
   StartTimeEntryRequest,
   StopTimeEntryRequest,
+  UpdateTimeEntryRequest,
   TimeEntriesQuery,
   CurrentEntryResponse,
 } from './types';
 
 export const timeEntriesApi = {
-  start: (data?: StartTimeEntryRequest) =>
+  start: (data: StartTimeEntryRequest) =>
     apiClient<TimeEntry>(API_ENDPOINTS.TIME_ENTRIES.START, {
       method: 'POST',
       body: data,
@@ -18,6 +19,12 @@ export const timeEntriesApi = {
   stop: (data: StopTimeEntryRequest) =>
     apiClient<TimeEntry>(API_ENDPOINTS.TIME_ENTRIES.STOP, {
       method: 'POST',
+      body: data,
+    }),
+
+  update: (id: string, data: UpdateTimeEntryRequest) =>
+    apiClient<TimeEntry>(`${API_ENDPOINTS.TIME_ENTRIES.LIST}/${id}`, {
+      method: 'PATCH',
       body: data,
     }),
 

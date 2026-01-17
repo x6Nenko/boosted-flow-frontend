@@ -15,7 +15,6 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-query'
 import { Route as GuestRegisterRouteImport } from './routes/_guest/register'
 import { Route as GuestLoginRouteImport } from './routes/_guest/login'
-import { Route as AuthTimeEntriesRouteImport } from './routes/_auth/time-entries'
 import { Route as AuthDashboardRouteImport } from './routes/_auth/dashboard'
 
 const GuestRoute = GuestRouteImport.update({
@@ -46,11 +45,6 @@ const GuestLoginRoute = GuestLoginRouteImport.update({
   path: '/login',
   getParentRoute: () => GuestRoute,
 } as any)
-const AuthTimeEntriesRoute = AuthTimeEntriesRouteImport.update({
-  id: '/time-entries',
-  path: '/time-entries',
-  getParentRoute: () => AuthRoute,
-} as any)
 const AuthDashboardRoute = AuthDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -60,7 +54,6 @@ const AuthDashboardRoute = AuthDashboardRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof AuthDashboardRoute
-  '/time-entries': typeof AuthTimeEntriesRoute
   '/login': typeof GuestLoginRoute
   '/register': typeof GuestRegisterRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
@@ -68,7 +61,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof AuthDashboardRoute
-  '/time-entries': typeof AuthTimeEntriesRoute
   '/login': typeof GuestLoginRoute
   '/register': typeof GuestRegisterRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
@@ -79,7 +71,6 @@ export interface FileRoutesById {
   '/_auth': typeof AuthRouteWithChildren
   '/_guest': typeof GuestRouteWithChildren
   '/_auth/dashboard': typeof AuthDashboardRoute
-  '/_auth/time-entries': typeof AuthTimeEntriesRoute
   '/_guest/login': typeof GuestLoginRoute
   '/_guest/register': typeof GuestRegisterRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
@@ -89,25 +80,17 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/dashboard'
-    | '/time-entries'
     | '/login'
     | '/register'
     | '/demo/tanstack-query'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/dashboard'
-    | '/time-entries'
-    | '/login'
-    | '/register'
-    | '/demo/tanstack-query'
+  to: '/' | '/dashboard' | '/login' | '/register' | '/demo/tanstack-query'
   id:
     | '__root__'
     | '/'
     | '/_auth'
     | '/_guest'
     | '/_auth/dashboard'
-    | '/_auth/time-entries'
     | '/_guest/login'
     | '/_guest/register'
     | '/demo/tanstack-query'
@@ -164,13 +147,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GuestLoginRouteImport
       parentRoute: typeof GuestRoute
     }
-    '/_auth/time-entries': {
-      id: '/_auth/time-entries'
-      path: '/time-entries'
-      fullPath: '/time-entries'
-      preLoaderRoute: typeof AuthTimeEntriesRouteImport
-      parentRoute: typeof AuthRoute
-    }
     '/_auth/dashboard': {
       id: '/_auth/dashboard'
       path: '/dashboard'
@@ -183,12 +159,10 @@ declare module '@tanstack/react-router' {
 
 interface AuthRouteChildren {
   AuthDashboardRoute: typeof AuthDashboardRoute
-  AuthTimeEntriesRoute: typeof AuthTimeEntriesRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
   AuthDashboardRoute: AuthDashboardRoute,
-  AuthTimeEntriesRoute: AuthTimeEntriesRoute,
 }
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)

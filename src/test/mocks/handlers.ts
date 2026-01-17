@@ -58,13 +58,16 @@ export const handlers = [
       return HttpResponse.json({ message: 'Already have an active timer' }, { status: 409 });
     }
 
-    const body = (await request.json().catch(() => ({}))) as { description?: string };
+    const body = (await request.json().catch(() => ({}))) as { activityId: string; description?: string };
     const entry: TimeEntry = {
       id: `entry-${entryIdCounter++}`,
       userId: 'user-123',
+      activityId: body.activityId,
       description: body.description || null,
       startedAt: new Date().toISOString(),
       stoppedAt: null,
+      rating: null,
+      comment: null,
       createdAt: new Date().toISOString(),
     };
     mockTimeEntries.unshift(entry);

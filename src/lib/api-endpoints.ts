@@ -9,6 +9,9 @@ export const API_ENDPOINTS = {
     LOGOUT: '/auth/logout',
     REFRESH: '/auth/refresh',
   },
+  ACTIVITIES: {
+    BASE: '/activities',
+  },
   TIME_ENTRIES: {
     START: '/time-entries/start',
     STOP: '/time-entries/stop',

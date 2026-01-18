@@ -16,6 +16,8 @@ import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-qu
 import { Route as GuestRegisterRouteImport } from './routes/_guest/register'
 import { Route as GuestLoginRouteImport } from './routes/_guest/login'
 import { Route as AuthDashboardRouteImport } from './routes/_auth/dashboard'
+import { Route as AuthActivitiesIndexRouteImport } from './routes/_auth/activities.index'
+import { Route as AuthActivitiesActivityIdRouteImport } from './routes/_auth/activities.$activityId'
 
 const GuestRoute = GuestRouteImport.update({
   id: '/_guest',
@@ -50,6 +52,17 @@ const AuthDashboardRoute = AuthDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthRoute,
 } as any)
+const AuthActivitiesIndexRoute = AuthActivitiesIndexRouteImport.update({
+  id: '/activities/',
+  path: '/activities/',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthActivitiesActivityIdRoute =
+  AuthActivitiesActivityIdRouteImport.update({
+    id: '/activities/$activityId',
+    path: '/activities/$activityId',
+    getParentRoute: () => AuthRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -57,6 +70,8 @@ export interface FileRoutesByFullPath {
   '/login': typeof GuestLoginRoute
   '/register': typeof GuestRegisterRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/activities/$activityId': typeof AuthActivitiesActivityIdRoute
+  '/activities': typeof AuthActivitiesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -64,6 +79,8 @@ export interface FileRoutesByTo {
   '/login': typeof GuestLoginRoute
   '/register': typeof GuestRegisterRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/activities/$activityId': typeof AuthActivitiesActivityIdRoute
+  '/activities': typeof AuthActivitiesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -74,6 +91,8 @@ export interface FileRoutesById {
   '/_guest/login': typeof GuestLoginRoute
   '/_guest/register': typeof GuestRegisterRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/_auth/activities/$activityId': typeof AuthActivitiesActivityIdRoute
+  '/_auth/activities/': typeof AuthActivitiesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -83,8 +102,17 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/demo/tanstack-query'
+    | '/activities/$activityId'
+    | '/activities'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard' | '/login' | '/register' | '/demo/tanstack-query'
+  to:
+    | '/'
+    | '/dashboard'
+    | '/login'
+    | '/register'
+    | '/demo/tanstack-query'
+    | '/activities/$activityId'
+    | '/activities'
   id:
     | '__root__'
     | '/'
@@ -94,6 +122,8 @@ export interface FileRouteTypes {
     | '/_guest/login'
     | '/_guest/register'
     | '/demo/tanstack-query'
+    | '/_auth/activities/$activityId'
+    | '/_auth/activities/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -154,15 +184,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthDashboardRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_auth/activities/': {
+      id: '/_auth/activities/'
+      path: '/activities'
+      fullPath: '/activities'
+      preLoaderRoute: typeof AuthActivitiesIndexRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/activities/$activityId': {
+      id: '/_auth/activities/$activityId'
+      path: '/activities/$activityId'
+      fullPath: '/activities/$activityId'
+      preLoaderRoute: typeof AuthActivitiesActivityIdRouteImport
+      parentRoute: typeof AuthRoute
+    }
   }
 }
 
 interface AuthRouteChildren {
   AuthDashboardRoute: typeof AuthDashboardRoute
+  AuthActivitiesActivityIdRoute: typeof AuthActivitiesActivityIdRoute
+  AuthActivitiesIndexRoute: typeof AuthActivitiesIndexRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
   AuthDashboardRoute: AuthDashboardRoute,
+  AuthActivitiesActivityIdRoute: AuthActivitiesActivityIdRoute,
+  AuthActivitiesIndexRoute: AuthActivitiesIndexRoute,
 }
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)

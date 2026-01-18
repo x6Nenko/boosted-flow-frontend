@@ -30,6 +30,7 @@ export const timeEntriesApi = {
 
   list: (query?: TimeEntriesQuery) => {
     const params = new URLSearchParams();
+    if (query?.activityId) params.set('activityId', query.activityId);
     if (query?.from) params.set('from', query.from);
     if (query?.to) params.set('to', query.to);
     const queryString = params.toString();

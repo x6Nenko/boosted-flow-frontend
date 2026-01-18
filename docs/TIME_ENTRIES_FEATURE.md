@@ -9,49 +9,52 @@ Enables users to track work sessions with start/stop timer controls, live durati
 ## 2. Component & Hook Hierarchy
 
 ```
-routes/_auth/dashboard.tsx (Route/Page)
-└── components/TimeTracker.tsx (Container)
-    ├── ActivityPicker (inline - activity selection pills)
-    ├── ActivityForm (inline - create new activity)
-    ├── TimerDuration.tsx (Presentational - live duration)
-    ├── TimeEntryRow (inline - list item with edit capability)
-    ├── RatingStars (inline - 1-5 star rating)
-    │
-    ├── hooks/useCurrentEntry() → TanStack Query
-    ├── hooks/useTimeEntries() → TanStack Query
-    ├── hooks/useStartTimer() → TanStack Mutation
-    ├── hooks/useStopTimer() → TanStack Mutation
-    └── hooks/useUpdateTimeEntry() → TanStack Mutation
-        │
-        └── api.ts (timeEntriesApi object)
-            └── lib/api-client.ts (shared fetch wrapper)
-                └── lib/api-endpoints.ts (centralized URL constants)
+routes/_auth/
+├── dashboard.tsx                         # Overview: current timer, all recent entries
+└── activities.$activityId.tsx            # Activity-specific: timer, filtered entries
+
+src/features/time-entries/
+├── types.ts                              # TypeScript definitions
+├── api.ts                                # API endpoints
+├── components/
+│   ├── TimerDuration.tsx                 # Live duration display
+│   ├── TimerDuration.test.ts             # Unit tests
+│   └── TimeEntryRow.tsx                  # Reusable entry row with rating/edit
+└── hooks/
+    ├── index.ts                          # Hook exports
+    ├── use-current-entry.ts              # TanStack Query for active entry
+    ├── use-time-entries.ts               # TanStack Query for listing
+    ├── use-start-timer.ts                # TanStack Mutation
+    ├── use-stop-timer.ts                 # TanStack Mutation
+    └── use-update-time-entry.ts          # TanStack Mutation
+
+src/lib/utils.ts                          # Shared formatTime, formatDate functions
 ```
 
-**Supporting Files:**
-- `types.ts` — TypeScript interfaces for TimeEntry, Request/Response shapes
-- `components/TimerDuration.test.ts` — Unit tests for duration formatting
+**Pages:**
+- `/dashboard` — Shows current timer (if running) and all recent entries across activities
+- `/activities/:activityId` — Timer control and entries filtered by activity
 
 ---
 
 ## 3. State & Data Flow
 
 ### **Starting Timer**
-1. User selects activity from picker → `selectedActivityId` state
+1. User goes to activity page `/activities/:activityId`
 2. User optionally enters description → `description` state
-3. User clicks "Start" → `handleStart()`
+3. User clicks "Start Tracking" → `handleStart()`
 4. `startTimer.mutate({ activityId, description? })`
 5. `useStartTimer` calls `timeEntriesApi.start(data)` → POST `/time-entries/start`
 6. **onSuccess:** `setQueryData(['time-entries', 'current'], { entry })` — immediate cache update
 7. Invalidates `['time-entries']` → triggers re-fetch of `useTimeEntries`
-8. UI re-renders: shows activity name, "Stop" button, live timer displays
+8. UI re-renders: shows "Stop" button, live timer displays
 
 ### **Stopping Timer**
 1. User clicks "Stop" → `handleStop()` → `stopTimer.mutate(currentEntry.id)`
 2. `useStopTimer` calls `timeEntriesApi.stop({ id })` → POST `/time-entries/stop`
 3. **onSuccess:** `setQueryData(['time-entries', 'current'], { entry: null })`
 4. Invalidates `['time-entries']` → list re-fetches to include stopped entry
-5. UI re-renders: shows activity picker, stopped entry appears in list with edit option
+5. UI re-renders: shows start form, stopped entry appears in history
 
 ### **Updating Entry (Rating/Comment)**
 1. User clicks "Edit" on stopped entry → opens inline edit form
@@ -68,9 +71,10 @@ routes/_auth/dashboard.tsx (Route/Page)
 4. UI derives `isRunning = !!currentEntry`
 
 ### **Loading Entry List**
-1. `useTimeEntries(query?)` fetches `/time-entries?from=...&to=...`
+1. `useTimeEntries(query?)` fetches `/time-entries?activityId=...&from=...&to=...`
 2. Cache key: `['time-entries', query]`
 3. Returns `TimeEntry[]` — sorted by backend
+4. Pass `{ activityId }` to filter by activity
 
 ### **Live Duration Tick**
 1. `TimerDuration` component mounts with `startedAt` prop
@@ -84,16 +88,16 @@ routes/_auth/dashboard.tsx (Route/Page)
 
 | Pattern | Implementation |
 |---------|----------------|
-| **Query Key Strategy** | Hierarchical: `['time-entries']` parent, `['time-entries', 'current']` child |
+| **Query Key Strategy** | Hierarchical: `['time-entries']` parent, `['time-entries', 'current']` child, `['time-entries', { activityId }]` filtered |
 | **Optimistic UI** | Uses `setQueryData` to immediately update cache before invalidation |
 | **No Polling** | `useCurrentEntry` has 10min `staleTime`—relies on mutation cache updates |
 | **Selective Invalidation** | `invalidateQueries({ queryKey: ['time-entries'] })` re-fetches all sub-keys |
 | **Computed State** | `isRunning` derived from `currentEntry` existence (not separate state) |
-| **Activity Required** | Must select activity before starting—`activityId` is required in request |
+| **Activity-based tracking** | Timer controls on activity page, not global dashboard |
 | **Edit Only When Stopped** | Rating/comment editing only available for stopped entries |
 | **Local Timer Logic** | `TimerDuration` uses React state + interval, not server polling |
 | **API Layer Separation** | `api.ts` wraps `apiClient` with typed endpoints—no fetch in hooks |
-| **Query Params Handling** | `URLSearchParams` for optional `from/to` filters in list query |
+| **Query Params Handling** | `URLSearchParams` for optional `activityId/from/to` filters in list query |
 
 ---
 
@@ -109,7 +113,7 @@ Returns: UseQueryResult<CurrentEntryResponse>
 
 #### `useTimeEntries(query?: TimeEntriesQuery)`
 ```typescript
-Params: { from?: string, to?: string } // ISO date strings
+Params: { activityId?: string, from?: string, to?: string }
 Returns: UseQueryResult<TimeEntry[]>
 ```
 
@@ -131,12 +135,6 @@ Returns: UseMutationResult<TimeEntry, Error, { id: string, data: UpdateTimeEntry
 ```
 
 ### **Components**
-
-#### `<TimeTracker />`
-```typescript
-Props: none (self-contained)
-Includes: ActivityPicker, ActivityForm, TimerDuration, TimeEntryRow
-```
 
 #### `<TimerDuration startedAt={string} />`
 ```typescript
@@ -169,7 +167,7 @@ Returns: Promise<TimeEntry>
 
 #### `timeEntriesApi.list(query?)`
 ```typescript
-GET /time-entries?from=...&to=...
+GET /time-entries?activityId=...&from=...&to=...
 Returns: Promise<TimeEntry[]>
 ```
 
@@ -207,6 +205,12 @@ UpdateTimeEntryRequest {
   rating?: number
   comment?: string
 }
+
+TimeEntriesQuery {
+  activityId?: string
+  from?: string
+  to?: string
+}
 ```
 
 ---
@@ -229,7 +233,7 @@ UpdateTimeEntryRequest {
 ### **Component Dependencies**
 - **Requires TanStack Query Provider** — must be wrapped in `<QueryClientProvider>`
 - **Requires authentication** — route is under `_auth` layout (enforces login)
-- **Requires activities** — shows create activity form if none exist
+- **Dashboard shows create form** — redirects to activity page after creation
 
 ### **Timing & Intervals**
 - **`TimerDuration` starts interval on mount** — must cleanup on unmount
@@ -239,11 +243,10 @@ UpdateTimeEntryRequest {
 ### **API Contracts**
 - **`description` max 500 chars** — enforced client-side with `maxLength`
 - **Empty description sends `undefined`** — backend interprets as null
-- **`from/to` query params are optional** — backend defaults to "all time"
+- **`activityId/from/to` query params are optional** — backend defaults accordingly
 
 ### **State Edge Cases**
-- **Activity picker disabled when running** — prevents changing activity mid-session
-- **Start button disabled without activity** — enforces activity selection
+- **Only one timer active** — activity page shows message if timer running elsewhere
 - **Negative duration clamped to 00:00:00** — `Math.max(0, ...)` in formatter
 
 ### **TypeScript Strictness**

@@ -40,6 +40,7 @@ export type UpdateTimeEntryRequest = {
  * Query params for fetching time entries
  */
 export type TimeEntriesQuery = {
+  activityId?: string;
   from?: string;
   to?: string;
 };

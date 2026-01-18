@@ -9,6 +9,9 @@ export const activitiesApi = {
       body: data,
     }),
 
+  get: (id: string) =>
+    apiClient<Activity>(`${API_ENDPOINTS.ACTIVITIES.BASE}/${id}`),
+
   list: (includeArchived = false) => {
     const params = new URLSearchParams();
     if (includeArchived) params.set('includeArchived', 'true');

@@ -2,7 +2,7 @@
 
 ## 1. High-Level Purpose
 
-Enables users to define activities (things they want to track time on) with a simple creation flow and activity selection for time tracking.
+Enables users to define activities (things they want to track time on) with a simple creation flow. Each activity has its own dedicated page for tracking time and viewing history.
 
 ---
 
@@ -12,14 +12,22 @@ Enables users to define activities (things they want to track time on) with a si
 src/features/activities/
 ├── types.ts                              # TypeScript definitions
 ├── api.ts                                # API endpoints using API_ENDPOINTS
+├── components/
+│   └── ActivityForm.tsx                  # Reusable activity creation form
 └── hooks/
     ├── index.ts                          # Hook exports
+    ├── use-activity.ts                   # TanStack Query for single activity
     ├── use-activities.ts                 # TanStack Query for listing
     └── use-create-activity.ts            # TanStack Mutation for creation
+
+src/routes/_auth/
+├── activities.index.tsx                  # Activities list page
+└── activities.$activityId.tsx            # Activity detail page with timer
 ```
 
-**Used in:**
-- `TimeTracker.tsx` (ActivityPicker, ActivityForm components)
+**Pages:**
+- `/activities` — List all activities, create new ones
+- `/activities/:activityId` — View/track single activity with its time entries
 
 ---
 
@@ -31,12 +39,18 @@ src/features/activities/
 3. Returns `Activity[]` — sorted by `createdAt DESC` from backend
 4. 60min `staleTime` — activities rarely change
 
+### **Loading Single Activity**
+1. `useActivity(id)` fetches `GET /activities/:id`
+2. Cache key: `['activities', id]`
+3. Returns `Activity`
+4. 60min `staleTime`
+
 ### **Creating Activity**
 1. User types activity name in `ActivityForm`
 2. On submit → `useCreateActivity().mutate({ name })`
 3. `activitiesApi.create()` → POST `/activities`
 4. **onSuccess:** Invalidates `['activities']` → list re-fetches
-5. Form clears, new activity appears in picker
+5. **Redirect:** Navigate to `/activities/:newActivityId`
 
 ---
 
@@ -44,16 +58,23 @@ src/features/activities/
 
 | Pattern | Implementation |
 |---------|----------------|
-| **Query Key Strategy** | `['activities', { includeArchived }]` for filtering support |
+| **Query Key Strategy** | `['activities', { includeArchived }]` for list, `['activities', id]` for single |
 | **Stale Time** | 60min — activities don't change frequently |
 | **Suggestions** | `ACTIVITY_SUGGESTIONS` constant for common activities |
 | **No Optimistic UI** | Simple invalidation on success is sufficient |
+| **Redirect on Create** | Navigate to activity page after creation |
 
 ---
 
 ## 5. Public Interface
 
 ### **Hooks**
+
+#### `useActivity(id)`
+```typescript
+Params: id: string
+Returns: UseQueryResult<Activity>
+```
 
 #### `useActivities(includeArchived?)`
 ```typescript
@@ -67,6 +88,12 @@ Returns: UseMutationResult<Activity, Error, CreateActivityRequest>
 ```
 
 ### **API Layer**
+
+#### `activitiesApi.get(id)`
+```typescript
+GET /activities/:id
+Returns: Promise<Activity>
+```
 
 #### `activitiesApi.create(data)`
 ```typescript
@@ -115,12 +142,13 @@ ACTIVITY_SUGGESTIONS = [
 ### **UI Behavior**
 - **Suggestions shown on focus** — filtered as user types
 - **Empty state shows create form** — no activities = must create first
-- **Activity picker uses pills** — simple tap to select
+- **First activity redirects** — after creating first activity, user goes to its page
+- **Activity page shows timer** — start/stop tracking directly on activity page
 
 ### **Cache Behavior**
 - **60min staleTime** — manual refresh not needed
-- **Invalidate on create** — ensures picker shows new activity immediately
+- **Invalidate on create** — ensures list shows new activity immediately
 
 ### **TypeScript Strictness**
 - **All API responses typed** — `Activity` from `types.ts`
-- **Query keys are tuples** — `['activities', opts]` not strings
+- **Query keys are tuples** — `['activities', opts]` or `['activities', id]`

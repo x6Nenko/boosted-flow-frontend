@@ -18,11 +18,15 @@ src/features/activities/
     ├── index.ts                          # Hook exports
     ├── use-activity.ts                   # TanStack Query for single activity
     ├── use-activities.ts                 # TanStack Query for listing
-    └── use-create-activity.ts            # TanStack Mutation for creation
+    ├── use-create-activity.ts            # TanStack Mutation for creation
+    ├── use-update-activity.ts            # TanStack Mutation for updating name
+    ├── use-archive-activity.ts           # TanStack Mutation for archiving
+    ├── use-unarchive-activity.ts         # TanStack Mutation for unarchiving
+    └── use-delete-activity.ts            # TanStack Mutation for hard delete
 
 src/routes/_auth/
-├── activities.index.tsx                  # Activities list page
-└── activities.$activityId.tsx            # Activity detail page with timer
+├── activities.index.tsx                  # Activities list page (with archived toggle)
+└── activities.$activityId.tsx            # Activity detail page with timer + management
 ```
 
 **Pages:**
@@ -51,6 +55,26 @@ src/routes/_auth/
 3. `activitiesApi.create()` → POST `/activities`
 4. **onSuccess:** Invalidates `['activities']` → list re-fetches
 5. **Redirect:** Navigate to `/activities/:newActivityId`
+
+### **Updating Activity**
+1. User clicks Edit → inline input appears with current name
+2. On save → `useUpdateActivity().mutate({ id, data: { name } })`
+3. `activitiesApi.update()` → PATCH `/activities/:id`
+4. **onSuccess:** Invalidates `['activities']` and `['activities', id]`
+
+### **Archiving/Unarchiving Activity**
+1. User clicks Archive/Unarchive button on activity page
+2. `useArchiveActivity().mutate(id)` or `useUnarchiveActivity().mutate(id)`
+3. `activitiesApi.archive()` → POST `/activities/:id/archive`
+4. **onSuccess:** Invalidates `['activities']` and `['activities', id]`
+5. Archived activities cannot track time
+
+### **Deleting Activity**
+1. User clicks Delete → confirmation dialog
+2. `useDeleteActivity().mutate(id)`
+3. `activitiesApi.delete()` → DELETE `/activities/:id`
+4. **onSuccess:** Invalidates `['activities']`, navigates to `/activities`
+5. **Warning:** Hard delete — cascades to time entries
 
 ---
 
@@ -87,6 +111,26 @@ Returns: UseQueryResult<Activity[]>
 Returns: UseMutationResult<Activity, Error, CreateActivityRequest>
 ```
 
+#### `useUpdateActivity()`
+```typescript
+Returns: UseMutationResult<Activity, Error, { id: string; data: UpdateActivityRequest }>
+```
+
+#### `useArchiveActivity()`
+```typescript
+Returns: UseMutationResult<Activity, Error, string>
+```
+
+#### `useUnarchiveActivity()`
+```typescript
+Returns: UseMutationResult<Activity, Error, string>
+```
+
+#### `useDeleteActivity()`
+```typescript
+Returns: UseMutationResult<void, Error, string>
+```
+
 ### **API Layer**
 
 #### `activitiesApi.get(id)`
@@ -108,6 +152,31 @@ GET /activities?includeArchived=true
 Returns: Promise<Activity[]>
 ```
 
+#### `activitiesApi.update(id, data)`
+```typescript
+PATCH /activities/:id
+Body: { name: string }
+Returns: Promise<Activity>
+```
+
+#### `activitiesApi.archive(id)`
+```typescript
+POST /activities/:id/archive
+Returns: Promise<Activity>
+```
+
+#### `activitiesApi.unarchive(id)`
+```typescript
+POST /activities/:id/unarchive
+Returns: Promise<Activity>
+```
+
+#### `activitiesApi.delete(id)`
+```typescript
+DELETE /activities/:id
+Returns: Promise<void>
+```
+
 ### **Types**
 
 ```typescript
@@ -121,6 +190,10 @@ Activity {
 }
 
 CreateActivityRequest {
+  name: string
+}
+
+UpdateActivityRequest {
   name: string
 }
 
@@ -144,10 +217,14 @@ ACTIVITY_SUGGESTIONS = [
 - **Empty state shows create form** — no activities = must create first
 - **First activity redirects** — after creating first activity, user goes to its page
 - **Activity page shows timer** — start/stop tracking directly on activity page
+- **Inline edit mode** — click Edit to rename activity
+- **Archive toggle on list** — checkbox to show/hide archived activities
+- **Archived activities block timer** — must unarchive to track time
+- **Delete confirmation** — browser confirm dialog before hard delete
 
 ### **Cache Behavior**
 - **60min staleTime** — manual refresh not needed
-- **Invalidate on create** — ensures list shows new activity immediately
+- **Invalidate on mutations** — ensures list/detail shows updates immediately
 
 ### **TypeScript Strictness**
 - **All API responses typed** — `Activity` from `types.ts`

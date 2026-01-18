@@ -1,6 +1,12 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
-import { useActivity } from '@/features/activities/hooks';
+import {
+  useActivity,
+  useUpdateActivity,
+  useArchiveActivity,
+  useUnarchiveActivity,
+  useDeleteActivity,
+} from '@/features/activities/hooks';
 import {
   useCurrentEntry,
   useTimeEntries,
@@ -16,17 +22,25 @@ export const Route = createFileRoute('/_auth/activities/$activityId')({
 
 function ActivityPage() {
   const { activityId } = Route.useParams();
+  const navigate = useNavigate();
   const [description, setDescription] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
+  const [editName, setEditName] = useState('');
 
   const { data: activity, isLoading: activityLoading } = useActivity(activityId);
   const { data: currentData } = useCurrentEntry();
   const { data: entries, isLoading: entriesLoading } = useTimeEntries({ activityId });
   const startTimer = useStartTimer();
   const stopTimer = useStopTimer();
+  const updateActivity = useUpdateActivity();
+  const archiveActivity = useArchiveActivity();
+  const unarchiveActivity = useUnarchiveActivity();
+  const deleteActivity = useDeleteActivity();
 
   const currentEntry = currentData?.entry ?? null;
   const isRunningThisActivity = currentEntry?.activityId === activityId;
   const isRunningOther = !!currentEntry && !isRunningThisActivity;
+  const isArchived = !!activity?.archivedAt;
 
   const handleStart = () => {
     startTimer.mutate(
@@ -41,6 +55,37 @@ function ActivityPage() {
   const handleStop = () => {
     if (currentEntry) {
       stopTimer.mutate(currentEntry.id);
+    }
+  };
+
+  const handleEditStart = () => {
+    if (activity) {
+      setEditName(activity.name);
+      setIsEditing(true);
+    }
+  };
+
+  const handleEditSave = () => {
+    if (!editName.trim()) return;
+    updateActivity.mutate(
+      { id: activityId, data: { name: editName.trim() } },
+      { onSuccess: () => setIsEditing(false) }
+    );
+  };
+
+  const handleArchive = () => {
+    archiveActivity.mutate(activityId);
+  };
+
+  const handleUnarchive = () => {
+    unarchiveActivity.mutate(activityId);
+  };
+
+  const handleDelete = () => {
+    if (confirm('Delete this activity and all its time entries? This cannot be undone.')) {
+      deleteActivity.mutate(activityId, {
+        onSuccess: () => navigate({ to: '/activities' }),
+      });
     }
   };
 
@@ -71,11 +116,84 @@ function ActivityPage() {
         </Link>
       </div>
 
-      <h1 className="text-xl font-bold text-gray-900 mb-4">{activity.name}</h1>
+      {/* Activity Header */}
+      <div className="mb-4">
+        {isEditing ? (
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={editName}
+              onChange={(e) => setEditName(e.target.value)}
+              maxLength={255}
+              className="flex-1 rounded border border-gray-300 px-3 py-2 text-sm"
+            />
+            <button
+              onClick={handleEditSave}
+              disabled={!editName.trim() || updateActivity.isPending}
+              className="rounded bg-indigo-600 px-3 py-2 text-sm text-white hover:bg-indigo-500 disabled:opacity-50"
+            >
+              Save
+            </button>
+            <button
+              onClick={() => setIsEditing(false)}
+              className="rounded border border-gray-300 px-3 py-2 text-sm hover:bg-gray-50"
+            >
+              Cancel
+            </button>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2">
+            <h1 className="text-xl font-bold text-gray-900">{activity.name}</h1>
+            {isArchived && (
+              <span className="text-xs text-gray-500">(archived)</span>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Activity Actions */}
+      {!isEditing && (
+        <div className="mb-4 flex gap-2">
+          <button
+            onClick={handleEditStart}
+            className="rounded border border-gray-300 px-3 py-1 text-sm hover:bg-gray-50"
+          >
+            Edit
+          </button>
+          {isArchived ? (
+            <button
+              onClick={handleUnarchive}
+              disabled={unarchiveActivity.isPending}
+              className="rounded border border-gray-300 px-3 py-1 text-sm hover:bg-gray-50 disabled:opacity-50"
+            >
+              Unarchive
+            </button>
+          ) : (
+            <button
+              onClick={handleArchive}
+              disabled={archiveActivity.isPending}
+              className="rounded border border-gray-300 px-3 py-1 text-sm hover:bg-gray-50 disabled:opacity-50"
+            >
+              Archive
+            </button>
+          )}
+          <button
+            onClick={handleDelete}
+            disabled={deleteActivity.isPending}
+            className="rounded border border-red-300 px-3 py-1 text-sm text-red-600 hover:bg-red-50 disabled:opacity-50"
+          >
+            Delete
+          </button>
+        </div>
+      )}
 
       {/* Timer Control */}
       <div className="rounded border border-gray-200 bg-white p-4 mb-4">
-        {isRunningThisActivity ? (
+        {isArchived ? (
+          <p className="text-sm text-gray-500">
+            This activity is archived. Unarchive it to track time.
+          </p>
+        ) : isRunningThisActivity ? (
           <>
             <div className="mb-3">
               {currentEntry.description && (

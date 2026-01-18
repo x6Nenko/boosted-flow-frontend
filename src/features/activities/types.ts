@@ -18,6 +18,13 @@ export type CreateActivityRequest = {
 };
 
 /**
+ * Request to update an activity
+ */
+export type UpdateActivityRequest = {
+  name: string;
+};
+
+/**
  * Predefined activity suggestions
  */
 export const ACTIVITY_SUGGESTIONS = [

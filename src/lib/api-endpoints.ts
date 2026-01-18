@@ -18,4 +18,8 @@ export const API_ENDPOINTS = {
     LIST: '/time-entries',
     CURRENT: '/time-entries/current',
   },
+  TAGS: {
+    BASE: '/tags',
+    GET_OR_CREATE: '/tags/get-or-create',
+  },
 } as const;

@@ -28,6 +28,11 @@ export const timeEntriesApi = {
       body: data,
     }),
 
+  delete: (id: string) =>
+    apiClient<void>(`${API_ENDPOINTS.TIME_ENTRIES.LIST}/${id}`, {
+      method: 'DELETE',
+    }),
+
   list: (query?: TimeEntriesQuery) => {
     const params = new URLSearchParams();
     if (query?.activityId) params.set('activityId', query.activityId);

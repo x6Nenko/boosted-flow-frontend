@@ -11,6 +11,17 @@ export type TimeEntry = {
   rating: number | null;
   comment: string | null;
   createdAt: string;
+  tags?: Tag[];
+};
+
+/**
+ * Tag as returned from the API
+ */
+export type Tag = {
+  id: string;
+  userId: string;
+  name: string;
+  createdAt: string;
 };
 
 /**
@@ -34,6 +45,7 @@ export type StopTimeEntryRequest = {
 export type UpdateTimeEntryRequest = {
   rating?: number;
   comment?: string;
+  tagIds?: string[];
 };
 
 /**

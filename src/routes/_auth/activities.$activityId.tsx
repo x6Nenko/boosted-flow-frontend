@@ -1,20 +1,30 @@
-import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
-import { useState } from 'react';
+import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
+import { useEffect, useState } from 'react';
 import {
   useActivity,
-  useUpdateActivity,
   useArchiveActivity,
-  useUnarchiveActivity,
   useDeleteActivity,
+  useUnarchiveActivity,
+  useUpdateActivity,
 } from '@/features/activities/hooks';
 import {
-  useCurrentEntry,
-  useTimeEntries,
-  useStartTimer,
-  useStopTimer,
-} from '@/features/time-entries/hooks';
+  pomodoroStore,
+  usePomodoroSettings,
+  usePomodoroState,
+} from '@/features/pomodoro';
+import { BreakTimer } from '@/features/pomodoro/components/BreakTimer';
+import { PomodoroTimer } from '@/features/pomodoro/components/PomodoroTimer';
+import { PomodoroSettingsModal } from '@/features/pomodoro/components/PomodoroSettingsModal';
 import { TimerDuration } from '@/features/time-entries/components/TimerDuration';
 import { TimeEntryRow } from '@/features/time-entries/components/TimeEntryRow';
+import {
+  useCurrentEntry,
+  useStartTimer,
+  useStopTimer,
+  useTimeEntries,
+} from '@/features/time-entries/hooks';
+
+type TimerMode = 'stopwatch' | 'pomodoro';
 
 export const Route = createFileRoute('/_auth/activities/$activityId')({
   component: ActivityPage,
@@ -26,6 +36,18 @@ function ActivityPage() {
   const [description, setDescription] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState('');
+  const [timerMode, setTimerMode] = useState<TimerMode>(() => {
+    const stored = localStorage.getItem(`timerMode-${activityId}`);
+    return (stored === 'pomodoro' ? 'pomodoro' : 'stopwatch') as TimerMode;
+  });
+  const [showSettings, setShowSettings] = useState(false);
+
+  const pomodoroSettings = usePomodoroSettings();
+  const pomodoroState = usePomodoroState();
+
+  useEffect(() => {
+    localStorage.setItem(`timerMode-${activityId}`, timerMode);
+  }, [timerMode, activityId]);
 
   const { data: activity, isLoading: activityLoading } = useActivity(activityId);
   const { data: currentData } = useCurrentEntry();
@@ -40,9 +62,13 @@ function ActivityPage() {
   const currentEntry = currentData?.entry ?? null;
   const isRunningThisActivity = currentEntry?.activityId === activityId;
   const isRunningOther = !!currentEntry && !isRunningThisActivity;
+  const isInBreak = pomodoroState.phase !== 'work' && pomodoroState.isBreakActive;
   const isArchived = !!activity?.archivedAt;
 
   const handleStart = () => {
+    if (timerMode === 'pomodoro') {
+      pomodoroStore.startWorkSession();
+    }
     startTimer.mutate(
       {
         activityId,
@@ -54,8 +80,30 @@ function ActivityPage() {
 
   const handleStop = () => {
     if (currentEntry) {
+      if (timerMode === 'pomodoro') {
+        pomodoroStore.completeWorkSession();
+      }
       stopTimer.mutate(currentEntry.id);
     }
+  };
+
+  const handlePomodoroComplete = () => {
+    if (currentEntry) {
+      pomodoroStore.completeWorkSession();
+      stopTimer.mutate(currentEntry.id);
+    }
+  };
+
+  const handleStartBreak = () => {
+    pomodoroStore.startBreak();
+  };
+
+  const handleSkipBreak = () => {
+    pomodoroStore.completeBreak();
+  };
+
+  const handleBreakComplete = () => {
+    pomodoroStore.completeBreak();
   };
 
   const handleEditStart = () => {
@@ -171,7 +219,7 @@ function ActivityPage() {
           ) : (
             <button
               onClick={handleArchive}
-              disabled={archiveActivity.isPending}
+              disabled={archiveActivity.isPending || isRunningThisActivity || isInBreak}
               className="rounded border border-gray-300 px-3 py-1 text-sm hover:bg-gray-50 disabled:opacity-50"
             >
               Archive
@@ -179,7 +227,7 @@ function ActivityPage() {
           )}
           <button
             onClick={handleDelete}
-            disabled={deleteActivity.isPending}
+            disabled={deleteActivity.isPending || isRunningThisActivity || isInBreak}
             className="rounded border border-red-300 px-3 py-1 text-sm text-red-600 hover:bg-red-50 disabled:opacity-50"
           >
             Delete
@@ -196,13 +244,26 @@ function ActivityPage() {
         ) : isRunningThisActivity ? (
           <>
             <div className="mb-3">
+              {timerMode === 'pomodoro' && (
+                <p className="text-xs text-gray-400 mb-1">
+                  Session {pomodoroState.currentSession} of {pomodoroSettings.sessionsBeforeLongBreak}
+                </p>
+              )}
               {currentEntry.description && (
                 <p className="text-sm text-gray-500">{currentEntry.description}</p>
               )}
             </div>
             <div className="mb-3 text-center">
               <span className="text-3xl font-mono text-indigo-600">
-                <TimerDuration startedAt={currentEntry.startedAt} />
+                {timerMode === 'pomodoro' ? (
+                  <PomodoroTimer
+                    startedAt={currentEntry.startedAt}
+                    durationMinutes={pomodoroSettings.workDuration}
+                    onComplete={handlePomodoroComplete}
+                  />
+                ) : (
+                  <TimerDuration startedAt={currentEntry.startedAt} />
+                )}
               </span>
             </div>
             <button
@@ -217,8 +278,76 @@ function ActivityPage() {
           <p className="text-sm text-gray-500">
             Timer is running on another activity. Stop it first to start tracking here.
           </p>
+        ) : timerMode === 'pomodoro' && pomodoroState.phase !== 'work' ? (
+          // Break phase UI
+          <div>
+            <p className="text-xs text-gray-400 mb-1">
+              Completed: Session {pomodoroState.currentSession} of {pomodoroSettings.sessionsBeforeLongBreak}
+            </p>
+            <p className="text-sm text-gray-700 mb-2">
+              {pomodoroState.phase === 'long-break' ? 'Long break' : 'Short break'} time!
+            </p>
+            {pomodoroState.isBreakActive && pomodoroState.breakStartedAt ? (
+              <div className="mb-3 text-center">
+                <span className="text-3xl font-mono text-green-600">
+                  <BreakTimer
+                    startedAt={pomodoroState.breakStartedAt}
+                    durationMinutes={pomodoroStore.getCurrentBreakDuration()}
+                    onComplete={handleBreakComplete}
+                  />
+                </span>
+                <button
+                  onClick={handleSkipBreak}
+                  className="mt-3 w-full rounded border border-gray-300 px-4 py-2 text-sm hover:bg-gray-50"
+                >
+                  Skip Break
+                </button>
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <button
+                  onClick={handleStartBreak}
+                  className="flex-1 rounded bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-500"
+                >
+                  Start {pomodoroState.phase === 'long-break' ? 'Long' : 'Short'} Break
+                </button>
+                <button
+                  onClick={handleSkipBreak}
+                  className="rounded border border-gray-300 px-4 py-2 text-sm hover:bg-gray-50"
+                >
+                  Skip
+                </button>
+              </div>
+            )}
+          </div>
+        ) : isInBreak ? (
+          <p className="text-sm text-gray-500">
+            Pomodoro break is active. Complete or skip it first to start tracking here.
+          </p>
         ) : (
           <>
+            {/* Mode toggle */}
+            <div className="mb-3 flex gap-1">
+              <button
+                onClick={() => setTimerMode('stopwatch')}
+                className={`flex-1 rounded px-3 py-1 text-sm ${timerMode === 'stopwatch'
+                  ? 'bg-gray-200 text-gray-900'
+                  : 'text-gray-500 hover:bg-gray-100'
+                  }`}
+              >
+                Stopwatch
+              </button>
+              <button
+                onClick={() => setTimerMode('pomodoro')}
+                className={`flex-1 rounded px-3 py-1 text-sm ${timerMode === 'pomodoro'
+                  ? 'bg-gray-200 text-gray-900'
+                  : 'text-gray-500 hover:bg-gray-100'
+                  }`}
+              >
+                Pomodoro
+              </button>
+            </div>
+
             <div className="mb-3">
               <input
                 type="text"
@@ -229,16 +358,44 @@ function ActivityPage() {
                 className="w-full rounded border border-gray-300 px-3 py-2 text-sm"
               />
             </div>
+
+            {/* Pomodoro settings preview */}
+            {timerMode === 'pomodoro' && (
+              <>
+                <p className="text-xs text-gray-400 mb-2">
+                  Next: Session {pomodoroState.currentSession} of {pomodoroSettings.sessionsBeforeLongBreak}
+                </p>
+                <div className="mb-3 flex items-center justify-between">
+                  <p className="text-xs text-gray-400">
+                    {pomodoroSettings.workDuration}m focus • {pomodoroSettings.shortBreakDuration}m short • {pomodoroSettings.longBreakDuration}m long • {pomodoroSettings.sessionsBeforeLongBreak} sessions
+                  </p>
+                  <button
+                    onClick={() => setShowSettings(true)}
+                    className="text-xs text-gray-400 hover:text-gray-600"
+                    title="Settings"
+                  >
+                    ⚙
+                  </button>
+                </div>
+              </>
+            )}
+
             <button
               onClick={handleStart}
               disabled={startTimer.isPending}
               className="w-full rounded bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-50"
             >
-              {startTimer.isPending ? 'Starting...' : 'Start Tracking'}
+              {startTimer.isPending
+                ? 'Starting...'
+                : timerMode === 'pomodoro'
+                  ? 'Start Pomodoro Session'
+                  : 'Start Tracking'}
             </button>
           </>
         )}
       </div>
+
+      <PomodoroSettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} />
 
       {/* Entries List */}
       <div className="rounded border border-gray-200 bg-white p-4">

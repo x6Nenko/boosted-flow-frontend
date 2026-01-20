@@ -2,8 +2,8 @@ import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { useLogout } from '@/features/auth/hooks';
 import { useActivities } from '@/features/activities/hooks';
 import { ActivityForm } from '@/features/activities/components/ActivityForm';
-import { useCurrentEntry, useTimeEntries, useStopTimer } from '@/features/time-entries/hooks';
-import { TimerDuration } from '@/features/time-entries/components/TimerDuration';
+import { usePomodoroState } from '@/features/pomodoro';
+import { useCurrentEntry, useTimeEntries } from '@/features/time-entries/hooks';
 import { TimeEntryRow } from '@/features/time-entries/components/TimeEntryRow';
 
 export const Route = createFileRoute('/_auth/dashboard')({
@@ -16,19 +16,13 @@ function DashboardPage() {
   const { data: activitiesData, isLoading: activitiesLoading } = useActivities();
   const { data: currentData } = useCurrentEntry();
   const { data: entries, isLoading: entriesLoading } = useTimeEntries();
-  const stopTimer = useStopTimer();
+  const pomodoroState = usePomodoroState();
 
   const activities = activitiesData || [];
   const currentEntry = currentData?.entry ?? null;
 
   const handleActivityCreated = (id: string) => {
     navigate({ to: '/activities/$activityId', params: { activityId: id } });
-  };
-
-  const handleStop = () => {
-    if (currentEntry) {
-      stopTimer.mutate(currentEntry.id);
-    }
   };
 
   if (activitiesLoading) {
@@ -81,36 +75,31 @@ function DashboardPage() {
         </button>
       </div>
 
-      {/* Current Timer */}
-      {currentEntry && (
-        <div className="rounded border border-gray-200 bg-white p-4 mb-4">
-          <div className="mb-2">
-            <p className="text-sm text-gray-500">Currently tracking:</p>
-            <Link
-              to="/activities/$activityId"
-              params={{ activityId: currentEntry.activityId }}
-              className="font-medium text-gray-900 hover:text-indigo-600"
-            >
-              {currentActivity?.name}
-            </Link>
-            {currentEntry.description && (
-              <p className="text-sm text-gray-500">{currentEntry.description}</p>
-            )}
-          </div>
-          <div className="mb-3 text-center">
-            <span className="text-3xl font-mono text-indigo-600">
-              <TimerDuration startedAt={currentEntry.startedAt} />
-            </span>
-          </div>
-          <button
-            onClick={handleStop}
-            disabled={stopTimer.isPending}
-            className="w-full rounded bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-500 disabled:opacity-50"
+      {/* Current Tracking Indicator */}
+      {currentEntry ? (
+        <div className="rounded border border-indigo-200 bg-indigo-50 p-3 mb-4">
+          <p className="text-xs text-indigo-600 mb-1">Currently tracking</p>
+          <Link
+            to="/activities/$activityId"
+            params={{ activityId: currentEntry.activityId }}
+            className="text-sm font-medium text-indigo-900 hover:text-indigo-700"
           >
-            {stopTimer.isPending ? 'Stopping...' : 'Stop'}
-          </button>
+            {currentActivity?.name}
+          </Link>
+          {currentEntry.description && (
+            <p className="text-xs text-indigo-700 mt-1">{currentEntry.description}</p>
+          )}
         </div>
-      )}
+      ) : pomodoroState.phase !== 'work' && pomodoroState.isBreakActive ? (
+        <div className="rounded border border-green-200 bg-green-50 p-3 mb-4">
+          <p className="text-xs text-green-600 mb-1">
+            {pomodoroState.phase === 'long-break' ? 'Long break' : 'Short break'} in progress
+          </p>
+          <p className="text-sm text-green-900">
+            Session {pomodoroState.currentSession} completed
+          </p>
+        </div>
+      ) : null}
 
       {/* Recent Entries */}
       <div className="rounded border border-gray-200 bg-white p-4">

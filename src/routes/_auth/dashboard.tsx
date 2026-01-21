@@ -5,6 +5,7 @@ import { ActivityForm } from '@/features/activities/components/ActivityForm';
 import { usePomodoroState } from '@/features/pomodoro';
 import { useCurrentEntry, useTimeEntries } from '@/features/time-entries/hooks';
 import { TimeEntryRow } from '@/features/time-entries/components/TimeEntryRow';
+import { ActivityHeatmap } from '@/features/time-entries/components/ActivityHeatmap';
 
 export const Route = createFileRoute('/_auth/dashboard')({
   component: DashboardPage,
@@ -100,6 +101,12 @@ function DashboardPage() {
           </p>
         </div>
       ) : null}
+
+      {/* Activity Heatmap */}
+      <div className="rounded border border-gray-200 bg-white p-4 mb-4">
+        <h2 className="mb-3 text-sm font-medium text-gray-900">Activity</h2>
+        <ActivityHeatmap />
+      </div>
 
       {/* Recent Entries */}
       <div className="rounded border border-gray-200 bg-white p-4">

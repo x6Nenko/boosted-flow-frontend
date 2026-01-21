@@ -10,7 +10,7 @@ Enables users to track work sessions with start/stop timer controls, live durati
 
 ```
 routes/_auth/
-├── dashboard.tsx                         # Overview: current timer, all recent entries
+├── dashboard.tsx                         # Overview: current timer, all recent entries, activity heatmap
 └── activities.$activityId.tsx            # Activity-specific: timer, filtered entries
 
 src/features/time-entries/
@@ -19,7 +19,8 @@ src/features/time-entries/
 ├── components/
 │   ├── TimerDuration.tsx                 # Live duration display
 │   ├── TimerDuration.test.ts             # Unit tests
-│   └── TimeEntryRow.tsx                  # Reusable entry row with rating/edit/tags/delete
+│   ├── TimeEntryRow.tsx                  # Reusable entry row with rating/edit/tags/delete
+│   └── ActivityHeatmap.tsx               # GitHub-style contribution grid (past 6 months)
 └── hooks/
     ├── index.ts                          # Hook exports
     ├── use-current-entry.ts              # TanStack Query for active entry
@@ -179,6 +180,21 @@ Returns: UseMutationResult<void, Error, string> // string = tag ID
 Props: { startedAt: string } // ISO timestamp
 Renders: "HH:MM:SS" string
 ```
+
+#### `<ActivityHeatmap />`
+```typescript
+Props: none
+Renders: GitHub-style contribution grid for past 6 months
+```
+Displays daily tracked time as a heatmap. Uses 5 levels (0-4) based on daily tracked minutes:
+- Level 0: No activity (< 1 min)
+- Level 1-4: Scaled from 1 min to 4 hours (≥4h = max level)
+
+Features:
+- Month labels above columns where month changes
+- Tooltip on hover: "Jan 15: 2.5h"
+- Color legend (Less → More)
+- Week starts on Sunday
 
 ### **API Layer**
 

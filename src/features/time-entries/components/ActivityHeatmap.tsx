@@ -34,7 +34,7 @@ export function ActivityHeatmap() {
 
   const { data: entries, isLoading } = useTimeEntries({ from: sixMonthsAgo });
 
-  const streakDays = useMemo(
+  const streak = useMemo(
     () => calculateCurrentStreak(entries || []),
     [entries]
   );
@@ -50,7 +50,10 @@ export function ActivityHeatmap() {
 
   return (
     <div>
-      <div className="text-sm text-gray-900 mb-2">Current streak: {streakDays}</div>
+      <div className="text-sm text-gray-900 mb-2">
+        Current streak: {streak.days}
+        {streak.isAtRisk && <span className="text-red-600"> (at risk)</span>}
+      </div>
       {/* Month labels */}
       <div className="flex" style={{ marginLeft: 0 }}>
         {weeks.map((_, weekIndex) => {

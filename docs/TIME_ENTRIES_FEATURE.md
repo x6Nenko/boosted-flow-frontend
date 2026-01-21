@@ -194,6 +194,7 @@ Streak rules:
 - Uses local day bucketing (same as heatmap) based on `startedAt`
 - A day counts only if total tracked time for that day is **> 1 minute**
 - Active entry (no `stoppedAt`) contributes using the current time
+- **At-risk indicator**: When today has no qualifying activity but yesterday does, the streak shows up to yesterday's checkpoint and displays "(at risk)" warning
 
 Displays daily tracked time as a heatmap. Uses 5 levels (0-4) based on daily tracked minutes:
 - Level 0: No activity (< 1 min)

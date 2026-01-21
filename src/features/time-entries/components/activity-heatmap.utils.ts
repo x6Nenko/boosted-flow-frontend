@@ -30,10 +30,15 @@ function getDurationMinutes(entry: TimeEntry): number {
   return Math.max(0, Math.floor((stop - start) / 60000));
 }
 
+export type StreakResult = {
+  days: number;
+  isAtRisk: boolean;
+};
+
 export function calculateCurrentStreak(
   entries: Array<TimeEntry>,
   now: Date = new Date()
-): number {
+): StreakResult {
   const minutesThresholdMs = 60_000;
 
   const trackedMsByDate = new Map<string, number>();
@@ -44,8 +49,15 @@ export function calculateCurrentStreak(
     trackedMsByDate.set(key, (trackedMsByDate.get(key) || 0) + durationMs);
   }
 
-  const cursor = new Date(now);
-  cursor.setHours(0, 0, 0, 0);
+  const today = new Date(now);
+  today.setHours(0, 0, 0, 0);
+  const todayKey = toLocalDateKey(today);
+  const hasTodayActivity = (trackedMsByDate.get(todayKey) || 0) > minutesThresholdMs;
+
+  const cursor = new Date(today);
+  if (!hasTodayActivity) {
+    cursor.setDate(cursor.getDate() - 1);
+  }
 
   let streak = 0;
   while (true) {
@@ -56,7 +68,9 @@ export function calculateCurrentStreak(
     cursor.setDate(cursor.getDate() - 1);
   }
 
-  return streak;
+  const isAtRisk = !hasTodayActivity && streak > 0;
+
+  return { days: streak, isAtRisk };
 }
 
 export function buildHeatmapData(

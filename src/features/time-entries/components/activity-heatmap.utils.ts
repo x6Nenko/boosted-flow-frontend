@@ -17,11 +17,46 @@ export function toLocalDateKey(date: Date): string {
   return `${year}-${month}-${day}`;
 }
 
+function getDurationMs(entry: TimeEntry, now: Date = new Date()): number {
+  const start = new Date(entry.startedAt).getTime();
+  const stop = entry.stoppedAt ? new Date(entry.stoppedAt).getTime() : now.getTime();
+  return Math.max(0, stop - start);
+}
+
 function getDurationMinutes(entry: TimeEntry): number {
   if (!entry.stoppedAt) return 0;
   const start = new Date(entry.startedAt).getTime();
   const stop = new Date(entry.stoppedAt).getTime();
   return Math.max(0, Math.floor((stop - start) / 60000));
+}
+
+export function calculateCurrentStreak(
+  entries: Array<TimeEntry>,
+  now: Date = new Date()
+): number {
+  const minutesThresholdMs = 60_000;
+
+  const trackedMsByDate = new Map<string, number>();
+  for (const entry of entries) {
+    const durationMs = getDurationMs(entry, now);
+    if (durationMs <= minutesThresholdMs) continue;
+    const key = toLocalDateKey(new Date(entry.startedAt));
+    trackedMsByDate.set(key, (trackedMsByDate.get(key) || 0) + durationMs);
+  }
+
+  const cursor = new Date(now);
+  cursor.setHours(0, 0, 0, 0);
+
+  let streak = 0;
+  while (true) {
+    const key = toLocalDateKey(cursor);
+    const trackedMs = trackedMsByDate.get(key) || 0;
+    if (trackedMs <= minutesThresholdMs) break;
+    streak += 1;
+    cursor.setDate(cursor.getDate() - 1);
+  }
+
+  return streak;
 }
 
 export function buildHeatmapData(

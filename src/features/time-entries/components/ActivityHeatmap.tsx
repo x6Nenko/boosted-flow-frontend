@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useTimeEntries } from '../hooks';
-import { buildHeatmapData } from './activity-heatmap.utils';
+import { buildHeatmapData, calculateCurrentStreak } from './activity-heatmap.utils';
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const MIN_MINUTES = 1;
@@ -34,6 +34,11 @@ export function ActivityHeatmap() {
 
   const { data: entries, isLoading } = useTimeEntries({ from: sixMonthsAgo });
 
+  const streakDays = useMemo(
+    () => calculateCurrentStreak(entries || []),
+    [entries]
+  );
+
   const { weeks, monthLabels } = useMemo(
     () => buildHeatmapData(entries || [], MONTHS_BACK),
     [entries]
@@ -45,6 +50,7 @@ export function ActivityHeatmap() {
 
   return (
     <div>
+      <div className="text-sm text-gray-900 mb-2">Current streak: {streakDays}</div>
       {/* Month labels */}
       <div className="flex" style={{ marginLeft: 0 }}>
         {weeks.map((_, weekIndex) => {

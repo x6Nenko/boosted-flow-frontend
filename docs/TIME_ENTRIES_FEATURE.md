@@ -20,7 +20,9 @@ src/features/time-entries/
 │   ├── TimerDuration.tsx                 # Live duration display
 │   ├── TimerDuration.test.ts             # Unit tests
 │   ├── TimeEntryRow.tsx                  # Reusable entry row with rating/edit/tags/delete
-│   └── ActivityHeatmap.tsx               # GitHub-style contribution grid (past 6 months)
+│   ├── ActivityHeatmap.tsx               # GitHub-style contribution grid (past 6 months)
+│   ├── activity-heatmap.utils.ts          # Heatmap bucketing + current streak logic
+│   └── activity-heatmap.utils.test.ts     # Unit tests for heatmap + streak
 └── hooks/
     ├── index.ts                          # Hook exports
     ├── use-current-entry.ts              # TanStack Query for active entry
@@ -42,7 +44,7 @@ src/lib/utils.ts                          # Shared formatTime, formatDate functi
 ```
 
 **Pages:**
-- `/dashboard` — Shows current timer (if running) and all recent entries across activities
+- `/dashboard` — Shows current timer (if running), current streak, heatmap, and recent entries across activities
 - `/activities/:activityId` — Timer control and entries filtered by activity
 
 ---
@@ -186,6 +188,13 @@ Renders: "HH:MM:SS" string
 Props: none
 Renders: GitHub-style contribution grid for past 6 months
 ```
+Also displays **Current streak** on the dashboard.
+
+Streak rules:
+- Uses local day bucketing (same as heatmap) based on `startedAt`
+- A day counts only if total tracked time for that day is **> 1 minute**
+- Active entry (no `stoppedAt`) contributes using the current time
+
 Displays daily tracked time as a heatmap. Uses 5 levels (0-4) based on daily tracked minutes:
 - Level 0: No activity (< 1 min)
 - Level 1-4: Scaled from 1 min to 4 hours (≥4h = max level)

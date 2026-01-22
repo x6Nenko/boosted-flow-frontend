@@ -1,10 +1,11 @@
 /**
  * Pomodoro timer settings and state management
  * Persists to localStorage for cross-session persistence
+ * State is per-activity to avoid conflicts when switching between activities
  */
 
 const SETTINGS_KEY = 'pomodoro-settings';
-const STATE_KEY = 'pomodoro-state';
+const STATE_KEY_PREFIX = 'pomodoro-state-';
 
 export type PomodoroSettings = {
   workDuration: number; // minutes
@@ -20,6 +21,7 @@ export type PomodoroState = {
   phase: PomodoroPhase;
   isBreakActive: boolean; // true when break timer is running (client-side only)
   breakStartedAt: string | null; // ISO timestamp for break timer
+  activityId: string | null; // which activity this state belongs to
 };
 
 const DEFAULT_SETTINGS: PomodoroSettings = {
@@ -34,6 +36,7 @@ const DEFAULT_STATE: PomodoroState = {
   phase: 'work',
   isBreakActive: false,
   breakStartedAt: null,
+  activityId: null,
 };
 
 // Subscribers for reactivity
@@ -51,30 +54,34 @@ function loadSettings(): PomodoroSettings {
   return DEFAULT_SETTINGS;
 }
 
-function loadState(): PomodoroState {
+function loadState(activityId: string | null): PomodoroState {
+  if (!activityId) return { ...DEFAULT_STATE };
   try {
-    const stored = localStorage.getItem(STATE_KEY);
+    const stored = localStorage.getItem(STATE_KEY_PREFIX + activityId);
     if (stored) {
       const parsed = JSON.parse(stored);
-      // Reset break state on load - breaks don't persist
       return {
         ...DEFAULT_STATE,
         ...parsed,
-        isBreakActive: false,
-        breakStartedAt: null,
+        activityId,
       };
     }
   } catch {
     // Invalid JSON, use defaults
   }
-  return DEFAULT_STATE;
+  return { ...DEFAULT_STATE, activityId };
 }
 
 let settings = loadSettings();
-let state = loadState();
+let state = loadState(null);
 
 function notifySubscribers() {
   subscribers.forEach((callback) => callback());
+}
+
+function saveState() {
+  if (!state.activityId) return;
+  localStorage.setItem(STATE_KEY_PREFIX + state.activityId, JSON.stringify(state));
 }
 
 export const pomodoroStore = {
@@ -96,6 +103,13 @@ export const pomodoroStore = {
   // State
   getState: () => state,
 
+  // Load state for a specific activity
+  setActivity: (activityId: string) => {
+    if (state.activityId === activityId) return;
+    state = loadState(activityId);
+    notifySubscribers();
+  },
+
   // Called when user starts a work session
   startWorkSession: () => {
     state = {
@@ -104,7 +118,7 @@ export const pomodoroStore = {
       isBreakActive: false,
       breakStartedAt: null,
     };
-    localStorage.setItem(STATE_KEY, JSON.stringify(state));
+    saveState();
     notifySubscribers();
   },
 
@@ -117,7 +131,7 @@ export const pomodoroStore = {
       isBreakActive: false,
       breakStartedAt: null,
     };
-    localStorage.setItem(STATE_KEY, JSON.stringify(state));
+    saveState();
     notifySubscribers();
   },
 
@@ -128,12 +142,7 @@ export const pomodoroStore = {
       isBreakActive: true,
       breakStartedAt: new Date().toISOString(),
     };
-    // Don't persist breakStartedAt - breaks are ephemeral
-    localStorage.setItem(STATE_KEY, JSON.stringify({
-      ...state,
-      isBreakActive: false,
-      breakStartedAt: null,
-    }));
+    saveState();
     notifySubscribers();
   },
 
@@ -141,19 +150,20 @@ export const pomodoroStore = {
   completeBreak: () => {
     const wasLongBreak = state.phase === 'long-break';
     state = {
+      ...state,
       currentSession: wasLongBreak ? 1 : state.currentSession + 1,
       phase: 'work',
       isBreakActive: false,
       breakStartedAt: null,
     };
-    localStorage.setItem(STATE_KEY, JSON.stringify(state));
+    saveState();
     notifySubscribers();
   },
 
-  // Reset to initial state
+  // Reset to initial state (keeps activityId)
   resetState: () => {
-    state = DEFAULT_STATE;
-    localStorage.setItem(STATE_KEY, JSON.stringify(state));
+    state = { ...DEFAULT_STATE, activityId: state.activityId };
+    saveState();
     notifySubscribers();
   },
 
@@ -168,5 +178,26 @@ export const pomodoroStore = {
     return state.phase === 'long-break'
       ? settings.longBreakDuration
       : settings.shortBreakDuration;
+  },
+
+  // Check if any activity has an active break
+  hasActiveBreak: () => {
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith(STATE_KEY_PREFIX)) {
+          const stored = localStorage.getItem(key);
+          if (stored) {
+            const parsed = JSON.parse(stored);
+            if (parsed.isBreakActive && parsed.phase !== 'work') {
+              return true;
+            }
+          }
+        }
+      }
+    } catch {
+      // Invalid JSON or localStorage error
+    }
+    return false;
   },
 };

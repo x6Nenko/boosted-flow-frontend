@@ -26,10 +26,9 @@ routes/_auth/
 ## 3. State & Data Flow
 
 ### **Storage Strategy**
-- **Settings** (work duration, break durations, session count): Persisted to `localStorage`
-- **Phase state** (current session, phase): Persisted to `localStorage`
-- **Timer mode** (stopwatch vs pomodoro per activity): Persisted to `localStorage`
-- **Break timer**: NOT persisted - ephemeral client-side only
+- **Settings** (work duration, break durations, session count): Persisted to `localStorage` (global)
+- **Phase state** (current session, phase, break timer): Persisted to `localStorage` (per-activity)
+- **Timer mode** (stopwatch vs pomodoro per activity): Persisted to `localStorage` (per-activity)
 - **Work session timer**: Uses existing backend time entry tracking
 
 ### **Starting Pomodoro Session**
@@ -54,10 +53,10 @@ routes/_auth/
 
 ### **Browser Refresh Behavior**
 - Settings: Restored from localStorage
-- Phase/session: Restored from localStorage
-- Timer mode: Restored from localStorage (per activity)
+- Phase/session: Restored from localStorage (per-activity)
+- Timer mode: Restored from localStorage (per-activity)
 - Active work timer: Restored via backend (existing `useCurrentEntry`)
-- Active break timer: Reset - user sees "Start Break" option again
+- Active break timer: Restored from localStorage (per-activity)
 
 ---
 
@@ -94,14 +93,16 @@ pomodoroStore.updateSettings(partial) // Merge updates, persist
 pomodoroStore.resetSettings()         // Restore defaults
 
 pomodoroStore.getState()              // Returns PomodoroState
+pomodoroStore.setActivity(activityId) // Load state for activity (per-activity isolation)
 pomodoroStore.startWorkSession()      // Begin work phase
 pomodoroStore.completeWorkSession()   // End work, determine break type
 pomodoroStore.startBreak()            // Begin break countdown
 pomodoroStore.completeBreak()         // End break, advance session
-pomodoroStore.resetState()            // Reset to session 1, work phase
+pomodoroStore.resetState()            // Reset to session 1, work phase (keeps activityId)
 
 pomodoroStore.subscribe(callback)     // For reactivity
 pomodoroStore.getCurrentBreakDuration() // Helper: returns current break duration
+pomodoroStore.hasActiveBreak()        // Helper: returns true if any activity has active break
 ```
 
 ### **Hooks**
@@ -151,6 +152,7 @@ type PomodoroState = {
   phase: PomodoroPhase;
   isBreakActive: boolean;         // true when break timer running
   breakStartedAt: string | null;  // ISO timestamp for break
+  activityId: string | null;      // which activity this state belongs to
 };
 ```
 
@@ -165,6 +167,7 @@ type PomodoroState = {
 
 ### **Pomodoro Start State**
 - Shows next session: "Next: Session 1 of 4"
+- Reset icon (↺) appears next to session indicator when session > 1
 - Shows settings preview: "25m focus • 5m short • 15m long • 4 sessions"
 - Gear icon opens settings modal
 - Button: "Start Pomodoro Session"
@@ -178,8 +181,9 @@ type PomodoroState = {
 ### **Break Prompt**
 - Shows completed session: "Completed: Session 1 of 4"
 - Shows break type: "Short break time!" or "Long break time!"
-- Two buttons: "Start [Short/Long] Break" | "Skip"
-- If started, shows countdown timer with "Skip Break" option
+- Three buttons: "Start Break" | "Skip" | "Reset"
+- Once started, shows countdown timer with "Stop Break" option only
+- Reset returns to session 1, work phase (for abandoning current pomodoro cycle)
 
 ### **Settings Modal**
 - Four number inputs for durations/sessions
@@ -194,6 +198,7 @@ type PomodoroState = {
 - Avoids duplication and conflicts with activity page timer
 
 ### **Break Phase Protections**
-- Other activities cannot be started during active break
-- Archive and delete buttons disabled during active tracking or breaks
+- Other activities cannot be started during any active break (global check across all activities)
+- Archive and delete buttons disabled during active tracking or breaks (on any activity)
 - Prevents data conflicts and ensures clean session completion
+- Message shown: "Break is active on another activity. Complete or skip it first to start tracking here."

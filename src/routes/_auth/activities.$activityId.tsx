@@ -45,6 +45,11 @@ function ActivityPage() {
   const pomodoroSettings = usePomodoroSettings();
   const pomodoroState = usePomodoroState();
 
+  // Load activity-specific pomodoro state
+  useEffect(() => {
+    pomodoroStore.setActivity(activityId);
+  }, [activityId]);
+
   useEffect(() => {
     localStorage.setItem(`timerMode-${activityId}`, timerMode);
   }, [timerMode, activityId]);
@@ -62,7 +67,7 @@ function ActivityPage() {
   const currentEntry = currentData?.entry ?? null;
   const isRunningThisActivity = currentEntry?.activityId === activityId;
   const isRunningOther = !!currentEntry && !isRunningThisActivity;
-  const isInBreak = pomodoroState.phase !== 'work' && pomodoroState.isBreakActive;
+  const hasAnyActiveBreak = pomodoroStore.hasActiveBreak();
   const isArchived = !!activity?.archivedAt;
 
   const handleStart = () => {
@@ -102,8 +107,8 @@ function ActivityPage() {
     pomodoroStore.completeBreak();
   };
 
-  const handleBreakComplete = () => {
-    pomodoroStore.completeBreak();
+  const handleResetPomodoro = () => {
+    pomodoroStore.resetState();
   };
 
   const handleEditStart = () => {
@@ -219,7 +224,7 @@ function ActivityPage() {
           ) : (
             <button
               onClick={handleArchive}
-              disabled={archiveActivity.isPending || isRunningThisActivity || isInBreak}
+              disabled={archiveActivity.isPending || isRunningThisActivity || hasAnyActiveBreak}
               className="rounded border border-gray-300 px-3 py-1 text-sm hover:bg-gray-50 disabled:opacity-50"
             >
               Archive
@@ -227,7 +232,7 @@ function ActivityPage() {
           )}
           <button
             onClick={handleDelete}
-            disabled={deleteActivity.isPending || isRunningThisActivity || isInBreak}
+            disabled={deleteActivity.isPending || isRunningThisActivity || hasAnyActiveBreak}
             className="rounded border border-red-300 px-3 py-1 text-sm text-red-600 hover:bg-red-50 disabled:opacity-50"
           >
             Delete
@@ -293,14 +298,14 @@ function ActivityPage() {
                   <BreakTimer
                     startedAt={pomodoroState.breakStartedAt}
                     durationMinutes={pomodoroStore.getCurrentBreakDuration()}
-                    onComplete={handleBreakComplete}
+                    onComplete={handleSkipBreak}
                   />
                 </span>
                 <button
                   onClick={handleSkipBreak}
                   className="mt-3 w-full rounded border border-gray-300 px-4 py-2 text-sm hover:bg-gray-50"
                 >
-                  Skip Break
+                  Stop Break
                 </button>
               </div>
             ) : (
@@ -309,7 +314,7 @@ function ActivityPage() {
                   onClick={handleStartBreak}
                   className="flex-1 rounded bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-500"
                 >
-                  Start {pomodoroState.phase === 'long-break' ? 'Long' : 'Short'} Break
+                  Start Break
                 </button>
                 <button
                   onClick={handleSkipBreak}
@@ -317,12 +322,18 @@ function ActivityPage() {
                 >
                   Skip
                 </button>
+                <button
+                  onClick={handleResetPomodoro}
+                  className="rounded border border-gray-300 px-4 py-2 text-sm hover:bg-gray-50"
+                >
+                  Reset
+                </button>
               </div>
             )}
           </div>
-        ) : isInBreak ? (
+        ) : hasAnyActiveBreak ? (
           <p className="text-sm text-gray-500">
-            Pomodoro break is active. Complete or skip it first to start tracking here.
+            Break is active on another activity. Complete or skip it first to start tracking here.
           </p>
         ) : (
           <>
@@ -362,9 +373,20 @@ function ActivityPage() {
             {/* Pomodoro settings preview */}
             {timerMode === 'pomodoro' && (
               <>
-                <p className="text-xs text-gray-400 mb-2">
-                  Next: Session {pomodoroState.currentSession} of {pomodoroSettings.sessionsBeforeLongBreak}
-                </p>
+                <div className="flex items-center gap-2 mb-2">
+                  <p className="text-xs text-gray-400">
+                    Next: Session {pomodoroState.currentSession} of {pomodoroSettings.sessionsBeforeLongBreak}
+                  </p>
+                  {pomodoroState.currentSession > 1 && (
+                    <button
+                      onClick={handleResetPomodoro}
+                      className="text-xs text-gray-400 hover:text-gray-600"
+                      title="Reset to Session 1"
+                    >
+                      ↺
+                    </button>
+                  )}
+                </div>
                 <div className="mb-3 flex items-center justify-between">
                   <p className="text-xs text-gray-400">
                     {pomodoroSettings.workDuration}m focus • {pomodoroSettings.shortBreakDuration}m short • {pomodoroSettings.longBreakDuration}m long • {pomodoroSettings.sessionsBeforeLongBreak} sessions

@@ -12,6 +12,13 @@ const localStorageMock = (() => {
     clear: () => {
       store = {};
     },
+    get length() {
+      return Object.keys(store).length;
+    },
+    key: (index: number) => {
+      const keys = Object.keys(store);
+      return keys[index] || null;
+    },
   };
 })();
 
@@ -90,6 +97,35 @@ describe('pomodoroStore', () => {
     });
   });
 
+  describe('setActivity', () => {
+    it('loads separate state for different activities', () => {
+      // Set up state for activity-1
+      pomodoroStore.setActivity('activity-1');
+      pomodoroStore.startWorkSession();
+      pomodoroStore.completeWorkSession();
+      pomodoroStore.completeBreak();
+      expect(pomodoroStore.getState().currentSession).toBe(2);
+
+      // Switch to activity-2 - should have fresh state
+      pomodoroStore.setActivity('activity-2');
+      expect(pomodoroStore.getState().currentSession).toBe(1);
+      expect(pomodoroStore.getState().phase).toBe('work');
+
+      // Switch back to activity-1 - should restore state
+      pomodoroStore.setActivity('activity-1');
+      expect(pomodoroStore.getState().currentSession).toBe(2);
+    });
+
+    it('does not reload state when setting same activity', () => {
+      const subscriber = vi.fn();
+      pomodoroStore.setActivity('activity-1');
+      pomodoroStore.subscribe(subscriber);
+
+      pomodoroStore.setActivity('activity-1');
+      expect(subscriber).not.toHaveBeenCalled();
+    });
+  });
+
   describe('subscribe', () => {
     it('notifies subscribers on state change', () => {
       const subscriber = vi.fn();
@@ -104,6 +140,44 @@ describe('pomodoroStore', () => {
       unsubscribe();
       pomodoroStore.startWorkSession();
       expect(subscriber).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('hasActiveBreak', () => {
+    it('returns false when no activities have active breaks', () => {
+      pomodoroStore.setActivity('activity-1');
+      expect(pomodoroStore.hasActiveBreak()).toBe(false);
+    });
+
+    it('returns true when current activity has active break', () => {
+      pomodoroStore.setActivity('activity-1');
+      pomodoroStore.startWorkSession();
+      pomodoroStore.completeWorkSession();
+      pomodoroStore.startBreak();
+      expect(pomodoroStore.hasActiveBreak()).toBe(true);
+    });
+
+    it('returns true when another activity has active break', () => {
+      // Set up break on activity-1
+      pomodoroStore.setActivity('activity-1');
+      pomodoroStore.startWorkSession();
+      pomodoroStore.completeWorkSession();
+      pomodoroStore.startBreak();
+
+      // Switch to activity-2
+      pomodoroStore.setActivity('activity-2');
+
+      // Should still detect break from activity-1
+      expect(pomodoroStore.hasActiveBreak()).toBe(true);
+    });
+
+    it('returns false after break is completed', () => {
+      pomodoroStore.setActivity('activity-1');
+      pomodoroStore.startWorkSession();
+      pomodoroStore.completeWorkSession();
+      pomodoroStore.startBreak();
+      pomodoroStore.completeBreak();
+      expect(pomodoroStore.hasActiveBreak()).toBe(false);
     });
   });
 });

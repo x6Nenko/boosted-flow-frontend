@@ -1,7 +1,7 @@
 import { Link } from '@tanstack/react-router'
 
 import { useState } from 'react'
-import { Home, Layers, Menu, X } from 'lucide-react'
+import { BarChart3, Home, Layers, Menu, X } from 'lucide-react'
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false)
@@ -45,6 +45,14 @@ export default function Header() {
             <Layers size={18} />
             <span>Activities</span>
           </Link>
+          <Link
+            to="/analytics"
+            className={navLinkClass}
+            activeProps={{ className: navLinkActiveClass }}
+          >
+            <BarChart3 size={18} />
+            <span>Analytics</span>
+          </Link>
         </nav>
       </header>
 
@@ -82,6 +90,15 @@ export default function Header() {
           >
             <Layers size={20} />
             <span>Activities</span>
+          </Link>
+          <Link
+            to="/analytics"
+            onClick={() => setIsOpen(false)}
+            className="flex items-center gap-3 p-3 rounded hover:bg-gray-800 transition-colors mb-1"
+            activeProps={{ className: 'flex items-center gap-3 p-3 rounded bg-indigo-600 hover:bg-indigo-700 transition-colors mb-1' }}
+          >
+            <BarChart3 size={20} />
+            <span>Analytics</span>
           </Link>
         </nav>
       </aside>

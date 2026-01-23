@@ -16,6 +16,7 @@ import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-qu
 import { Route as GuestRegisterRouteImport } from './routes/_guest/register'
 import { Route as GuestLoginRouteImport } from './routes/_guest/login'
 import { Route as AuthDashboardRouteImport } from './routes/_auth/dashboard'
+import { Route as AuthAnalyticsRouteImport } from './routes/_auth/analytics'
 import { Route as AuthActivitiesIndexRouteImport } from './routes/_auth/activities.index'
 import { Route as AuthActivitiesActivityIdRouteImport } from './routes/_auth/activities.$activityId'
 
@@ -52,6 +53,11 @@ const AuthDashboardRoute = AuthDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthRoute,
 } as any)
+const AuthAnalyticsRoute = AuthAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => AuthRoute,
+} as any)
 const AuthActivitiesIndexRoute = AuthActivitiesIndexRouteImport.update({
   id: '/activities/',
   path: '/activities/',
@@ -66,6 +72,7 @@ const AuthActivitiesActivityIdRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/analytics': typeof AuthAnalyticsRoute
   '/dashboard': typeof AuthDashboardRoute
   '/login': typeof GuestLoginRoute
   '/register': typeof GuestRegisterRoute
@@ -75,6 +82,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/analytics': typeof AuthAnalyticsRoute
   '/dashboard': typeof AuthDashboardRoute
   '/login': typeof GuestLoginRoute
   '/register': typeof GuestRegisterRoute
@@ -87,6 +95,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_auth': typeof AuthRouteWithChildren
   '/_guest': typeof GuestRouteWithChildren
+  '/_auth/analytics': typeof AuthAnalyticsRoute
   '/_auth/dashboard': typeof AuthDashboardRoute
   '/_guest/login': typeof GuestLoginRoute
   '/_guest/register': typeof GuestRegisterRoute
@@ -98,6 +107,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/analytics'
     | '/dashboard'
     | '/login'
     | '/register'
@@ -107,6 +117,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/analytics'
     | '/dashboard'
     | '/login'
     | '/register'
@@ -118,6 +129,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_auth'
     | '/_guest'
+    | '/_auth/analytics'
     | '/_auth/dashboard'
     | '/_guest/login'
     | '/_guest/register'
@@ -184,6 +196,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthDashboardRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_auth/analytics': {
+      id: '/_auth/analytics'
+      path: '/analytics'
+      fullPath: '/analytics'
+      preLoaderRoute: typeof AuthAnalyticsRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/_auth/activities/': {
       id: '/_auth/activities/'
       path: '/activities'
@@ -202,12 +221,14 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthRouteChildren {
+  AuthAnalyticsRoute: typeof AuthAnalyticsRoute
   AuthDashboardRoute: typeof AuthDashboardRoute
   AuthActivitiesActivityIdRoute: typeof AuthActivitiesActivityIdRoute
   AuthActivitiesIndexRoute: typeof AuthActivitiesIndexRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
+  AuthAnalyticsRoute: AuthAnalyticsRoute,
   AuthDashboardRoute: AuthDashboardRoute,
   AuthActivitiesActivityIdRoute: AuthActivitiesActivityIdRoute,
   AuthActivitiesIndexRoute: AuthActivitiesIndexRoute,

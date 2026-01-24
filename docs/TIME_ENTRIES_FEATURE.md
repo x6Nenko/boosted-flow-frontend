@@ -2,7 +2,7 @@
 
 ## 1. High-Level Purpose
 
-Enables users to track work sessions with start/stop timer controls, live duration display, activity-based categorization, post-session rating/comments, and tag categorization.
+Enables users to track work sessions with start/stop timer controls, live duration display, activity-based categorization, and post-session rating/comments.
 
 ---
 
@@ -14,12 +14,12 @@ routes/_auth/
 └── activities.$activityId.tsx            # Activity-specific: timer, filtered entries
 
 src/features/time-entries/
-├── types.ts                              # TypeScript definitions (TimeEntry, Tag, requests)
+├── types.ts                              # TypeScript definitions (TimeEntry, requests)
 ├── api.ts                                # API endpoints
 ├── components/
 │   ├── TimerDuration.tsx                 # Live duration display
 │   ├── TimerDuration.test.ts             # Unit tests
-│   ├── TimeEntryRow.tsx                  # Reusable entry row with rating/edit/tags/delete
+│   ├── TimeEntryRow.tsx                  # Reusable entry row with rating/edit/delete
 │   ├── ActivityHeatmap.tsx               # GitHub-style contribution grid (past 6 months)
 │   ├── activity-heatmap.utils.ts          # Heatmap bucketing + current streak logic
 │   └── activity-heatmap.utils.test.ts     # Unit tests for heatmap + streak
@@ -31,14 +31,6 @@ src/features/time-entries/
     ├── use-stop-timer.ts                 # TanStack Mutation
     ├── use-update-time-entry.ts          # TanStack Mutation
     └── use-delete-time-entry.ts          # TanStack Mutation
-
-src/features/tags/
-├── api.ts                                # Tags API endpoints
-└── hooks/
-    ├── index.ts                          # Hook exports
-    ├── use-tags.ts                       # TanStack Query for listing tags
-    ├── use-get-or-create-tags.ts         # TanStack Mutation for get-or-create
-    └── use-delete-tag.ts                 # TanStack Mutation for deletion
 
 src/lib/utils.ts                          # Shared formatTime, formatDate functions
 ```
@@ -75,14 +67,13 @@ src/lib/utils.ts                          # Shared formatTime, formatDate functi
 4. Invalidates `['time-entries']` → list re-fetches to include stopped entry
 5. UI re-renders: shows start form, stopped entry appears in history
 
-### **Updating Entry (Rating/Comment/Tags/Distractions)**
+### **Updating Entry (Rating/Comment/Distractions)**
 1. User clicks "Edit" on stopped entry → opens inline edit form
-2. User sets rating (1-5 stars), comment, tags (comma separated), and/or distractions (+/- buttons)
-3. User clicks "Save" → tags resolved via `getOrCreateTags.mutateAsync(names)`
-4. `updateEntry.mutate({ id, data: { rating, comment, tagIds, distractionCount } })`
-5. `useUpdateTimeEntry` calls `timeEntriesApi.update(id, data)` → PATCH `/time-entries/:id`
-6. **onSuccess:** Invalidates `['time-entries']` → list re-fetches
-7. Edit form closes, entry shows updated values
+2. User sets rating (1-5 stars), comment, and/or distractions (+/- buttons)
+3. User clicks "Save" → `updateEntry.mutate({ id, data: { rating, comment, distractionCount } })`
+4. `useUpdateTimeEntry` calls `timeEntriesApi.update(id, data)` → PATCH `/time-entries/:id`
+5. **onSuccess:** Invalidates `['time-entries']` → list re-fetches
+6. Edit form closes, entry shows updated values
 
 ### **Deleting Entry**
 1. User clicks "Delete" in edit form → confirmation dialog
@@ -157,29 +148,12 @@ Returns: UseMutationResult<TimeEntry, Error, string> // string = entry ID
 #### `useUpdateTimeEntry()`
 ```typescript
 Returns: UseMutationResult<TimeEntry, Error, { id: string, data: UpdateTimeEntryRequest }>
-// UpdateTimeEntryRequest = { rating?: number, comment?: string, tagIds?: string[] }
+// UpdateTimeEntryRequest = { rating?: number, comment?: string, distractionCount?: number }
 ```
 
 #### `useDeleteTimeEntry()`
 ```typescript
 Returns: UseMutationResult<void, Error, string> // string = entry ID
-```
-
-### **Tags Hooks**
-
-#### `useTags()`
-```typescript
-Returns: UseQueryResult<Tag[]>
-```
-
-#### `useGetOrCreateTags()`
-```typescript
-Returns: UseMutationResult<Tag[], Error, string[]> // string[] = tag names
-```
-
-#### `useDeleteTag()`
-```typescript
-Returns: UseMutationResult<void, Error, string> // string = tag ID
 ```
 
 ### **Components**
@@ -232,7 +206,7 @@ Returns: Promise<TimeEntry>
 #### `timeEntriesApi.update(id, data)`
 ```typescript
 PATCH /time-entries/:id
-Body: { rating?: number, comment?: string, tagIds?: string[], distractionCount?: number }
+Body: { rating?: number, comment?: string, distractionCount?: number }
 Returns: Promise<TimeEntry>
 ```
 
@@ -254,27 +228,6 @@ GET /time-entries/current
 Returns: Promise<CurrentEntryResponse>
 ```
 
-### **Tags API Layer**
-
-#### `tagsApi.list()`
-```typescript
-GET /tags
-Returns: Promise<Tag[]>
-```
-
-#### `tagsApi.getOrCreate(names)`
-```typescript
-POST /tags/get-or-create
-Body: { names: string[] }
-Returns: Promise<Tag[]>
-```
-
-#### `tagsApi.delete(id)`
-```typescript
-DELETE /tags/:id
-Returns: Promise<void>
-```
-
 ### **Types**
 
 ```typescript
@@ -288,14 +241,6 @@ TimeEntry {
   rating: number | null  // 1-5
   comment: string | null
   distractionCount: number  // default 0
-  createdAt: string
-  tags?: Tag[]
-}
-
-Tag {
-  id: string
-  userId: string
-  name: string
   createdAt: string
 }
 
@@ -312,7 +257,6 @@ StopTimeEntryRequest {
 UpdateTimeEntryRequest {
   rating?: number
   comment?: string
-  tagIds?: string[]
   distractionCount?: number
 }
 
@@ -334,13 +278,11 @@ TimeEntriesQuery {
 - **`stoppedAt: null` means active** — do not rely on separate "status" field
 - **10min staleTime on current entry** — do not poll; mutations update cache manually
 
-### **Rating/Comment/Tags Rules**
+### **Rating/Comment Rules**
 - **Edit only when stopped** — cannot modify active entries
 - **1-week edit window** — backend enforces max 1 week after `stoppedAt`
 - **Rating 1-5** — enforced at UI level with star picker
 - **Comment max 1000 chars** — enforced client-side with `maxLength`
-- **Max 3 tags** — enforced by slicing tag input to first 3 entries
-- **Tags resolved via getOrCreate** — names sent to backend, IDs returned for linking
 
 ### **Component Dependencies**
 - **Requires TanStack Query Provider** — must be wrapped in `<QueryClientProvider>`

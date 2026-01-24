@@ -1,7 +1,3 @@
-/**
- * Centralized API endpoint constants
- * Prevents hardcoded strings scattered throughout the codebase
- */
 export const API_ENDPOINTS = {
   AUTH: {
     LOGIN: '/auth/login',
@@ -17,9 +13,5 @@ export const API_ENDPOINTS = {
     STOP: '/time-entries/stop',
     LIST: '/time-entries',
     CURRENT: '/time-entries/current',
-  },
-  TAGS: {
-    BASE: '/tags',
-    GET_OR_CREATE: '/tags/get-or-create',
   },
 } as const;

@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Link } from '@tanstack/react-router';
 import { useUpdateTimeEntry, useDeleteTimeEntry } from '../hooks';
-import { useGetOrCreateTags } from '@/features/tags/hooks';
 import { formatStoppedDuration, TimerDuration } from './TimerDuration';
 import { formatTime, formatDate } from '@/lib/utils';
 import type { TimeEntry } from '../types';
@@ -49,34 +48,19 @@ export function TimeEntryRow({
   const [isEditing, setIsEditing] = useState(false);
   const [comment, setComment] = useState(entry.comment || '');
   const [rating, setRating] = useState<number | null>(entry.rating);
-  const [tagInput, setTagInput] = useState('');
   const [distractionCount, setDistractionCount] = useState(entry.distractionCount);
   const updateEntry = useUpdateTimeEntry();
   const deleteEntry = useDeleteTimeEntry();
-  const getOrCreateTags = useGetOrCreateTags();
 
   const isStopped = !!entry.stoppedAt;
 
   const handleSave = async () => {
-    const tagNames = tagInput
-      .split(',')
-      .map((t) => t.trim())
-      .filter(Boolean)
-      .slice(0, 3);
-
-    let tagIds: string[] | undefined;
-    if (tagNames.length > 0) {
-      const tags = await getOrCreateTags.mutateAsync(tagNames);
-      tagIds = tags.map((t) => t.id);
-    }
-
     updateEntry.mutate(
       {
         id: entry.id,
         data: {
           rating: rating ?? undefined,
           comment: comment || undefined,
-          tagIds,
           distractionCount,
         },
       },
@@ -93,7 +77,6 @@ export function TimeEntryRow({
   const handleEditStart = () => {
     setComment(entry.comment || '');
     setRating(entry.rating);
-    setTagInput(entry.tags?.map((t) => t.name).join(', ') || '');
     setDistractionCount(entry.distractionCount);
     setIsEditing(true);
   };
@@ -137,13 +120,6 @@ export function TimeEntryRow({
                 rows={2}
                 className="w-full rounded border border-gray-300 px-2 py-1 text-sm"
               />
-              <input
-                type="text"
-                value={tagInput}
-                onChange={(e) => setTagInput(e.target.value)}
-                placeholder="Tags (comma separated, max 3)"
-                className="w-full rounded border border-gray-300 px-2 py-1 text-sm"
-              />
               <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-500">Distractions:</span>
                 <button
@@ -165,7 +141,7 @@ export function TimeEntryRow({
               <div className="flex gap-2">
                 <button
                   onClick={handleSave}
-                  disabled={updateEntry.isPending || getOrCreateTags.isPending}
+                  disabled={updateEntry.isPending}
                   className="rounded bg-indigo-600 px-2 py-1 text-xs text-white hover:bg-indigo-500 disabled:opacity-50"
                 >
                   Save
@@ -191,11 +167,6 @@ export function TimeEntryRow({
               {entry.comment && (
                 <span className="text-xs text-gray-500 truncate">{entry.comment}</span>
               )}
-              {entry.tags && entry.tags.length > 0 && (
-                <span className="text-xs text-gray-400">
-                  {entry.tags.map((t) => t.name).join(', ')}
-                </span>
-              )}
               {entry.distractionCount > 0 && (
                 <span className="text-xs text-gray-400">
                   {entry.distractionCount} distraction{entry.distractionCount !== 1 ? 's' : ''}
@@ -212,16 +183,11 @@ export function TimeEntryRow({
         </div>
       )}
 
-      {!editable && isStopped && (entry.rating || (entry.tags && entry.tags.length > 0) || entry.distractionCount > 0) && (
+      {!editable && isStopped && (entry.rating || entry.distractionCount > 0) && (
         <div className="mt-2 flex items-center gap-2 flex-wrap">
           {entry.rating && <RatingStars value={entry.rating} onChange={() => { }} disabled />}
           {entry.comment && (
             <span className="text-xs text-gray-500 truncate">{entry.comment}</span>
-          )}
-          {entry.tags && entry.tags.length > 0 && (
-            <span className="text-xs text-gray-400">
-              {entry.tags.map((t) => t.name).join(', ')}
-            </span>
           )}
           {entry.distractionCount > 0 && (
             <span className="text-xs text-gray-400">

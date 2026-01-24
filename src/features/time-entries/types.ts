@@ -47,7 +47,6 @@ export type StopTimeEntryRequest = {
 export type UpdateTimeEntryRequest = {
   rating?: number;
   comment?: string;
-  tagIds?: string[];
   distractionCount?: number;
 };
 

@@ -70,7 +70,7 @@ function ActivityPage() {
   const { data: entries, isLoading: entriesLoading } = useTimeEntries({
     activityId,
     from: dateRange?.from,
-    to: dateRange?.to,
+    to: dateRange?.to + 'T23:59:59',
   });
   const startTimer = useStartTimer();
   const stopTimer = useStopTimer();

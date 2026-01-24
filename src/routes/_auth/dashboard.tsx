@@ -29,7 +29,7 @@ function DashboardPage() {
 
   const dateRange = period !== 'all' ? getDateRangeForDays(Number(period)) : undefined;
   const { data: entries, isLoading: entriesLoading } = useTimeEntries(
-    dateRange ? { from: dateRange.from, to: dateRange.to } : undefined
+    dateRange ? { from: dateRange.from, to: dateRange.to + 'T23:59:59' } : undefined
   );
   const pomodoroState = usePomodoroState();
 

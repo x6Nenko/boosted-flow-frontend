@@ -23,8 +23,16 @@ import {
   useStopTimer,
   useTimeEntries,
 } from '@/features/time-entries/hooks';
+import { getDateRangeForDays } from '@/features/analytics';
 
 type TimerMode = 'stopwatch' | 'pomodoro';
+
+const PERIOD_OPTIONS = [
+  { value: '7', label: 'Last 7 days' },
+  { value: '30', label: 'Last 30 days' },
+  { value: '90', label: 'Last 90 days' },
+  { value: 'all', label: 'All time' },
+] as const;
 
 export const Route = createFileRoute('/_auth/activities/$activityId')({
   component: ActivityPage,
@@ -42,6 +50,7 @@ function ActivityPage() {
     return (stored === 'pomodoro' ? 'pomodoro' : 'stopwatch') as TimerMode;
   });
   const [showSettings, setShowSettings] = useState(false);
+  const [period, setPeriod] = useState('7');
 
   const pomodoroSettings = usePomodoroSettings();
   const pomodoroState = usePomodoroState();
@@ -57,7 +66,12 @@ function ActivityPage() {
 
   const { data: activity, isLoading: activityLoading } = useActivity(activityId);
   const { data: currentData } = useCurrentEntry();
-  const { data: entries, isLoading: entriesLoading } = useTimeEntries({ activityId });
+  const dateRange = period !== 'all' ? getDateRangeForDays(Number(period)) : undefined;
+  const { data: entries, isLoading: entriesLoading } = useTimeEntries({
+    activityId,
+    from: dateRange?.from,
+    to: dateRange?.to,
+  });
   const startTimer = useStartTimer();
   const stopTimer = useStopTimer();
   const updateActivity = useUpdateActivity();
@@ -440,7 +454,20 @@ function ActivityPage() {
 
       {/* Entries List */}
       <div className="rounded border border-gray-200 bg-white p-4">
-        <h2 className="mb-3 text-sm font-medium text-gray-900">History</h2>
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="text-sm font-medium text-gray-900">History</h2>
+          <select
+            value={period}
+            onChange={(e) => setPeriod(e.target.value)}
+            className="rounded border border-gray-300 px-2 py-1 text-sm"
+          >
+            {PERIOD_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+        </div>
         {entriesLoading ? (
           <p className="text-sm text-gray-500">Loading...</p>
         ) : entries && entries.length > 0 ? (

@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
+import { useState } from 'react';
 import { useLogout } from '@/features/auth/hooks';
 import { useActivities } from '@/features/activities/hooks';
 import { ActivityForm } from '@/features/activities/components/ActivityForm';
@@ -6,17 +7,30 @@ import { usePomodoroState } from '@/features/pomodoro';
 import { useCurrentEntry, useTimeEntries } from '@/features/time-entries/hooks';
 import { TimeEntryRow } from '@/features/time-entries/components/TimeEntryRow';
 import { ActivityHeatmap } from '@/features/time-entries/components/ActivityHeatmap';
+import { getDateRangeForDays } from '@/features/analytics';
 
 export const Route = createFileRoute('/_auth/dashboard')({
   component: DashboardPage,
 });
 
+const PERIOD_OPTIONS = [
+  { value: '7', label: 'Last 7 days' },
+  { value: '30', label: 'Last 30 days' },
+  { value: '90', label: 'Last 90 days' },
+  { value: 'all', label: 'All time' },
+] as const;
+
 function DashboardPage() {
   const navigate = useNavigate();
   const logout = useLogout();
+  const [period, setPeriod] = useState('7');
   const { data: activitiesData, isLoading: activitiesLoading } = useActivities();
   const { data: currentData } = useCurrentEntry();
-  const { data: entries, isLoading: entriesLoading } = useTimeEntries();
+
+  const dateRange = period !== 'all' ? getDateRangeForDays(Number(period)) : undefined;
+  const { data: entries, isLoading: entriesLoading } = useTimeEntries(
+    dateRange ? { from: dateRange.from, to: dateRange.to } : undefined
+  );
   const pomodoroState = usePomodoroState();
 
   const activities = activitiesData || [];
@@ -110,7 +124,20 @@ function DashboardPage() {
 
       {/* Recent Entries */}
       <div className="rounded border border-gray-200 bg-white p-4">
-        <h2 className="mb-3 text-sm font-medium text-gray-900">Recent Entries</h2>
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="text-sm font-medium text-gray-900">Recent Entries</h2>
+          <select
+            value={period}
+            onChange={(e) => setPeriod(e.target.value)}
+            className="rounded border border-gray-300 px-2 py-1 text-sm"
+          >
+            {PERIOD_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+        </div>
         {entriesLoading ? (
           <p className="text-sm text-gray-500">Loading...</p>
         ) : entries && entries.length > 0 ? (

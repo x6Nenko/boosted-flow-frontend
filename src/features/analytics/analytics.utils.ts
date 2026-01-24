@@ -70,3 +70,14 @@ export function getDefaultDateRange(): { from: string; to: string } {
     to: to.toISOString().split('T')[0],
   };
 }
+
+export function getDateRangeForDays(days: number): { from: string; to: string } {
+  const to = new Date();
+  const from = new Date();
+  from.setDate(from.getDate() - days);
+
+  return {
+    from: from.toISOString().split('T')[0],
+    to: to.toISOString().split('T')[0],
+  };
+}

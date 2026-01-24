@@ -92,6 +92,8 @@ src/lib/utils.ts                          # Shared formatTime, formatDate functi
 2. Cache key: `['time-entries', query]`
 3. Returns `TimeEntry[]` — sorted by backend
 4. Pass `{ activityId }` to filter by activity
+5. **Default:** Both dashboard and activity pages load last 7 days by default
+6. Period filter dropdown allows switching: 7 days, 30 days, 90 days, or all time
 
 ### **Live Duration Tick**
 1. `TimerDuration` component mounts with `startedAt` prop

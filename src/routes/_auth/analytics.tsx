@@ -114,6 +114,14 @@ function AnalyticsPage() {
               }
             />
             <MetricCard
+              label="Total Distractions"
+              value={analytics.totalDistractions.toString()}
+            />
+            <MetricCard
+              label="Avg Distractions"
+              value={analytics.averageDistractions.toFixed(1)}
+            />
+            <MetricCard
               label="Peak Hour"
               value={peakHour !== null ? `${peakHour}:00` : '—'}
             />

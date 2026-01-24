@@ -68,6 +68,7 @@ export const handlers = [
       stoppedAt: null,
       rating: null,
       comment: null,
+      distractionCount: 0,
       createdAt: new Date().toISOString(),
     };
     mockTimeEntries.unshift(entry);

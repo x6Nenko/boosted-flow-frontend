@@ -10,6 +10,7 @@ export type TimeEntry = {
   stoppedAt: string | null;
   rating: number | null;
   comment: string | null;
+  distractionCount: number;
   createdAt: string;
   tags?: Tag[];
 };
@@ -37,6 +38,7 @@ export type StartTimeEntryRequest = {
  */
 export type StopTimeEntryRequest = {
   id: string;
+  distractionCount?: number;
 };
 
 /**
@@ -46,6 +48,7 @@ export type UpdateTimeEntryRequest = {
   rating?: number;
   comment?: string;
   tagIds?: string[];
+  distractionCount?: number;
 };
 
 /**

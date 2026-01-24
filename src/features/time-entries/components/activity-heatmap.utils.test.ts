@@ -21,6 +21,7 @@ describe('activity-heatmap.utils', () => {
         stoppedAt: '2026-01-20T00:30:00-05:00',
         rating: null,
         comment: null,
+        distractionCount: 0,
         createdAt: '2026-01-20T00:30:00-05:00',
       };
 
@@ -48,6 +49,7 @@ describe('activity-heatmap.utils', () => {
           stoppedAt: '2026-01-19T10:03:00Z',
           rating: null,
           comment: null,
+          distractionCount: 0,
           createdAt: '2026-01-19T10:03:00Z',
         },
         {
@@ -59,6 +61,7 @@ describe('activity-heatmap.utils', () => {
           stoppedAt: '2026-01-20T10:02:00Z',
           rating: null,
           comment: null,
+          distractionCount: 0,
           createdAt: '2026-01-20T10:02:00Z',
         },
         {
@@ -70,6 +73,7 @@ describe('activity-heatmap.utils', () => {
           stoppedAt: '2026-01-21T10:02:00Z',
           rating: null,
           comment: null,
+          distractionCount: 0,
           createdAt: '2026-01-21T10:02:00Z',
         },
       ];
@@ -91,6 +95,7 @@ describe('activity-heatmap.utils', () => {
           stoppedAt: '2026-01-20T10:03:00Z',
           rating: null,
           comment: null,
+          distractionCount: 0,
           createdAt: '2026-01-20T10:03:00Z',
         },
         {
@@ -102,6 +107,7 @@ describe('activity-heatmap.utils', () => {
           stoppedAt: '2026-01-21T10:01:00Z', // exactly 60s
           rating: null,
           comment: null,
+          distractionCount: 0,
           createdAt: '2026-01-21T10:01:00Z',
         },
       ];
@@ -123,6 +129,7 @@ describe('activity-heatmap.utils', () => {
           stoppedAt: null,
           rating: null,
           comment: null,
+          distractionCount: 0,
           createdAt: '2026-01-21T11:58:00Z',
         },
       ];
@@ -144,6 +151,7 @@ describe('activity-heatmap.utils', () => {
           stoppedAt: '2026-01-19T10:03:00Z',
           rating: null,
           comment: null,
+          distractionCount: 0,
           createdAt: '2026-01-19T10:03:00Z',
         },
         {
@@ -155,6 +163,7 @@ describe('activity-heatmap.utils', () => {
           stoppedAt: '2026-01-20T10:02:00Z',
           rating: null,
           comment: null,
+          distractionCount: 0,
           createdAt: '2026-01-20T10:02:00Z',
         },
       ];
@@ -176,6 +185,7 @@ describe('activity-heatmap.utils', () => {
           stoppedAt: '2026-01-19T10:03:00Z',
           rating: null,
           comment: null,
+          distractionCount: 0,
           createdAt: '2026-01-19T10:03:00Z',
         },
       ];
@@ -197,6 +207,7 @@ describe('activity-heatmap.utils', () => {
           stoppedAt: '2026-01-18T10:03:00Z',
           rating: null,
           comment: null,
+          distractionCount: 0,
           createdAt: '2026-01-18T10:03:00Z',
         },
         {
@@ -208,6 +219,7 @@ describe('activity-heatmap.utils', () => {
           stoppedAt: '2026-01-19T10:02:00Z',
           rating: null,
           comment: null,
+          distractionCount: 0,
           createdAt: '2026-01-19T10:02:00Z',
         },
         {
@@ -219,6 +231,7 @@ describe('activity-heatmap.utils', () => {
           stoppedAt: '2026-01-20T10:02:00Z',
           rating: null,
           comment: null,
+          distractionCount: 0,
           createdAt: '2026-01-20T10:02:00Z',
         },
       ];

@@ -36,6 +36,7 @@ function ActivityPage() {
   const [description, setDescription] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState('');
+  const [distractionCount, setDistractionCount] = useState(0);
   const [timerMode, setTimerMode] = useState<TimerMode>(() => {
     const stored = localStorage.getItem(`timerMode-${activityId}`);
     return (stored === 'pomodoro' ? 'pomodoro' : 'stopwatch') as TimerMode;
@@ -74,6 +75,7 @@ function ActivityPage() {
     if (timerMode === 'pomodoro') {
       pomodoroStore.startWorkSession();
     }
+    setDistractionCount(0);
     startTimer.mutate(
       {
         activityId,
@@ -88,14 +90,20 @@ function ActivityPage() {
       if (timerMode === 'pomodoro') {
         pomodoroStore.completeWorkSession();
       }
-      stopTimer.mutate(currentEntry.id);
+      stopTimer.mutate({
+        id: currentEntry.id,
+        distractionCount: distractionCount > 0 ? distractionCount : undefined,
+      });
     }
   };
 
   const handlePomodoroComplete = () => {
     if (currentEntry) {
       pomodoroStore.completeWorkSession();
-      stopTimer.mutate(currentEntry.id);
+      stopTimer.mutate({
+        id: currentEntry.id,
+        distractionCount: distractionCount > 0 ? distractionCount : undefined,
+      });
     }
   };
 
@@ -278,6 +286,17 @@ function ActivityPage() {
             >
               {stopTimer.isPending ? 'Stopping...' : 'Stop'}
             </button>
+            <div className="mt-3 flex items-center justify-center gap-2">
+              <button
+                onClick={() => setDistractionCount((c) => c + 1)}
+                className="rounded border border-gray-300 px-3 py-1 text-sm hover:bg-gray-50"
+              >
+                + Distraction
+              </button>
+              {distractionCount > 0 && (
+                <span className="text-sm text-gray-500">{distractionCount}</span>
+              )}
+            </div>
           </>
         ) : isRunningOther ? (
           <p className="text-sm text-gray-500">

@@ -55,27 +55,34 @@ src/lib/utils.ts                          # Shared formatTime, formatDate functi
 1. User goes to activity page `/activities/:activityId`
 2. User optionally enters description → `description` state
 3. User clicks "Start Tracking" → `handleStart()`
-4. `startTimer.mutate({ activityId, description? })`
-5. `useStartTimer` calls `timeEntriesApi.start(data)` → POST `/time-entries/start`
-6. **onSuccess:** `setQueryData(['time-entries', 'current'], { entry })` — immediate cache update
-7. Invalidates `['time-entries']` → triggers re-fetch of `useTimeEntries`
-8. UI re-renders: shows "Stop" button, live timer displays
+4. `distractionCount` resets to 0
+5. `startTimer.mutate({ activityId, description? })`
+6. `useStartTimer` calls `timeEntriesApi.start(data)` → POST `/time-entries/start`
+7. **onSuccess:** `setQueryData(['time-entries', 'current'], { entry })` — immediate cache update
+8. Invalidates `['time-entries']` → triggers re-fetch of `useTimeEntries`
+9. UI re-renders: shows "Stop" button, live timer displays, "+ Distraction" button
+
+### **Tracking Distractions**
+1. User clicks "+ Distraction" while timer is running
+2. Local `distractionCount` state increments by 1
+3. Count shown next to button when > 0
+4. Sent to backend when timer stops
 
 ### **Stopping Timer**
-1. User clicks "Stop" → `handleStop()` → `stopTimer.mutate(currentEntry.id)`
-2. `useStopTimer` calls `timeEntriesApi.stop({ id })` → POST `/time-entries/stop`
+1. User clicks "Stop" → `handleStop()` → `stopTimer.mutate({ id, distractionCount })`
+2. `useStopTimer` calls `timeEntriesApi.stop({ id, distractionCount })` → POST `/time-entries/stop`
 3. **onSuccess:** `setQueryData(['time-entries', 'current'], { entry: null })`
 4. Invalidates `['time-entries']` → list re-fetches to include stopped entry
 5. UI re-renders: shows start form, stopped entry appears in history
 
-### **Updating Entry (Rating/Comment/Tags)**
+### **Updating Entry (Rating/Comment/Tags/Distractions)**
 1. User clicks "Edit" on stopped entry → opens inline edit form
-2. User sets rating (1-5 stars), comment, and/or tags (comma separated)
+2. User sets rating (1-5 stars), comment, tags (comma separated), and/or distractions (+/- buttons)
 3. User clicks "Save" → tags resolved via `getOrCreateTags.mutateAsync(names)`
-4. `updateEntry.mutate({ id, data: { rating, comment, tagIds } })`
+4. `updateEntry.mutate({ id, data: { rating, comment, tagIds, distractionCount } })`
 5. `useUpdateTimeEntry` calls `timeEntriesApi.update(id, data)` → PATCH `/time-entries/:id`
 6. **onSuccess:** Invalidates `['time-entries']` → list re-fetches
-7. Edit form closes, entry shows updated rating/comment/tags
+7. Edit form closes, entry shows updated values
 
 ### **Deleting Entry**
 1. User clicks "Delete" in edit form → confirmation dialog
@@ -218,14 +225,14 @@ Returns: Promise<TimeEntry>
 #### `timeEntriesApi.stop(data)`
 ```typescript
 POST /time-entries/stop
-Body: { id: string }
+Body: { id: string, distractionCount?: number }
 Returns: Promise<TimeEntry>
 ```
 
 #### `timeEntriesApi.update(id, data)`
 ```typescript
 PATCH /time-entries/:id
-Body: { rating?: number, comment?: string, tagIds?: string[] }
+Body: { rating?: number, comment?: string, tagIds?: string[], distractionCount?: number }
 Returns: Promise<TimeEntry>
 ```
 
@@ -280,6 +287,7 @@ TimeEntry {
   stoppedAt: string | null
   rating: number | null  // 1-5
   comment: string | null
+  distractionCount: number  // default 0
   createdAt: string
   tags?: Tag[]
 }
@@ -298,12 +306,14 @@ StartTimeEntryRequest {
 
 StopTimeEntryRequest {
   id: string
+  distractionCount?: number
 }
 
 UpdateTimeEntryRequest {
   rating?: number
   comment?: string
   tagIds?: string[]
+  distractionCount?: number
 }
 
 TimeEntriesQuery {

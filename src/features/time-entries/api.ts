@@ -16,10 +16,10 @@ export const timeEntriesApi = {
       body: data,
     }),
 
-  stop: (data: StopTimeEntryRequest) =>
+  stop: ({ id, distractionCount }: StopTimeEntryRequest) =>
     apiClient<TimeEntry>(API_ENDPOINTS.TIME_ENTRIES.STOP, {
       method: 'POST',
-      body: data,
+      body: { id, ...(distractionCount !== undefined && { distractionCount }) },
     }),
 
   update: (id: string, data: UpdateTimeEntryRequest) =>

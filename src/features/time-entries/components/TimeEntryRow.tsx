@@ -50,6 +50,7 @@ export function TimeEntryRow({
   const [comment, setComment] = useState(entry.comment || '');
   const [rating, setRating] = useState<number | null>(entry.rating);
   const [tagInput, setTagInput] = useState('');
+  const [distractionCount, setDistractionCount] = useState(entry.distractionCount);
   const updateEntry = useUpdateTimeEntry();
   const deleteEntry = useDeleteTimeEntry();
   const getOrCreateTags = useGetOrCreateTags();
@@ -76,6 +77,7 @@ export function TimeEntryRow({
           rating: rating ?? undefined,
           comment: comment || undefined,
           tagIds,
+          distractionCount,
         },
       },
       { onSuccess: () => setIsEditing(false) }
@@ -92,6 +94,7 @@ export function TimeEntryRow({
     setComment(entry.comment || '');
     setRating(entry.rating);
     setTagInput(entry.tags?.map((t) => t.name).join(', ') || '');
+    setDistractionCount(entry.distractionCount);
     setIsEditing(true);
   };
 
@@ -141,6 +144,24 @@ export function TimeEntryRow({
                 placeholder="Tags (comma separated, max 3)"
                 className="w-full rounded border border-gray-300 px-2 py-1 text-sm"
               />
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-500">Distractions:</span>
+                <button
+                  type="button"
+                  onClick={() => setDistractionCount((c) => Math.max(0, c - 1))}
+                  className="rounded border border-gray-300 px-2 py-0.5 text-sm hover:bg-gray-50"
+                >
+                  −
+                </button>
+                <span className="text-sm w-6 text-center">{distractionCount}</span>
+                <button
+                  type="button"
+                  onClick={() => setDistractionCount((c) => c + 1)}
+                  className="rounded border border-gray-300 px-2 py-0.5 text-sm hover:bg-gray-50"
+                >
+                  +
+                </button>
+              </div>
               <div className="flex gap-2">
                 <button
                   onClick={handleSave}
@@ -175,6 +196,11 @@ export function TimeEntryRow({
                   {entry.tags.map((t) => t.name).join(', ')}
                 </span>
               )}
+              {entry.distractionCount > 0 && (
+                <span className="text-xs text-gray-400">
+                  {entry.distractionCount} distraction{entry.distractionCount !== 1 ? 's' : ''}
+                </span>
+              )}
               <button
                 onClick={handleEditStart}
                 className="text-xs text-indigo-600 hover:text-indigo-500"
@@ -186,7 +212,7 @@ export function TimeEntryRow({
         </div>
       )}
 
-      {!editable && isStopped && (entry.rating || (entry.tags && entry.tags.length > 0)) && (
+      {!editable && isStopped && (entry.rating || (entry.tags && entry.tags.length > 0) || entry.distractionCount > 0) && (
         <div className="mt-2 flex items-center gap-2 flex-wrap">
           {entry.rating && <RatingStars value={entry.rating} onChange={() => { }} disabled />}
           {entry.comment && (
@@ -195,6 +221,11 @@ export function TimeEntryRow({
           {entry.tags && entry.tags.length > 0 && (
             <span className="text-xs text-gray-400">
               {entry.tags.map((t) => t.name).join(', ')}
+            </span>
+          )}
+          {entry.distractionCount > 0 && (
+            <span className="text-xs text-gray-400">
+              {entry.distractionCount} distraction{entry.distractionCount !== 1 ? 's' : ''}
             </span>
           )}
         </div>

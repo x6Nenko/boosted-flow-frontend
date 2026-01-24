@@ -7,6 +7,7 @@ export function computeAnalytics(entries: TimeEntry[]): AnalyticsData {
   let totalTimeMs = 0;
   let totalRating = 0;
   let ratedSessionCount = 0;
+  let totalDistractions = 0;
   const timeByActivity: Record<string, number> = {};
   const peakHours: Record<number, number> = {};
 
@@ -16,11 +17,12 @@ export function computeAnalytics(entries: TimeEntry[]): AnalyticsData {
     const durationMs = stopMs - startMs;
 
     totalTimeMs += durationMs;
+    totalDistractions += entry.distractionCount;
 
     // Time by activity
     timeByActivity[entry.activityId] = (timeByActivity[entry.activityId] || 0) + durationMs;
 
-    // Peak hours (hour when session started, UTC)
+    // Peak hours (hour when session started, local timezone)
     const hour = new Date(entry.startedAt).getHours();
     peakHours[hour] = (peakHours[hour] || 0) + durationMs;
 
@@ -41,6 +43,8 @@ export function computeAnalytics(entries: TimeEntry[]): AnalyticsData {
     ratedSessionCount,
     timeByActivity,
     peakHours,
+    totalDistractions,
+    averageDistractions: sessionCount > 0 ? totalDistractions / sessionCount : 0,
   };
 }
 

@@ -11,6 +11,7 @@ const makeEntry = (overrides: Partial<TimeEntry> = {}): TimeEntry => ({
   stoppedAt: '2024-01-15T10:00:00.000Z', // 1 hour
   rating: null,
   comment: null,
+  distractionCount: 0,
   createdAt: '2024-01-15T09:00:00.000Z',
   ...overrides,
 });
@@ -103,15 +104,66 @@ describe('computeAnalytics', () => {
   });
 
   describe('peakHours', () => {
-    it('groups time by start hour', () => {
+    it('groups time by start hour (local timezone)', () => {
       const entries = [
-        makeEntry({ id: '1', startedAt: '2024-01-15T09:00:00.000Z', stoppedAt: '2024-01-15T10:00:00.000Z' }), // 9:00
-        makeEntry({ id: '2', startedAt: '2024-01-15T09:30:00.000Z', stoppedAt: '2024-01-15T10:00:00.000Z' }), // 9:30
-        makeEntry({ id: '3', startedAt: '2024-01-15T14:00:00.000Z', stoppedAt: '2024-01-15T15:00:00.000Z' }), // 14:00
+        makeEntry({ id: '1', startedAt: '2024-01-15T09:00:00.000', stoppedAt: '2024-01-15T10:00:00.000' }), // 1h at hour 9
+        makeEntry({ id: '2', startedAt: '2024-01-15T09:30:00.000', stoppedAt: '2024-01-15T10:00:00.000' }), // 30m at hour 9
+        makeEntry({ id: '3', startedAt: '2024-01-15T14:00:00.000', stoppedAt: '2024-01-15T15:00:00.000' }), // 1h at hour 14
       ];
       const result = computeAnalytics(entries);
       expect(result.peakHours[9]).toBe(90 * 60 * 1000); // 1h + 30m
       expect(result.peakHours[14]).toBe(60 * 60 * 1000); // 1h
+    });
+  });
+
+  describe('totalDistractions', () => {
+    it('returns 0 for empty entries', () => {
+      const result = computeAnalytics([]);
+      expect(result.totalDistractions).toBe(0);
+    });
+
+    it('sums distractions from completed entries', () => {
+      const entries = [
+        makeEntry({ id: '1', distractionCount: 3 }),
+        makeEntry({ id: '2', distractionCount: 5 }),
+      ];
+      const result = computeAnalytics(entries);
+      expect(result.totalDistractions).toBe(8);
+    });
+
+    it('excludes active entries', () => {
+      const entries = [
+        makeEntry({ id: '1', distractionCount: 3 }),
+        makeEntry({ id: '2', stoppedAt: null, distractionCount: 5 }),
+      ];
+      const result = computeAnalytics(entries);
+      expect(result.totalDistractions).toBe(3);
+    });
+  });
+
+  describe('averageDistractions', () => {
+    it('returns 0 for no sessions', () => {
+      const result = computeAnalytics([]);
+      expect(result.averageDistractions).toBe(0);
+    });
+
+    it('calculates average correctly', () => {
+      const entries = [
+        makeEntry({ id: '1', distractionCount: 3 }),
+        makeEntry({ id: '2', distractionCount: 5 }),
+        makeEntry({ id: '3', distractionCount: 1 }),
+      ];
+      const result = computeAnalytics(entries);
+      expect(result.averageDistractions).toBe(3);
+    });
+
+    it('handles entries with zero distractions', () => {
+      const entries = [
+        makeEntry({ id: '1', distractionCount: 0 }),
+        makeEntry({ id: '2', distractionCount: 6 }),
+      ];
+      const result = computeAnalytics(entries);
+      expect(result.averageDistractions).toBe(3);
     });
   });
 });

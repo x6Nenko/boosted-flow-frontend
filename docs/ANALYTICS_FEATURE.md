@@ -91,6 +91,8 @@ type AnalyticsData = {
   ratedSessionCount: number;              // Number of sessions with ratings
   timeByActivity: Record<string, number>; // Time per activity ID in milliseconds
   peakHours: Record<number, number>;      // Time per hour (0-23) in milliseconds
+  totalDistractions: number;              // Total distraction count across all sessions
+  averageDistractions: number;            // Average distractions per session
 }
 ```
 
@@ -115,6 +117,8 @@ Returns last 30 days as date strings (YYYY-MM-DD format).
 | **Session Count** | Number of completed sessions | Period + Activity |
 | **Avg Session** | Total time ÷ session count | Period + Activity |
 | **Avg Rating** | Mean of all ratings (1-5) | Period + Activity |
+| **Total Distractions** | Sum of all distraction counts | Period + Activity |
+| **Avg Distractions** | Total distractions ÷ session count | Period + Activity |
 | **Peak Hour** | Hour with most tracked time | Period + Activity |
 | **Time per Activity** | Breakdown by activity | Period only |
 

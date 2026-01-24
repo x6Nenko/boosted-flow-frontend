@@ -12,4 +12,6 @@ export type AnalyticsData = {
   ratedSessionCount: number;
   timeByActivity: Record<string, number>;
   peakHours: Record<number, number>;
+  totalDistractions: number;
+  averageDistractions: number;
 };

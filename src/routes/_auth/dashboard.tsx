@@ -18,16 +18,24 @@ const PERIOD_OPTIONS = [
   { value: '30', label: 'Last 30 days' },
   { value: '90', label: 'Last 90 days' },
   { value: 'all', label: 'All time' },
+  { value: 'custom', label: 'Custom Range' },
 ] as const;
 
 function DashboardPage() {
   const navigate = useNavigate();
   const logout = useLogout();
   const [period, setPeriod] = useState('7');
+  const [customFrom, setCustomFrom] = useState('');
+  const [customTo, setCustomTo] = useState('');
   const { data: activitiesData, isLoading: activitiesLoading } = useActivities();
   const { data: currentData } = useCurrentEntry();
 
-  const dateRange = period !== 'all' ? getDateRangeForDays(Number(period)) : undefined;
+  const dateRange =
+    period === 'custom'
+      ? (customFrom && customTo ? { from: customFrom, to: customTo } : undefined)
+      : period !== 'all'
+        ? getDateRangeForDays(Number(period))
+        : undefined;
   const { data: entries, isLoading: entriesLoading } = useTimeEntries(
     dateRange ? { from: dateRange.from, to: dateRange.to + 'T23:59:59' } : undefined
   );
@@ -138,6 +146,22 @@ function DashboardPage() {
             ))}
           </select>
         </div>
+        {period === 'custom' && (
+          <div className="mb-3 flex gap-2">
+            <input
+              type="date"
+              value={customFrom}
+              onChange={(e) => setCustomFrom(e.target.value)}
+              className="rounded border border-gray-300 px-2 py-1 text-sm"
+            />
+            <input
+              type="date"
+              value={customTo}
+              onChange={(e) => setCustomTo(e.target.value)}
+              className="rounded border border-gray-300 px-2 py-1 text-sm"
+            />
+          </div>
+        )}
         {entriesLoading ? (
           <p className="text-sm text-gray-500">Loading...</p>
         ) : entries && entries.length > 0 ? (

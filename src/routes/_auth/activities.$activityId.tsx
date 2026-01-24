@@ -32,6 +32,7 @@ const PERIOD_OPTIONS = [
   { value: '30', label: 'Last 30 days' },
   { value: '90', label: 'Last 90 days' },
   { value: 'all', label: 'All time' },
+  { value: 'custom', label: 'Custom Range' },
 ] as const;
 
 export const Route = createFileRoute('/_auth/activities/$activityId')({
@@ -51,6 +52,8 @@ function ActivityPage() {
   });
   const [showSettings, setShowSettings] = useState(false);
   const [period, setPeriod] = useState('7');
+  const [customFrom, setCustomFrom] = useState('');
+  const [customTo, setCustomTo] = useState('');
 
   const pomodoroSettings = usePomodoroSettings();
   const pomodoroState = usePomodoroState();
@@ -66,7 +69,12 @@ function ActivityPage() {
 
   const { data: activity, isLoading: activityLoading } = useActivity(activityId);
   const { data: currentData } = useCurrentEntry();
-  const dateRange = period !== 'all' ? getDateRangeForDays(Number(period)) : undefined;
+  const dateRange =
+    period === 'custom'
+      ? (customFrom && customTo ? { from: customFrom, to: customTo } : undefined)
+      : period !== 'all'
+        ? getDateRangeForDays(Number(period))
+        : undefined;
   const { data: entries, isLoading: entriesLoading } = useTimeEntries({
     activityId,
     from: dateRange?.from,
@@ -468,6 +476,22 @@ function ActivityPage() {
             ))}
           </select>
         </div>
+        {period === 'custom' && (
+          <div className="mb-3 flex gap-2">
+            <input
+              type="date"
+              value={customFrom}
+              onChange={(e) => setCustomFrom(e.target.value)}
+              className="rounded border border-gray-300 px-2 py-1 text-sm"
+            />
+            <input
+              type="date"
+              value={customTo}
+              onChange={(e) => setCustomTo(e.target.value)}
+              className="rounded border border-gray-300 px-2 py-1 text-sm"
+            />
+          </div>
+        )}
         {entriesLoading ? (
           <p className="text-sm text-gray-500">Loading...</p>
         ) : entries && entries.length > 0 ? (

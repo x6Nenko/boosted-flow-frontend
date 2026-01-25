@@ -1,5 +1,5 @@
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   useActivity,
   useArchiveActivity,
@@ -7,11 +7,13 @@ import {
   useUnarchiveActivity,
   useUpdateActivity,
 } from '@/features/activities/hooks';
+import { useActivityPageHotkeys } from '@/features/hotkeys';
 import {
   pomodoroStore,
   usePomodoroSettings,
   usePomodoroState,
 } from '@/features/pomodoro';
+import { useRegisterCommand } from '@/features/command-palette';
 import { BreakTimer } from '@/features/pomodoro/components/BreakTimer';
 import { PomodoroTimer } from '@/features/pomodoro/components/PomodoroTimer';
 import { PomodoroSettingsModal } from '@/features/pomodoro/components/PomodoroSettingsModal';
@@ -57,6 +59,7 @@ function ActivityPage() {
 
   const pomodoroSettings = usePomodoroSettings();
   const pomodoroState = usePomodoroState();
+  const isInBreakPhase = pomodoroState.phase !== 'work';
 
   // Load activity-specific pomodoro state
   useEffect(() => {
@@ -118,6 +121,104 @@ function ActivityPage() {
       });
     }
   };
+
+  const handleStartStop = useCallback(() => {
+    if (isArchived || isRunningOther || hasAnyActiveBreak) return;
+    if (isRunningThisActivity) {
+      if (currentEntry) {
+        if (timerMode === 'pomodoro') {
+          pomodoroStore.completeWorkSession();
+        }
+        stopTimer.mutate({
+          id: currentEntry.id,
+          distractionCount: distractionCount > 0 ? distractionCount : undefined,
+        });
+      }
+    } else if (pomodoroState.phase === 'work') {
+      if (timerMode === 'pomodoro') {
+        pomodoroStore.startWorkSession();
+      }
+      setDistractionCount(0);
+      startTimer.mutate({ activityId, description: description.trim() || undefined });
+    }
+  }, [isArchived, isRunningOther, hasAnyActiveBreak, isRunningThisActivity, pomodoroState.phase, currentEntry, timerMode, distractionCount, activityId, description, startTimer, stopTimer]);
+
+  const handleAddDistraction = useCallback(() => {
+    if (isRunningThisActivity) {
+      setDistractionCount((c) => c + 1);
+    }
+  }, [isRunningThisActivity]);
+
+  const handleToggleTimerMode = useCallback(() => {
+    setTimerMode((mode) => (mode === 'stopwatch' ? 'pomodoro' : 'stopwatch'));
+  }, []);
+
+  const handleOpenPomodoroSettings = useCallback(() => {
+    setShowSettings(true);
+  }, []);
+
+  const startStopCommand = useMemo(
+    () => ({
+      id: 'timer.startStop',
+      group: 'Timer',
+      label: 'Start/Stop Timer',
+      shortcut: 'Space',
+      run: handleStartStop,
+    }),
+    [handleStartStop]
+  );
+
+  const toggleModeCommand = useMemo(
+    () => ({
+      id: 'timer.toggleMode',
+      group: 'Timer',
+      label: 'Toggle Pomodoro/Stopwatch',
+      run: handleToggleTimerMode,
+    }),
+    [handleToggleTimerMode]
+  );
+
+  const addDistractionCommand = useMemo(
+    () => ({
+      id: 'timer.addDistraction',
+      group: 'Timer',
+      label: 'Add Distraction',
+      shortcut: '⇧D',
+      run: handleAddDistraction,
+    }),
+    [handleAddDistraction]
+  );
+
+  const skipBreakCommand = useMemo(
+    () => ({
+      id: 'timer.skipBreak',
+      group: 'Timer',
+      label: 'Skip Break',
+      run: () => pomodoroStore.completeBreak(),
+    }),
+    []
+  );
+
+  const pomodoroSettingsCommand = useMemo(
+    () => ({
+      id: 'timer.settings',
+      group: 'Timer',
+      label: 'Pomodoro Settings',
+      run: handleOpenPomodoroSettings,
+    }),
+    [handleOpenPomodoroSettings]
+  );
+
+  useRegisterCommand(startStopCommand);
+  useRegisterCommand(toggleModeCommand);
+  useRegisterCommand(addDistractionCommand);
+  useRegisterCommand(isInBreakPhase ? skipBreakCommand : null);
+  useRegisterCommand(pomodoroSettingsCommand);
+
+  useActivityPageHotkeys({
+    onStartStop: handleStartStop,
+    onAddDistraction: handleAddDistraction,
+  });
 
   const handlePomodoroComplete = () => {
     if (currentEntry) {
@@ -381,7 +482,7 @@ function ActivityPage() {
             {/* Mode toggle */}
             <div className="mb-3 flex gap-1">
               <button
-                onClick={() => setTimerMode('stopwatch')}
+                onClick={handleToggleTimerMode}
                 className={`flex-1 rounded px-3 py-1 text-sm ${timerMode === 'stopwatch'
                   ? 'bg-gray-200 text-gray-900'
                   : 'text-gray-500 hover:bg-gray-100'
@@ -433,7 +534,7 @@ function ActivityPage() {
                     {pomodoroSettings.workDuration}m focus • {pomodoroSettings.shortBreakDuration}m short • {pomodoroSettings.longBreakDuration}m long • {pomodoroSettings.sessionsBeforeLongBreak} sessions
                   </p>
                   <button
-                    onClick={() => setShowSettings(true)}
+                    onClick={handleOpenPomodoroSettings}
                     className="text-xs text-gray-400 hover:text-gray-600"
                     title="Settings"
                   >

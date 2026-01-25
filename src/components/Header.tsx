@@ -1,7 +1,30 @@
 import { Link } from '@tanstack/react-router'
 
-import { useState } from 'react'
-import { BarChart3, Home, Layers, Menu, X } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { BarChart3, Home, Layers, Menu, Search, X } from 'lucide-react'
+import { commandPaletteStore } from '@/features/command-palette'
+
+function SearchButton() {
+  const [isMac, setIsMac] = useState(false);
+
+  useEffect(() => {
+    const nav = navigator as any;
+    // Check the modern API first (userAgentData), then fall back to the string check
+    const isMacPlatform = nav.userAgentData?.platform === 'macOS' || nav.userAgent.includes('Mac');
+    setIsMac(isMacPlatform);
+  }, []);
+
+  return (
+    <button
+      type="button"
+      onClick={() => commandPaletteStore.open()}
+      className="flex items-center gap-1 rounded-full bg-gray-700 px-2 py-1 text-sm hover:bg-gray-600 transition-colors"
+    >
+      <Search size={14} className="text-gray-400" />
+      <kbd className="text-xs text-gray-400">{isMac ? '⌘K' : 'Ctrl K'}</kbd>
+    </button>
+  );
+}
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false)
@@ -53,7 +76,13 @@ export default function Header() {
             <BarChart3 size={18} />
             <span>Analytics</span>
           </Link>
+          <SearchButton />
         </nav>
+
+        {/* Mobile Search Button */}
+        <div className="md:hidden">
+          <SearchButton />
+        </div>
       </header>
 
       {/* Mobile Sidebar */}

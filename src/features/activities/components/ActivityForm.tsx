@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useCreateActivity } from '../hooks';
 import { ACTIVITY_SUGGESTIONS } from '../types';
+import { useRegisterCommand } from '@/features/command-palette';
 
 type ActivityFormProps = {
   onCreated?: (id: string) => void;
@@ -10,6 +11,19 @@ export function ActivityForm({ onCreated }: ActivityFormProps) {
   const [name, setName] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
   const createActivity = useCreateActivity();
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const newActivityCommand = useMemo(
+    () => ({
+      id: 'activities.new',
+      group: 'Actions',
+      label: 'New Activity',
+      run: () => inputRef.current?.focus(),
+    }),
+    []
+  );
+
+  useRegisterCommand(newActivityCommand);
 
   const filteredSuggestions = ACTIVITY_SUGGESTIONS.filter((s) =>
     s.toLowerCase().includes(name.toLowerCase())
@@ -38,6 +52,7 @@ export function ActivityForm({ onCreated }: ActivityFormProps) {
     <form onSubmit={handleSubmit} className="space-y-3">
       <div className="relative">
         <input
+          ref={inputRef}
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}

@@ -1,5 +1,5 @@
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   useActivity,
   useArchiveActivity,
@@ -56,6 +56,7 @@ function ActivityPage() {
   const [period, setPeriod] = useState('7');
   const [customFrom, setCustomFrom] = useState('');
   const [customTo, setCustomTo] = useState('');
+  const intentionInputRef = useRef<HTMLInputElement>(null);
 
   const pomodoroSettings = usePomodoroSettings();
   const pomodoroState = usePomodoroState();
@@ -95,8 +96,15 @@ function ActivityPage() {
   const isRunningOther = !!currentEntry && !isRunningThisActivity;
   const hasAnyActiveBreak = pomodoroStore.hasActiveBreak();
   const isArchived = !!activity?.archivedAt;
+  const isBreakActive = pomodoroState.isBreakActive && !!pomodoroState.breakStartedAt;
+  const canSetIntention =
+    !isArchived &&
+    !isRunningThisActivity &&
+    !isRunningOther &&
+    !hasAnyActiveBreak &&
+    pomodoroState.phase === 'work';
 
-  const handleStart = () => {
+  const handleStart = useCallback(() => {
     if (timerMode === 'pomodoro') {
       pomodoroStore.startWorkSession();
     }
@@ -108,7 +116,7 @@ function ActivityPage() {
       },
       { onSuccess: () => setDescription('') }
     );
-  };
+  }, [timerMode, startTimer, activityId, description]);
 
   const handleStop = () => {
     if (currentEntry) {
@@ -189,12 +197,42 @@ function ActivityPage() {
     [handleAddDistraction]
   );
 
+  const intentionCommand = useMemo(
+    () => ({
+      id: 'timer.intention',
+      group: 'Timer',
+      label: 'Start timer with intention',
+      run: () => intentionInputRef.current?.focus(),
+    }),
+    []
+  );
+
   const skipBreakCommand = useMemo(
     () => ({
       id: 'timer.skipBreak',
       group: 'Timer',
       label: 'Skip Break',
       run: () => pomodoroStore.completeBreak(),
+    }),
+    []
+  );
+
+  const startBreakCommand = useMemo(
+    () => ({
+      id: 'timer.startBreak',
+      group: 'Timer',
+      label: 'Start Break',
+      run: () => pomodoroStore.startBreak(),
+    }),
+    []
+  );
+
+  const resetPomodoroCommand = useMemo(
+    () => ({
+      id: 'timer.resetPomodoro',
+      group: 'Timer',
+      label: 'Reset Pomodoro Phase',
+      run: () => pomodoroStore.resetState(),
     }),
     []
   );
@@ -212,8 +250,11 @@ function ActivityPage() {
   useRegisterCommand(startStopCommand);
   useRegisterCommand(toggleModeCommand);
   useRegisterCommand(addDistractionCommand);
+  useRegisterCommand(canSetIntention ? intentionCommand : null);
   useRegisterCommand(isInBreakPhase ? skipBreakCommand : null);
+  useRegisterCommand(isInBreakPhase && !isBreakActive ? startBreakCommand : null);
   useRegisterCommand(pomodoroSettingsCommand);
+  useRegisterCommand(resetPomodoroCommand);
 
   useActivityPageHotkeys({
     onStartStop: handleStartStop,
@@ -447,7 +488,7 @@ function ActivityPage() {
                   onClick={handleSkipBreak}
                   className="mt-3 w-full rounded border border-gray-300 px-4 py-2 text-sm hover:bg-gray-50"
                 >
-                  Stop Break
+                  Skip Break
                 </button>
               </div>
             ) : (
@@ -482,7 +523,7 @@ function ActivityPage() {
             {/* Mode toggle */}
             <div className="mb-3 flex gap-1">
               <button
-                onClick={handleToggleTimerMode}
+                onClick={() => setTimerMode('stopwatch')}
                 className={`flex-1 rounded px-3 py-1 text-sm ${timerMode === 'stopwatch'
                   ? 'bg-gray-200 text-gray-900'
                   : 'text-gray-500 hover:bg-gray-100'
@@ -503,10 +544,17 @@ function ActivityPage() {
 
             <div className="mb-3">
               <input
+                ref={intentionInputRef}
                 type="text"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="What are you working on? (optional)"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleStart();
+                  }
+                }}
+                placeholder="What are your intention? (optional)"
                 maxLength={500}
                 className="w-full rounded border border-gray-300 px-3 py-2 text-sm"
               />

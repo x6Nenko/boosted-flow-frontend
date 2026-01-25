@@ -59,8 +59,11 @@ src/features/hotkeys/
 **Activity Page (`/activities/:id`):**
 - Start/Stop Timer (`Space`)
 - Toggle Pomodoro/Stopwatch
+- Start timer with intention (focuses intention input)
 - Add Distraction (`⇧D`)
+- Start Break (only during break phase)
 - Skip Break (only during break phase)
+- Reset Pomodoro Phase
 - Pomodoro Settings
 
 ---

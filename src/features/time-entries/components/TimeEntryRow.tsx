@@ -115,7 +115,7 @@ export function TimeEntryRow({
               <textarea
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
-                placeholder="Add a comment..."
+                placeholder="What are your reflections? (optional)"
                 maxLength={1000}
                 rows={2}
                 className="w-full rounded border border-gray-300 px-2 py-1 text-sm"

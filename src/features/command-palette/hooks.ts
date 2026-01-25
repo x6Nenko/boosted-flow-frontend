@@ -16,3 +16,11 @@ export function useRegisterCommand(command: CommandDefinition | null) {
     return commandRegistry.register(command);
   }, [command]);
 }
+
+export function useRegisterCommands(commands: CommandDefinition[]) {
+  useEffect(() => {
+    if (!commands.length) return;
+    const unregisters = commands.map((command) => commandRegistry.register(command));
+    return () => unregisters.forEach((unregister) => unregister());
+  }, [commands]);
+}

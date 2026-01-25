@@ -1,7 +1,8 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useActivities } from '@/features/activities/hooks';
 import { ActivityForm } from '@/features/activities/components/ActivityForm';
+import { useRegisterCommands } from '@/features/command-palette';
 
 export const Route = createFileRoute('/_auth/activities/')({
   component: ActivitiesPage,
@@ -11,6 +12,21 @@ function ActivitiesPage() {
   const navigate = useNavigate();
   const [includeArchived, setIncludeArchived] = useState(false);
   const { data: activities, isLoading } = useActivities(includeArchived);
+
+  const activityCommands = useMemo(() => {
+    if (!activities) return [];
+    return activities.map((activity) => ({
+      id: `activities.open.${activity.id}`,
+      group: 'Activities',
+      label: activity.archivedAt ? `${activity.name} (archived)` : activity.name,
+      run: () => navigate({
+        to: '/activities/$activityId',
+        params: { activityId: activity.id },
+      }),
+    }));
+  }, [activities, navigate]);
+
+  useRegisterCommands(activityCommands);
 
   const handleActivityCreated = (id: string) => {
     navigate({ to: '/activities/$activityId', params: { activityId: id } });

@@ -17,8 +17,8 @@ export function CommandPalette() {
   const close = () => commandPaletteStore.close();
 
   const runAndClose = (fn: () => void) => {
-    fn();
     close();
+    window.setTimeout(fn, 0);
   };
 
   const dashboardCommand = useMemo(
@@ -70,7 +70,13 @@ export function CommandPalette() {
   }, [commands]);
 
   return (
-    <Command.Dialog open={isOpen} onOpenChange={(open) => (open ? commandPaletteStore.open() : close())} label="Command Palette">
+    <Command.Dialog
+      open={isOpen}
+      onOpenChange={(open) => (open ? commandPaletteStore.open() : close())}
+      label="Command Palette"
+      overlayClassName="cmdk-overlay"
+      contentClassName="cmdk-content"
+    >
       <Command.Input placeholder="Type a command..." />
       <Command.List>
         <Command.Empty>No results found.</Command.Empty>

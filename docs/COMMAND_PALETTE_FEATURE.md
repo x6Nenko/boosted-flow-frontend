@@ -54,6 +54,7 @@ src/features/hotkeys/
 
 **Activities Page (`/activities`):**
 - New Activity — focuses the activity name input
+- Search Activities — type to filter by name and open
 
 **Activity Page (`/activities/:id`):**
 - Start/Stop Timer (`Space`)
@@ -88,6 +89,21 @@ useActivityPageHotkeys({
   onStartStop: () => void,      // Called on Space
   onAddDistraction: () => void, // Called on Shift+D
 });
+
+// Register a single command
+useRegisterCommand({
+  id: 'timer.startStop',
+  group: 'Timer',
+  label: 'Start/Stop Timer',
+  shortcut: 'Space',
+  run: handleStartStop,
+});
+
+// Register multiple commands (e.g., dynamic list of activities)
+useRegisterCommands([
+  { id: 'activity.1', group: 'Activities', label: 'Project A', run: () => {} },
+  { id: 'activity.2', group: 'Activities', label: 'Project B', run: () => {} },
+]);
 ```
 
 ---
@@ -105,10 +121,15 @@ useActivityPageHotkeys({
 - `useActivityPageHotkeys` for Space and Shift+D
 - Commands registered via the command registry
 
+### Activities Page
+- Registers one command per activity so the palette can filter by name and open it
+- Uses `useRegisterCommands` hook for dynamic command lists
+
 ### Command Registry
-Commands are registered by the components that own the action.
+Commands are registered by the components that own the action using hooks:
 
 ```typescript
+// Single command
 useRegisterCommand({
   id: 'timer.startStop',
   group: 'Timer',
@@ -116,6 +137,9 @@ useRegisterCommand({
   shortcut: 'Space',
   run: handleStartStop,
 });
+
+// Multiple commands (dynamic lists)
+useRegisterCommands(activityCommands);
 ```
 
 ---

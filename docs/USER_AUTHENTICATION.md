@@ -2,7 +2,7 @@
 
 ## 1. High-Level Purpose
 
-Enables secure user authentication using JWT access tokens (in-memory) and refresh tokens (HttpOnly cookies), with automatic session restoration and protected route navigation.
+Enables secure user authentication using JWT access tokens (in-memory) and refresh tokens (HttpOnly cookies), with automatic session restoration, protected route navigation, and Google OAuth support.
 
 ---
 
@@ -21,20 +21,23 @@ src/
 │   ├── auth-guard.ts (Route guards & session init)
 │   ├── auth.schema.ts (Zod validation schemas)
 │   ├── components/
-│   │   ├── LoginForm.tsx (Login form with react-hook-form)
-│   │   └── RegisterForm.tsx (Registration form with react-hook-form)
+│   │   ├── LoginForm.tsx (Login form with react-hook-form + Google OAuth)
+│   │   ├── RegisterForm.tsx (Registration form with react-hook-form + Google OAuth)
+│   │   └── GoogleSignInButton.tsx (Google OAuth button component)
 │   └── hooks/
 │       ├── use-auth.ts (Subscribe to auth state)
 │       ├── use-login.ts (TanStack Mutation)
 │       ├── use-register.ts (TanStack Mutation)
-│       └── use-logout.ts (TanStack Mutation + cache clear)
+│       ├── use-logout.ts (TanStack Mutation + cache clear)
+│       └── use-google-auth.ts (Google OAuth initiation + code exchange)
 ├── routes/
 │   ├── index.tsx (Public landing - redirects authenticated users)
 │   ├── _auth.tsx (Layout route with requireAuth guard)
 │   ├── _guest.tsx (Layout route with requireGuest guard)
 │   ├── _auth/dashboard.tsx (Protected page)
 │   ├── _guest/login.tsx (Renders LoginForm)
-│   └── _guest/register.tsx (Renders RegisterForm)
+│   ├── _guest/register.tsx (Renders RegisterForm)
+│   └── auth/callback.tsx (OAuth callback handler)
 ```
 
 ---
@@ -81,6 +84,18 @@ src/
    - `authStore.setAccessToken(null)`
    - `queryClient.clear()` (purge all cached data)
    - `navigate({ to: '/login' })`
+
+### **Google OAuth Flow**
+1. User clicks "Sign in with Google" → `GoogleSignInButton` component
+2. `useGoogleAuth().initiateGoogleAuth()` → redirect to `${API_BASE_URL}/auth/google`
+3. Backend redirects to Google consent screen
+4. User authenticates with Google
+5. Google redirects to backend callback → backend issues one-time code
+6. Backend redirects to `/auth/callback?code=...`
+7. `AuthCallbackPage` extracts code → `useGoogleAuth().exchangeCode.mutate(code)`
+8. TanStack Mutation → `authApi.exchangeCode()` → POST `/auth/exchange`
+9. Response: `{ accessToken: "..." }` + HttpOnly `refreshToken` cookie
+10. `onSuccess` → `authStore.setAccessToken(token)` → `navigate({ to: '/dashboard' })`
 
 ---
 
@@ -152,6 +167,27 @@ Returns: UseMutationResult<void, Error, void>
   - mutate()
   - isPending
 ```
+
+#### `useGoogleAuth()`
+```ts
+Returns: {
+  initiateGoogleAuth: () => void  // Redirects to Google OAuth
+  exchangeCode: UseMutationResult<AuthResponse, Error, string>
+    - mutate(code: string)
+    - isPending, isError, error
+}
+```
+
+### **Components**
+
+#### `GoogleSignInButton`
+```ts
+Props: {
+  mode?: 'signin' | 'signup'  // Default: 'signin'
+  disabled?: boolean
+}
+```
+Renders Google-branded sign-in button following Google's branding guidelines.
 
 ### **API Client**
 
@@ -231,3 +267,10 @@ void | throws redirect({ to: '/' })
 - **No query key factories** (not used in auth feature)
 - **Cache cleared on logout** (prevents data leakage between users)
 - Mutations don't invalidate queries (auth is self-contained state)
+
+### **Google OAuth Rules**
+- **One-time code exchange** - Backend uses short-lived codes (5 min expiry), not tokens in URLs
+- **Callback route is public** - `/auth/callback` must not be behind `_guest` or `_auth` guards
+- **Code consumed immediately** - `exchangeCode` mutation called on mount, code deleted on backend after use
+- **Error handling** - OAuth errors redirect to login page with error display
+- **Google branding** - `GoogleSignInButton` follows Google's identity branding guidelines

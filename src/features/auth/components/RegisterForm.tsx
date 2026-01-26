@@ -1,9 +1,12 @@
 import { Link } from '@tanstack/react-router';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import type { RegisterFormData } from '@/features/auth/auth.schema';
+import { registerSchema } from '@/features/auth/auth.schema';
 import { useRegister } from '@/features/auth/hooks';
-import { registerSchema, type RegisterFormData } from '@/features/auth/auth.schema';
 import { ApiError } from '@/lib/api-client';
+
+import { GoogleSignInButton } from './GoogleSignInButton';
 
 export function RegisterForm() {
   const register = useRegister();
@@ -99,6 +102,17 @@ export function RegisterForm() {
             {register.isPending ? 'Creating account...' : 'Register'}
           </button>
         </div>
+
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-gray-300" />
+          </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="bg-white px-2 text-gray-500">Or</span>
+          </div>
+        </div>
+
+        <GoogleSignInButton mode="signup" disabled={register.isPending} />
 
         <div className="text-center text-sm">
           <span className="text-gray-600">Already have an account? </span>

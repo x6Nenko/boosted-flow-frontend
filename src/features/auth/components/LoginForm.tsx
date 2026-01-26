@@ -1,9 +1,12 @@
 import { Link } from '@tanstack/react-router';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import type { LoginFormData } from '@/features/auth/auth.schema';
+import { loginSchema } from '@/features/auth/auth.schema';
 import { useLogin } from '@/features/auth/hooks';
-import { loginSchema, type LoginFormData } from '@/features/auth/auth.schema';
 import { ApiError } from '@/lib/api-client';
+
+import { GoogleSignInButton } from './GoogleSignInButton';
 
 export function LoginForm() {
   const login = useLogin();
@@ -83,6 +86,17 @@ export function LoginForm() {
             {login.isPending ? 'Signing in...' : 'Sign in'}
           </button>
         </div>
+
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-gray-300" />
+          </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="bg-white px-2 text-gray-500">Or</span>
+          </div>
+        </div>
+
+        <GoogleSignInButton disabled={login.isPending} />
 
         <div className="text-center text-sm">
           <span className="text-gray-600">Don't have an account? </span>

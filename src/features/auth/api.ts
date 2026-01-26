@@ -1,5 +1,5 @@
+import type { AuthResponse, ExchangeCodeRequest, LoginRequest, RegisterRequest } from './types';
 import { apiClient } from '@/lib/api-client';
-import type { AuthResponse, LoginRequest, RegisterRequest } from './types';
 import { API_ENDPOINTS } from '@/lib/api-endpoints';
 
 export const authApi = {
@@ -11,4 +11,6 @@ export const authApi = {
     apiClient<AuthResponse>(API_ENDPOINTS.AUTH.REFRESH, { method: 'POST' }),
   logout: () =>
     apiClient<void>(API_ENDPOINTS.AUTH.LOGOUT, { method: 'POST' }),
+  exchangeCode: (data: ExchangeCodeRequest) =>
+    apiClient<AuthResponse>(API_ENDPOINTS.AUTH.EXCHANGE, { method: 'POST', body: data }),
 };

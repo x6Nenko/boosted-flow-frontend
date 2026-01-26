@@ -14,6 +14,10 @@ export type RegisterRequest = {
   password: string;
 };
 
+export type ExchangeCodeRequest = {
+  code: string;
+};
+
 // Auth State
 export type AuthState = {
   accessToken: string | null;

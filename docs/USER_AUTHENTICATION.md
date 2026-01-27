@@ -120,7 +120,7 @@ src/
 5. User enters new password + confirmation → form validation via `resetPasswordSchema`
 6. On valid submission → `useResetPassword().mutate({ token, password })`
 7. TanStack Mutation → `authApi.resetPassword()` → POST `/auth/reset-password`
-8. `onSuccess` → `navigate({ to: '/login' })` (user must log in with new password)
+8. On success → show confirmation message and a "Continue to login" link
 
 ---
 

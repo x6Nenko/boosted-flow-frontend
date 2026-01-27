@@ -6,6 +6,8 @@ export const API_ENDPOINTS = {
     REFRESH: '/auth/refresh',
     GOOGLE: '/auth/google',
     EXCHANGE: '/auth/exchange',
+    FORGOT_PASSWORD: '/auth/forgot-password',
+    RESET_PASSWORD: '/auth/reset-password',
   },
   ACTIVITIES: {
     BASE: '/activities',

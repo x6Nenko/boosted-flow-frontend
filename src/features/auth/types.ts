@@ -3,6 +3,10 @@ export type AuthResponse = {
   accessToken: string;
 };
 
+export type MessageResponse = {
+  message: string;
+};
+
 // Request Types
 export type LoginRequest = {
   email: string;
@@ -16,6 +20,15 @@ export type RegisterRequest = {
 
 export type ExchangeCodeRequest = {
   code: string;
+};
+
+export type ForgotPasswordRequest = {
+  email: string;
+};
+
+export type ResetPasswordRequest = {
+  token: string;
+  password: string;
 };
 
 // Auth State

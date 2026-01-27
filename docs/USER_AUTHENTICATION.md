@@ -23,13 +23,17 @@ src/
 │   ├── components/
 │   │   ├── LoginForm.tsx (Login form with react-hook-form + Google OAuth)
 │   │   ├── RegisterForm.tsx (Registration form with react-hook-form + Google OAuth)
-│   │   └── GoogleSignInButton.tsx (Google OAuth button component)
+│   │   ├── GoogleSignInButton.tsx (Google OAuth button component)
+│   │   ├── ForgotPasswordForm.tsx (Forgot password request form)
+│   │   └── ResetPasswordForm.tsx (Password reset form with token)
 │   └── hooks/
 │       ├── use-auth.ts (Subscribe to auth state)
 │       ├── use-login.ts (TanStack Mutation)
 │       ├── use-register.ts (TanStack Mutation)
 │       ├── use-logout.ts (TanStack Mutation + cache clear)
-│       └── use-google-auth.ts (Google OAuth initiation + code exchange)
+│       ├── use-google-auth.ts (Google OAuth initiation + code exchange)
+│       ├── use-forgot-password.ts (TanStack Mutation for password reset request)
+│       └── use-reset-password.ts (TanStack Mutation for password reset)
 ├── routes/
 │   ├── index.tsx (Public landing - redirects authenticated users)
 │   ├── _auth.tsx (Layout route with requireAuth guard)
@@ -37,6 +41,8 @@ src/
 │   ├── _auth/dashboard.tsx (Protected page)
 │   ├── _guest/login.tsx (Renders LoginForm)
 │   ├── _guest/register.tsx (Renders RegisterForm)
+│   ├── _guest/forgot-password.tsx (Renders ForgotPasswordForm)
+│   ├── _guest/reset-password.tsx (Renders ResetPasswordForm with token from URL)
 │   └── auth/callback.tsx (OAuth callback handler)
 ```
 
@@ -96,6 +102,25 @@ src/
 8. TanStack Mutation → `authApi.exchangeCode()` → POST `/auth/exchange`
 9. Response: `{ accessToken: "..." }` + HttpOnly `refreshToken` cookie
 10. `onSuccess` → `authStore.setAccessToken(token)` → `navigate({ to: '/dashboard' })`
+
+### **Forgot Password Flow**
+1. User clicks "Forgot your password?" on login page → navigates to `/forgot-password`
+2. User enters email → `ForgotPasswordForm` component (react-hook-form)
+3. Form validation via Zod schema (`forgotPasswordSchema`) - email format
+4. On valid submission → `useForgotPassword().mutate({ email })`
+5. TanStack Mutation → `authApi.forgotPassword()` → POST `/auth/forgot-password`
+6. Response: `{ message: "..." }` (always success to prevent enumeration)
+7. Component shows success message with "Check your email" confirmation
+
+### **Reset Password Flow**
+1. User clicks reset link in email → navigates to `/reset-password?token=...`
+2. Route validates token presence in URL search params
+3. If no token → shows "Invalid reset link" error with link to request new one
+4. If token exists → `ResetPasswordForm` component receives token prop
+5. User enters new password + confirmation → form validation via `resetPasswordSchema`
+6. On valid submission → `useResetPassword().mutate({ token, password })`
+7. TanStack Mutation → `authApi.resetPassword()` → POST `/auth/reset-password`
+8. `onSuccess` → `navigate({ to: '/login' })` (user must log in with new password)
 
 ---
 
@@ -178,6 +203,20 @@ Returns: {
 }
 ```
 
+#### `useForgotPassword()`
+```ts
+Returns: UseMutationResult<MessageResponse, Error, ForgotPasswordRequest>
+  - mutate(data: { email: string })
+  - isPending, isError, error, isSuccess
+```
+
+#### `useResetPassword()`
+```ts
+Returns: UseMutationResult<MessageResponse, Error, ResetPasswordRequest>
+  - mutate(data: { token: string; password: string })
+  - isPending, isError, error
+```
+
 ### **Components**
 
 #### `GoogleSignInButton`
@@ -246,7 +285,7 @@ void | throws redirect({ to: '/' })
 - `beforeLoad` runs **before** component render (no flash of unauthorized content)
 
 ### **Form Validation**
-- **Zod schemas**: `loginSchema` and `registerSchema` in `auth.schema.ts`
+- **Zod schemas**: `loginSchema`, `registerSchema`, `forgotPasswordSchema`, `resetPasswordSchema` in `auth.schema.ts`
 - **Login validation**: Valid email format + password required
 - **Register validation**:
   - Valid email format
@@ -255,6 +294,8 @@ void | throws redirect({ to: '/' })
   - At least one lowercase letter
   - At least one number
   - Confirmation must match password
+- **Forgot password validation**: Valid email format
+- **Reset password validation**: Same rules as register (8-72 chars, complexity, confirmation match)
 - **Server errors**: Extracted from `ApiError.data.message`
 - **Display priority**: Zod validation errors shown inline, server errors displayed above form
 

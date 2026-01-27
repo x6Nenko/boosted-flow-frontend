@@ -71,6 +71,12 @@ export function LoginForm() {
           </div>
         </div>
 
+        <div className="text-right text-sm">
+          <Link to="/forgot-password" className="font-medium text-indigo-600 hover:text-indigo-500">
+            Forgot your password?
+          </Link>
+        </div>
+
         {apiErrorMessage && (
           <div className="rounded-md bg-red-50 p-4">
             <p className="text-sm text-red-800">{apiErrorMessage}</p>

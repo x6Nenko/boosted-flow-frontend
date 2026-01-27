@@ -3,6 +3,7 @@ import { Link } from '@tanstack/react-router';
 import { useUpdateTimeEntry, useDeleteTimeEntry } from '../hooks';
 import { formatStoppedDuration, TimerDuration } from './TimerDuration';
 import { formatTime, formatDate } from '@/lib/utils';
+import { toDateTimeLocalValue, toIsoFromLocal } from '../time-entries.utils';
 import type { TimeEntry } from '../types';
 import type { Activity } from '@/features/activities/types';
 
@@ -49,16 +50,31 @@ export function TimeEntryRow({
   const [comment, setComment] = useState(entry.comment || '');
   const [rating, setRating] = useState<number | null>(entry.rating);
   const [distractionCount, setDistractionCount] = useState(entry.distractionCount);
+  const [startedAtLocal, setStartedAtLocal] = useState(
+    entry.startedAt ? toDateTimeLocalValue(entry.startedAt) : ''
+  );
+  const [stoppedAtLocal, setStoppedAtLocal] = useState(
+    entry.stoppedAt ? toDateTimeLocalValue(entry.stoppedAt) : ''
+  );
   const updateEntry = useUpdateTimeEntry();
   const deleteEntry = useDeleteTimeEntry();
 
   const isStopped = !!entry.stoppedAt;
 
   const handleSave = async () => {
+    const startedAtIso = startedAtLocal ? toIsoFromLocal(startedAtLocal) : undefined;
+    const stoppedAtIso = stoppedAtLocal ? toIsoFromLocal(stoppedAtLocal) : undefined;
+    const startedAtChanged =
+      startedAtIso && startedAtIso !== entry.startedAt ? startedAtIso : undefined;
+    const stoppedAtChanged =
+      stoppedAtIso && stoppedAtIso !== entry.stoppedAt ? stoppedAtIso : undefined;
+
     updateEntry.mutate(
       {
         id: entry.id,
         data: {
+          startedAt: startedAtChanged,
+          stoppedAt: stoppedAtChanged,
           rating: rating ?? undefined,
           comment: comment || undefined,
           distractionCount,
@@ -78,6 +94,8 @@ export function TimeEntryRow({
     setComment(entry.comment || '');
     setRating(entry.rating);
     setDistractionCount(entry.distractionCount);
+    setStartedAtLocal(entry.startedAt ? toDateTimeLocalValue(entry.startedAt) : '');
+    setStoppedAtLocal(entry.stoppedAt ? toDateTimeLocalValue(entry.stoppedAt) : '');
     setIsEditing(true);
   };
 
@@ -111,6 +129,26 @@ export function TimeEntryRow({
         <div className="mt-2">
           {isEditing ? (
             <div className="space-y-2">
+              <div className="grid gap-2 sm:grid-cols-2">
+                <label className="text-xs text-gray-500">
+                  Started at
+                  <input
+                    type="datetime-local"
+                    value={startedAtLocal}
+                    onChange={(e) => setStartedAtLocal(e.target.value)}
+                    className="mt-1 w-full rounded border border-gray-300 px-2 py-1 text-sm"
+                  />
+                </label>
+                <label className="text-xs text-gray-500">
+                  Stopped at
+                  <input
+                    type="datetime-local"
+                    value={stoppedAtLocal}
+                    onChange={(e) => setStoppedAtLocal(e.target.value)}
+                    className="mt-1 w-full rounded border border-gray-300 px-2 py-1 text-sm"
+                  />
+                </label>
+              </div>
               <RatingStars value={rating} onChange={setRating} />
               <textarea
                 value={comment}

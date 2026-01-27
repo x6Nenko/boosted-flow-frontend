@@ -13,6 +13,7 @@ export const API_ENDPOINTS = {
   TIME_ENTRIES: {
     START: '/time-entries/start',
     STOP: '/time-entries/stop',
+    MANUAL: '/time-entries/manual',
     LIST: '/time-entries',
     CURRENT: '/time-entries/current',
   },

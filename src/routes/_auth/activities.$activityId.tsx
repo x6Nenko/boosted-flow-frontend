@@ -1,5 +1,7 @@
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
   useActivity,
   useArchiveActivity,
@@ -21,11 +23,15 @@ import { TimerDuration } from '@/features/time-entries/components/TimerDuration'
 import { TimeEntryRow } from '@/features/time-entries/components/TimeEntryRow';
 import {
   useCurrentEntry,
+  useCreateManualTimeEntry,
   useStartTimer,
   useStopTimer,
   useTimeEntries,
 } from '@/features/time-entries/hooks';
+import { manualEntrySchema, type ManualEntryFormData } from '@/features/time-entries/time-entries.schema';
+import { toIsoFromLocal } from '@/features/time-entries/time-entries.utils';
 import { getDateRangeForDays } from '@/features/analytics';
+import { ApiError } from '@/lib/api-client';
 
 type TimerMode = 'stopwatch' | 'pomodoro';
 
@@ -56,6 +62,7 @@ function ActivityPage() {
   const [period, setPeriod] = useState('7');
   const [customFrom, setCustomFrom] = useState('');
   const [customTo, setCustomTo] = useState('');
+  const [manualOpen, setManualOpen] = useState(false);
   const intentionInputRef = useRef<HTMLInputElement>(null);
 
   const pomodoroSettings = usePomodoroSettings();
@@ -86,6 +93,16 @@ function ActivityPage() {
   });
   const startTimer = useStartTimer();
   const stopTimer = useStopTimer();
+  const createManual = useCreateManualTimeEntry();
+  const {
+    register: registerManualField,
+    handleSubmit: handleManualSubmit,
+    reset: resetManualForm,
+    formState: { errors: manualErrors, isSubmitting: isManualSubmitting },
+  } = useForm<ManualEntryFormData>({
+    resolver: zodResolver(manualEntrySchema),
+  });
+
   const updateActivity = useUpdateActivity();
   const archiveActivity = useArchiveActivity();
   const unarchiveActivity = useUnarchiveActivity();
@@ -313,6 +330,31 @@ function ActivityPage() {
       });
     }
   };
+
+  const onManualSubmit = (data: ManualEntryFormData) => {
+    const startedAtIso = toIsoFromLocal(data.startedAt);
+    const stoppedAtIso = toIsoFromLocal(data.stoppedAt);
+    if (!startedAtIso || !stoppedAtIso) return;
+    createManual.mutate(
+      {
+        activityId,
+        startedAt: startedAtIso,
+        stoppedAt: stoppedAtIso,
+        description: data.description?.trim() || undefined,
+      },
+      {
+        onSuccess: () => {
+          resetManualForm();
+          setManualOpen(false);
+        },
+      }
+    );
+  };
+
+  const manualApiErrorMessage =
+    createManual.error instanceof ApiError
+      ? (createManual.error.data as { message?: string })?.message || 'Failed to save entry'
+      : createManual.error?.message;
 
   if (activityLoading) {
     return (
@@ -608,6 +650,95 @@ function ActivityPage() {
       </div>
 
       <PomodoroSettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} />
+
+      {/* Manual Entry */}
+      <div className="rounded border border-gray-200 bg-white p-4 mb-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-medium text-gray-900">Manual entry</h2>
+          <button
+            onClick={() => setManualOpen((open) => !open)}
+            className="text-sm text-indigo-600 hover:text-indigo-500"
+          >
+            {manualOpen ? 'Close' : 'Add'}
+          </button>
+        </div>
+        {manualOpen && (
+          <form className="mt-3 space-y-2" onSubmit={handleManualSubmit(onManualSubmit)}>
+            <div className="grid gap-2 sm:grid-cols-2">
+              <label className="text-xs text-gray-500">
+                Started at
+                <input
+                  type="datetime-local"
+                  {...registerManualField('startedAt')}
+                  className="mt-1 w-full rounded border border-gray-300 px-2 py-1 text-sm"
+                />
+                {manualErrors.startedAt && (
+                  <p className="mt-1 text-xs text-red-600">{manualErrors.startedAt.message}</p>
+                )}
+              </label>
+              <label className="text-xs text-gray-500">
+                Stopped at
+                <input
+                  type="datetime-local"
+                  {...registerManualField('stoppedAt')}
+                  className="mt-1 w-full rounded border border-gray-300 px-2 py-1 text-sm"
+                />
+                {manualErrors.stoppedAt && (
+                  <p className="mt-1 text-xs text-red-600">{manualErrors.stoppedAt.message}</p>
+                )}
+              </label>
+            </div>
+            <div>
+              <input
+                type="text"
+                placeholder="Description (optional)"
+                maxLength={500}
+                {...registerManualField('description')}
+                className="w-full rounded border border-gray-300 px-2 py-1 text-sm"
+              />
+              {manualErrors.description && (
+                <p className="mt-1 text-xs text-red-600">{manualErrors.description.message}</p>
+              )}
+            </div>
+            {manualApiErrorMessage && (
+              <div className="rounded border border-red-200 bg-red-50 px-3 py-2">
+                <p className="text-xs text-red-700">{manualApiErrorMessage}</p>
+              </div>
+            )}
+            <div className="flex gap-2">
+              <button
+                type="submit"
+                disabled={
+                  isManualSubmitting ||
+                  createManual.isPending ||
+                  isArchived ||
+                  isRunningThisActivity ||
+                  isRunningOther ||
+                  hasAnyActiveBreak
+                }
+                className="rounded bg-indigo-600 px-3 py-1 text-sm text-white hover:bg-indigo-500 disabled:opacity-50"
+              >
+                {createManual.isPending ? 'Saving...' : 'Save'}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  resetManualForm();
+                  setManualOpen(false);
+                }}
+                className="rounded border border-gray-300 px-3 py-1 text-sm hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+            </div>
+            {(isArchived || isRunningThisActivity || isRunningOther || hasAnyActiveBreak) && (
+              <p className="text-xs text-gray-500">
+                Manual entry is disabled while archived, another timer is running, or a break is active.
+              </p>
+            )}
+          </form>
+        )}
+      </div>
 
       {/* Entries List */}
       <div className="rounded border border-gray-200 bg-white p-4">

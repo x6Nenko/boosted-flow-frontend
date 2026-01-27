@@ -14,6 +14,8 @@ routes/_auth/
 └── activities.$activityId.tsx            # Activity-specific: timer, filtered entries
 
 src/features/time-entries/
+├── time-entries.schema.ts               # Zod schema for manual entry form
+├── time-entries.utils.ts                # datetime-local helpers
 ├── types.ts                              # TypeScript definitions (TimeEntry, requests)
 ├── api.ts                                # API endpoints
 ├── components/
@@ -29,6 +31,7 @@ src/features/time-entries/
     ├── use-time-entries.ts               # TanStack Query for listing
     ├── use-start-timer.ts                # TanStack Mutation
     ├── use-stop-timer.ts                 # TanStack Mutation
+    ├── use-create-manual-time-entry.ts   # TanStack Mutation
     ├── use-update-time-entry.ts          # TanStack Mutation
     └── use-delete-time-entry.ts          # TanStack Mutation
 
@@ -74,6 +77,20 @@ src/lib/utils.ts                          # Shared formatTime, formatDate functi
 4. `useUpdateTimeEntry` calls `timeEntriesApi.update(id, data)` → PATCH `/time-entries/:id`
 5. **onSuccess:** Invalidates `['time-entries']` → list re-fetches
 6. Edit form closes, entry shows updated values
+
+### **Updating Entry Timestamps (Manual adjustments)**
+1. User clicks "Edit" on stopped entry → shows datetime inputs for started/stopped
+2. User updates startedAt/stoppedAt values
+3. User clicks "Save" → `updateEntry.mutate({ id, data: { startedAt, stoppedAt } })`
+4. `useUpdateTimeEntry` calls `timeEntriesApi.update(id, data)` → PATCH `/time-entries/:id`
+5. **onSuccess:** Invalidates `['time-entries']` → list re-fetches
+
+### **Manual Entry (Create stopped entry)**
+1. User opens "Manual entry" section on activity page
+2. User inputs startedAt, stoppedAt, optional description
+3. User clicks "Save" → `createManual.mutate({ activityId, startedAt, stoppedAt, description? })`
+4. `useCreateManualTimeEntry` calls `timeEntriesApi.createManual(data)` → POST `/time-entries/manual`
+5. **onSuccess:** Invalidates `['time-entries']` → list re-fetches
 
 ### **Deleting Entry**
 1. User clicks "Delete" in edit form → confirmation dialog
@@ -151,7 +168,13 @@ Returns: UseMutationResult<TimeEntry, Error, string> // string = entry ID
 #### `useUpdateTimeEntry()`
 ```typescript
 Returns: UseMutationResult<TimeEntry, Error, { id: string, data: UpdateTimeEntryRequest }>
-// UpdateTimeEntryRequest = { rating?: number, comment?: string, distractionCount?: number }
+// UpdateTimeEntryRequest = { startedAt?: string, stoppedAt?: string, rating?: number, comment?: string, distractionCount?: number }
+```
+
+#### `useCreateManualTimeEntry()`
+```typescript
+Returns: UseMutationResult<TimeEntry, Error, CreateManualTimeEntryRequest>
+// CreateManualTimeEntryRequest = { activityId: string, startedAt: string, stoppedAt: string, description?: string }
 ```
 
 #### `useDeleteTimeEntry()`
@@ -209,7 +232,14 @@ Returns: Promise<TimeEntry>
 #### `timeEntriesApi.update(id, data)`
 ```typescript
 PATCH /time-entries/:id
-Body: { rating?: number, comment?: string, distractionCount?: number }
+Body: { startedAt?: string, stoppedAt?: string, rating?: number, comment?: string, distractionCount?: number }
+Returns: Promise<TimeEntry>
+```
+
+#### `timeEntriesApi.createManual(data)`
+```typescript
+POST /time-entries/manual
+Body: { activityId: string, startedAt: string, stoppedAt: string, description?: string }
 Returns: Promise<TimeEntry>
 ```
 
@@ -258,9 +288,18 @@ StopTimeEntryRequest {
 }
 
 UpdateTimeEntryRequest {
+  startedAt?: string
+  stoppedAt?: string
   rating?: number
   comment?: string
   distractionCount?: number
+}
+
+CreateManualTimeEntryRequest {
+  activityId: string
+  startedAt: string
+  stoppedAt: string
+  description?: string
 }
 
 TimeEntriesQuery {
@@ -286,6 +325,8 @@ TimeEntriesQuery {
 - **1-week edit window** — backend enforces max 1 week after `stoppedAt`
 - **Rating 1-5** — enforced at UI level with star picker
 - **Comment max 1000 chars** — enforced client-side with `maxLength`
+- **Timestamp edits** — available only for stopped entries; must keep `startedAt < stoppedAt`
+- **Manual entries** — created as already stopped entries
 
 ### **Component Dependencies**
 - **Requires TanStack Query Provider** — must be wrapped in `<QueryClientProvider>`

@@ -4,6 +4,7 @@ import type {
   TimeEntry,
   StartTimeEntryRequest,
   StopTimeEntryRequest,
+  CreateManualTimeEntryRequest,
   UpdateTimeEntryRequest,
   TimeEntriesQuery,
   CurrentEntryResponse,
@@ -20,6 +21,12 @@ export const timeEntriesApi = {
     apiClient<TimeEntry>(API_ENDPOINTS.TIME_ENTRIES.STOP, {
       method: 'POST',
       body: { id, ...(distractionCount !== undefined && { distractionCount }) },
+    }),
+
+  createManual: (data: CreateManualTimeEntryRequest) =>
+    apiClient<TimeEntry>(API_ENDPOINTS.TIME_ENTRIES.MANUAL, {
+      method: 'POST',
+      body: data,
     }),
 
   update: (id: string, data: UpdateTimeEntryRequest) =>

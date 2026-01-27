@@ -34,6 +34,16 @@ export type StartTimeEntryRequest = {
 };
 
 /**
+ * Request to create a manual time entry
+ */
+export type CreateManualTimeEntryRequest = {
+  activityId: string;
+  startedAt: string;
+  stoppedAt: string;
+  description?: string;
+};
+
+/**
  * Request to stop an active time entry
  */
 export type StopTimeEntryRequest = {
@@ -45,6 +55,8 @@ export type StopTimeEntryRequest = {
  * Request to update a finished time entry
  */
 export type UpdateTimeEntryRequest = {
+  startedAt?: string;
+  stoppedAt?: string;
   rating?: number;
   comment?: string;
   distractionCount?: number;

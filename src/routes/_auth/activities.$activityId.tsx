@@ -135,7 +135,8 @@ function ActivityPage() {
     );
   }, [timerMode, startTimer, activityId, description]);
 
-  const handleStop = () => {
+  const handleStopTimer = () => {
+    if (startTimer.isPending) return;
     if (currentEntry) {
       if (timerMode === 'pomodoro') {
         pomodoroStore.completeWorkSession();
@@ -147,8 +148,9 @@ function ActivityPage() {
     }
   };
 
-  const handleStartStop = useCallback(() => {
+  const handleToggleTimer = useCallback(() => {
     if (isArchived || isRunningOther || hasAnyActiveBreak) return;
+    if (startTimer.isPending) return;
     if (isRunningThisActivity) {
       if (currentEntry) {
         if (timerMode === 'pomodoro') {
@@ -188,9 +190,9 @@ function ActivityPage() {
       group: 'Timer',
       label: 'Start/Stop Timer',
       shortcut: 'Space',
-      run: handleStartStop,
+      run: handleToggleTimer,
     }),
-    [handleStartStop]
+    [handleToggleTimer]
   );
 
   const toggleModeCommand = useMemo(
@@ -274,7 +276,7 @@ function ActivityPage() {
   useRegisterCommand(resetPomodoroCommand);
 
   useActivityPageHotkeys({
-    onStartStop: handleStartStop,
+    onStartStop: handleToggleTimer,
     onAddDistraction: handleAddDistraction,
   });
 
@@ -486,11 +488,11 @@ function ActivityPage() {
               </span>
             </div>
             <button
-              onClick={handleStop}
-              disabled={stopTimer.isPending}
+              onClick={handleStopTimer}
+              disabled={stopTimer.isPending || startTimer.isPending}
               className="w-full rounded bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-500 disabled:opacity-50"
             >
-              {stopTimer.isPending ? 'Stopping...' : 'Stop'}
+              {startTimer.isPending ? 'Starting...' : stopTimer.isPending ? 'Stopping...' : 'Stop'}
             </button>
             <div className="mt-3 flex items-center justify-center gap-2">
               <button

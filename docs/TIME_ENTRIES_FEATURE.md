@@ -52,10 +52,11 @@ src/lib/utils.ts                          # Shared formatTime, formatDate functi
 3. User clicks "Start Tracking" → `handleStart()`
 4. `distractionCount` resets to 0
 5. `startTimer.mutate({ activityId, description? })`
-6. `useStartTimer` calls `timeEntriesApi.start(data)` → POST `/time-entries/start`
-7. **onSuccess:** `setQueryData(['time-entries', 'current'], { entry })` — immediate cache update
-8. Invalidates `['time-entries']` → triggers re-fetch of `useTimeEntries`
-9. UI re-renders: shows "Stop" button, live timer displays, "+ Distraction" button
+6. **onMutate:** immediately sets `['time-entries', 'current']` with an optimistic entry using the **client timestamp**
+7. UI re-renders instantly: shows "Stop" button and live timer display without waiting for the network
+8. `useStartTimer` calls `timeEntriesApi.start(data)` → POST `/time-entries/start`
+9. **onSuccess:** swaps optimistic entry with server entry, **optionally backfills `startedAt`** when server time lags by a few seconds
+10. Invalidates **list queries only** (keeps `current` cached) → prevents server timestamp from overwriting the optimistic start
 
 ### **Tracking Distractions**
 1. User clicks "+ Distraction" while timer is running

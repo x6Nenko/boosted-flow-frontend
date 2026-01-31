@@ -5,7 +5,7 @@ import { apiClient, ApiError } from './api-client';
 import { authStore } from '@/features/auth/auth-store';
 import { API_ENDPOINTS } from './api-endpoints';
 
-const API_BASE_URL = 'http://localhost:3000';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 const MOCK_TOKEN = 'initial-token';
 const REFRESHED_TOKEN = 'refreshed-token';
 

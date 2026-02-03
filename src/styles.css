@@ -99,7 +99,7 @@
   --color-black: var(--color-black);
   --color-white: var(--color-white);
   --color-distraction: var(--color-distraction);
-  
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -175,6 +175,15 @@
 
   .timer-nums {
     font-variant-numeric: tabular-nums;
+  }
+
+  /* Fix autofill background for dark theme */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px var(--color-background) inset !important;
+    -webkit-text-fill-color: var(--color-foreground) !important;
   }
 }
 

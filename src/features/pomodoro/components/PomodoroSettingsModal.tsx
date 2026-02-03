@@ -1,5 +1,8 @@
 import { useState } from 'react';
 import { pomodoroStore, usePomodoroSettings } from '../index';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import type { PomodoroSettings } from '../index';
 
 type PomodoroSettingsModalProps = {
@@ -32,80 +35,79 @@ export function PomodoroSettingsModal({ isOpen, onClose }: PomodoroSettingsModal
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-sm rounded bg-white p-4"
+        className="w-full max-w-sm rounded-xl border border-border bg-card p-6 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="mb-4 text-lg font-medium text-gray-900">Pomodoro Settings</h2>
+        <h2 className="mb-6 text-xl font-semibold text-foreground">Pomodoro Settings</h2>
 
-        <div className="space-y-3">
+        <div className="space-y-4">
           <div>
-            <label className="block text-sm text-gray-700">Work duration (minutes)</label>
-            <input
+            <Label htmlFor="workDuration" className="text-sm text-muted-foreground mb-2">
+              Work duration (minutes)
+            </Label>
+            <Input
+              id="workDuration"
               type="number"
               min="1"
               value={form.workDuration}
               onChange={(e) => handleChange('workDuration', e.target.value)}
-              className="mt-1 w-full rounded border border-gray-300 px-3 py-2 text-sm"
             />
           </div>
 
           <div>
-            <label className="block text-sm text-gray-700">Short break (minutes)</label>
-            <input
+            <Label htmlFor="shortBreak" className="text-sm text-muted-foreground mb-2">
+              Short break (minutes)
+            </Label>
+            <Input
+              id="shortBreak"
               type="number"
               min="1"
               value={form.shortBreakDuration}
               onChange={(e) => handleChange('shortBreakDuration', e.target.value)}
-              className="mt-1 w-full rounded border border-gray-300 px-3 py-2 text-sm"
             />
           </div>
 
           <div>
-            <label className="block text-sm text-gray-700">Long break (minutes)</label>
-            <input
+            <Label htmlFor="longBreak" className="text-sm text-muted-foreground mb-2">
+              Long break (minutes)
+            </Label>
+            <Input
+              id="longBreak"
               type="number"
               min="1"
               value={form.longBreakDuration}
               onChange={(e) => handleChange('longBreakDuration', e.target.value)}
-              className="mt-1 w-full rounded border border-gray-300 px-3 py-2 text-sm"
             />
           </div>
 
           <div>
-            <label className="block text-sm text-gray-700">Sessions before long break</label>
-            <input
+            <Label htmlFor="sessions" className="text-sm text-muted-foreground mb-2">
+              Sessions before long break
+            </Label>
+            <Input
+              id="sessions"
               type="number"
               min="1"
               value={form.sessionsBeforeLongBreak}
               onChange={(e) => handleChange('sessionsBeforeLongBreak', e.target.value)}
-              className="mt-1 w-full rounded border border-gray-300 px-3 py-2 text-sm"
             />
           </div>
         </div>
 
-        <div className="mt-4 flex gap-2">
-          <button
-            onClick={handleSave}
-            className="flex-1 rounded bg-indigo-600 px-3 py-2 text-sm text-white hover:bg-indigo-500"
-          >
+        <div className="mt-6 flex gap-2">
+          <Button onClick={handleSave} className="flex-1">
             Save
-          </button>
-          <button
-            onClick={handleReset}
-            className="rounded border border-gray-300 px-3 py-2 text-sm hover:bg-gray-50"
-          >
+          </Button>
+          <Button onClick={handleReset} variant="outline">
             Reset
-          </button>
-          <button
-            onClick={onClose}
-            className="rounded border border-gray-300 px-3 py-2 text-sm hover:bg-gray-50"
-          >
+          </Button>
+          <Button onClick={onClose} variant="outline">
             Cancel
-          </button>
+          </Button>
         </div>
       </div>
     </div>

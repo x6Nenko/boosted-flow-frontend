@@ -36,15 +36,15 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
     return (
       <div className="w-full max-w-md space-y-8">
         <div>
-          <h1 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
+          <h1 className="mt-6 text-center text-3xl font-bold tracking-tight text-foreground">
             Password updated
           </h1>
-          <p className="mt-2 text-center text-sm text-gray-600">
+          <p className="mt-2 text-center text-sm text-muted-foreground">
             Your password has been reset successfully.
           </p>
         </div>
         <div className="text-center">
-          <Link to="/login" className="font-medium text-indigo-600 hover:text-indigo-500">
+          <Link to="/login" className="font-medium text-primary hover:text-primary/80">
             Continue to login
           </Link>
         </div>
@@ -55,15 +55,15 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
   return (
     <div className="w-full max-w-md space-y-8">
       <div>
-        <h1 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
+        <h1 className="mt-6 text-center text-3xl font-bold tracking-tight text-foreground">
           Reset your password
         </h1>
-        <p className="mt-2 text-center text-sm text-gray-600">
+        <p className="mt-2 text-center text-sm text-muted-foreground">
           Enter your new password below.
         </p>
       </div>
 
-      <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
+      <form className="mt-8 space-y-6 rounded-xl border border-border bg-card p-8" onSubmit={handleSubmit(onSubmit)}>
         <div className="space-y-4">
           <div>
             <Label htmlFor="password" className="sr-only">
@@ -98,8 +98,8 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
         </div>
 
         {apiErrorMessage && (
-          <div className="rounded-md bg-red-50 p-4">
-            <p className="text-sm text-red-800">{apiErrorMessage}</p>
+          <div className="rounded-md bg-destructive/10 border border-destructive/20 p-4">
+            <p className="text-sm text-destructive">{apiErrorMessage}</p>
           </div>
         )}
 
@@ -114,7 +114,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
         </div>
 
         <div className="text-center text-sm">
-          <Link to="/login" className="font-medium text-indigo-600 hover:text-indigo-500">
+          <Link to="/login" className="font-medium text-primary hover:text-primary/80">
             Back to login
           </Link>
         </div>

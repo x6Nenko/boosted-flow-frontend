@@ -33,12 +33,12 @@ export function LoginForm() {
   return (
     <div className="w-full max-w-md space-y-8">
       <div>
-        <h1 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
+        <h1 className="mt-6 text-center text-3xl font-bold tracking-tight text-foreground">
           Sign in to your account
         </h1>
       </div>
 
-      <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
+      <form className="mt-8 space-y-6 rounded-xl border border-border bg-card p-8" onSubmit={handleSubmit(onSubmit)}>
         <div className="space-y-4 rounded-md shadow-sm">
           <div>
             <Label htmlFor="email" className="sr-only">
@@ -73,14 +73,14 @@ export function LoginForm() {
         </div>
 
         <div className="text-right text-sm">
-          <Link to="/forgot-password" className="font-medium text-indigo-600 hover:text-indigo-500">
+          <Link to="/forgot-password" className="font-medium text-primary hover:text-primary/80">
             Forgot your password?
           </Link>
         </div>
 
         {apiErrorMessage && (
-          <div className="rounded-md bg-red-50 p-4">
-            <p className="text-sm text-red-800">{apiErrorMessage}</p>
+          <div className="rounded-md bg-destructive/10 border border-destructive/20 p-4">
+            <p className="text-sm text-destructive">{apiErrorMessage}</p>
           </div>
         )}
 
@@ -96,18 +96,18 @@ export function LoginForm() {
 
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-300" />
+            <div className="w-full border-t border-border" />
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="bg-white px-2 text-gray-500">Or</span>
+            <span className="bg-card px-2 text-muted-foreground">Or</span>
           </div>
         </div>
 
         <GoogleSignInButton disabled={login.isPending} />
 
         <div className="text-center text-sm">
-          <span className="text-gray-600">Don't have an account? </span>
-          <Link to="/register" className="font-medium text-indigo-600 hover:text-indigo-500">
+          <span className="text-muted-foreground">Don't have an account? </span>
+          <Link to="/register" className="font-medium text-primary hover:text-primary/80">
             Register
           </Link>
         </div>

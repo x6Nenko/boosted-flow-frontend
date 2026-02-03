@@ -45,21 +45,21 @@ export function ActivityHeatmap() {
   );
 
   if (isLoading) {
-    return <div className="text-sm text-gray-500">Loading...</div>;
+    return <div className="text-sm text-muted-foreground">Loading...</div>;
   }
 
   return (
     <div>
-      <div className="text-sm text-gray-900 mb-2">
+      <div className="text-sm text-foreground mb-2">
         Current streak: {streak.days}
-        {streak.isAtRisk && <span className="text-red-600"> (at risk)</span>}
+        {streak.isAtRisk && <span className="text-destructive"> (at risk)</span>}
       </div>
       {/* Month labels */}
       <div className="flex" style={{ marginLeft: 0 }}>
         {weeks.map((_, weekIndex) => {
           const label = monthLabels.find((m) => m.week === weekIndex);
           return (
-            <div key={weekIndex} className="text-xs text-gray-500" style={{ width: 12, marginRight: 2 }}>
+            <div key={weekIndex} className="text-xs text-muted-foreground" style={{ width: 12, marginRight: 2 }}>
               {label ? MONTHS[label.month] : ''}
             </div>
           );
@@ -76,12 +76,12 @@ export function ActivityHeatmap() {
                 <div
                   key={dayIndex}
                   title={`${formatTooltipDate(day.date)}: ${day.minutes > 0 ? formatHours(day.minutes) : 'No activity'}`}
-                  className={`
-                    ${level === 0 ? 'bg-gray-100' : ''}
-                    ${level === 1 ? 'bg-green-200' : ''}
-                    ${level === 2 ? 'bg-green-400' : ''}
-                    ${level === 3 ? 'bg-green-600' : ''}
-                    ${level === 4 ? 'bg-green-800' : ''}
+                  className={`rounded-sm
+                    ${level === 0 ? 'bg-muted' : ''}
+                    ${level === 1 ? 'bg-primary/20' : ''}
+                    ${level === 2 ? 'bg-primary/40' : ''}
+                    ${level === 3 ? 'bg-primary/60' : ''}
+                    ${level === 4 ? 'bg-primary/80' : ''}
                   `}
                   style={{ width: 12, height: 12, marginBottom: 2 }}
                 />
@@ -92,13 +92,13 @@ export function ActivityHeatmap() {
       </div>
 
       {/* Legend */}
-      <div className="flex items-center gap-1 mt-2 text-xs text-gray-500">
+      <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground">
         <span>Less</span>
-        <div className="bg-gray-100" style={{ width: 12, height: 12 }} />
-        <div className="bg-green-200" style={{ width: 12, height: 12 }} />
-        <div className="bg-green-400" style={{ width: 12, height: 12 }} />
-        <div className="bg-green-600" style={{ width: 12, height: 12 }} />
-        <div className="bg-green-800" style={{ width: 12, height: 12 }} />
+        <div className="bg-muted rounded-sm" style={{ width: 12, height: 12 }} />
+        <div className="bg-primary/20 rounded-sm" style={{ width: 12, height: 12 }} />
+        <div className="bg-primary/40 rounded-sm" style={{ width: 12, height: 12 }} />
+        <div className="bg-primary/60 rounded-sm" style={{ width: 12, height: 12 }} />
+        <div className="bg-primary/80 rounded-sm" style={{ width: 12, height: 12 }} />
         <span>More</span>
       </div>
     </div>

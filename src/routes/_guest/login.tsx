@@ -7,7 +7,7 @@ export const Route = createFileRoute('/_guest/login')({
 
 function LoginPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
+    <div className="flex min-h-[calc(100vh-200px)] items-center justify-center px-4 py-12">
       <LoginForm />
     </div>
   );

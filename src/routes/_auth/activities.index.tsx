@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import { useActivities } from '@/features/activities/hooks';
 import { ActivityForm } from '@/features/activities/components/ActivityForm';
 import { useRegisterCommands } from '@/features/command-palette';
+import { Checkbox } from '@/components/ui/checkbox';
 
 export const Route = createFileRoute('/_auth/activities/')({
   component: ActivitiesPage,
@@ -34,33 +35,32 @@ function ActivitiesPage() {
 
   if (isLoading) {
     return (
-      <div className="p-4">
-        <p className="text-sm text-gray-500">Loading...</p>
+      <div className="py-8">
+        <p className="text-sm text-muted-foreground">Loading...</p>
       </div>
     );
   }
 
   return (
-    <div className="p-4">
-      <h1 className="text-xl font-bold text-gray-900 mb-4">Activities</h1>
+    <div className="py-8">
+      <h1 className="text-2xl font-bold text-foreground mb-6">Activities</h1>
 
       {/* Create Activity */}
-      <div className="rounded border border-gray-200 bg-white p-4 mb-4">
-        <h2 className="mb-3 text-sm font-medium text-gray-900">Create Activity</h2>
+      <div className="rounded-xl border border-border bg-card p-6 mb-6">
+        <h2 className="mb-4 text-base font-semibold text-foreground">Create Activity</h2>
         <ActivityForm onCreated={handleActivityCreated} />
       </div>
 
       {/* Activities List */}
-      <div className="rounded border border-gray-200 bg-white p-4">
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-sm font-medium text-gray-900">All Activities</h2>
-          <label className="flex items-center gap-2 text-sm text-gray-600">
-            <input
-              type="checkbox"
+      <div className="rounded-xl border border-border bg-card p-6">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-base font-semibold text-foreground">All Activities</h2>
+          <label className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Checkbox
               checked={includeArchived}
-              onChange={(e) => setIncludeArchived(e.target.checked)}
+              onCheckedChange={(checked) => setIncludeArchived(checked === true)}
             />
-            Show archived
+            <span>Show archived</span>
           </label>
         </div>
         {activities && activities.length > 0 ? (
@@ -70,17 +70,17 @@ function ActivitiesPage() {
                 key={activity.id}
                 to="/activities/$activityId"
                 params={{ activityId: activity.id }}
-                className="flex items-center justify-between rounded border border-gray-200 px-3 py-2 text-sm hover:bg-gray-50"
+                className="flex items-center justify-between rounded-lg border border-border bg-background px-4 py-3 text-sm hover:bg-accent transition-colors"
               >
-                <span>{activity.name}</span>
+                <span className="text-foreground">{activity.name}</span>
                 {activity.archivedAt && (
-                  <span className="text-xs text-gray-500">(archived)</span>
+                  <span className="text-xs text-muted-foreground">(archived)</span>
                 )}
               </Link>
             ))}
           </div>
         ) : (
-          <p className="text-sm text-gray-500">No activities yet. Create one above.</p>
+          <p className="text-sm text-muted-foreground">No activities yet. Create one above.</p>
         )}
       </div>
     </div>

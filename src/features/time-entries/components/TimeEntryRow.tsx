@@ -4,6 +4,8 @@ import { useUpdateTimeEntry, useDeleteTimeEntry } from '../hooks';
 import { formatStoppedDuration, TimerDuration } from './TimerDuration';
 import { formatTime, formatDate } from '@/lib/utils';
 import { toDateTimeLocalValue, toIsoFromLocal } from '../time-entries.utils';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import type { TimeEntry } from '../types';
 import type { Activity } from '@/features/activities/types';
 
@@ -104,21 +106,21 @@ export function TimeEntryRow({
       <div className="flex items-center justify-between">
         <div className="flex-1 min-w-0">
           {showActivityName && (
-            <p className="text-sm font-medium text-gray-900">{activity?.name || 'Unknown'}</p>
+            <p className="text-sm font-medium text-foreground">{activity?.name || 'Unknown'}</p>
           )}
           {entry.description && (
-            <p className="text-sm text-gray-700">{entry.description}</p>
+            <p className="text-sm text-muted-foreground">{entry.description}</p>
           )}
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-muted-foreground">
             {formatDate(entry.startedAt)} • {formatTime(entry.startedAt)}
             {entry.stoppedAt && ` – ${formatTime(entry.stoppedAt)}`}
           </p>
         </div>
-        <div className="text-sm font-mono text-gray-700">
+        <div className="text-sm font-mono text-foreground">
           {entry.stoppedAt ? (
             formatStoppedDuration(entry.startedAt, entry.stoppedAt)
           ) : (
-            <span className="text-indigo-600">
+            <span className="text-primary">
               <TimerDuration startedAt={entry.startedAt} />
             </span>
           )}
@@ -128,24 +130,24 @@ export function TimeEntryRow({
       {editable && isStopped && (
         <div className="mt-2">
           {isEditing ? (
-            <div className="space-y-2">
-              <div className="grid gap-2 sm:grid-cols-2">
-                <label className="text-xs text-gray-500">
+            <div className="space-y-3">
+              <div className="grid gap-3 sm:grid-cols-2">
+                <label className="text-xs text-muted-foreground">
                   Started at
-                  <input
+                  <Input
                     type="datetime-local"
                     value={startedAtLocal}
                     onChange={(e) => setStartedAtLocal(e.target.value)}
-                    className="mt-1 w-full rounded border border-gray-300 px-2 py-1 text-sm"
+                    className="mt-2"
                   />
                 </label>
-                <label className="text-xs text-gray-500">
+                <label className="text-xs text-muted-foreground">
                   Stopped at
-                  <input
+                  <Input
                     type="datetime-local"
                     value={stoppedAtLocal}
                     onChange={(e) => setStoppedAtLocal(e.target.value)}
-                    className="mt-1 w-full rounded border border-gray-300 px-2 py-1 text-sm"
+                    className="mt-2"
                   />
                 </label>
               </div>
@@ -156,63 +158,67 @@ export function TimeEntryRow({
                 placeholder="What are your reflections? (optional)"
                 maxLength={1000}
                 rows={2}
-                className="w-full rounded border border-gray-300 px-2 py-1 text-sm"
+                className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
               />
               <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-500">Distractions:</span>
-                <button
+                <span className="text-sm text-muted-foreground">Distractions:</span>
+                <Button
                   type="button"
                   onClick={() => setDistractionCount((c) => Math.max(0, c - 1))}
-                  className="rounded border border-gray-300 px-2 py-0.5 text-sm hover:bg-gray-50"
+                  variant="outline"
+                  size="sm"
                 >
                   −
-                </button>
-                <span className="text-sm w-6 text-center">{distractionCount}</span>
-                <button
+                </Button>
+                <span className="text-sm w-6 text-center text-foreground">{distractionCount}</span>
+                <Button
                   type="button"
                   onClick={() => setDistractionCount((c) => c + 1)}
-                  className="rounded border border-gray-300 px-2 py-0.5 text-sm hover:bg-gray-50"
+                  variant="outline"
+                  size="sm"
                 >
                   +
-                </button>
+                </Button>
               </div>
               <div className="flex gap-2">
-                <button
+                <Button
                   onClick={handleSave}
                   disabled={updateEntry.isPending}
-                  className="rounded bg-indigo-600 px-2 py-1 text-xs text-white hover:bg-indigo-500 disabled:opacity-50"
+                  size="sm"
                 >
                   Save
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={() => setIsEditing(false)}
-                  className="rounded bg-gray-100 px-2 py-1 text-xs text-gray-700 hover:bg-gray-200"
+                  variant="outline"
+                  size="sm"
                 >
                   Cancel
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={handleDelete}
                   disabled={deleteEntry.isPending}
-                  className="rounded bg-red-100 px-2 py-1 text-xs text-red-600 hover:bg-red-200 disabled:opacity-50"
+                  variant="destructive"
+                  size="sm"
                 >
                   Delete
-                </button>
+                </Button>
               </div>
             </div>
           ) : (
             <div className="flex items-center gap-2 flex-wrap">
               <RatingStars value={entry.rating} onChange={() => { }} disabled />
               {entry.comment && (
-                <span className="text-xs text-gray-500 truncate">{entry.comment}</span>
+                <span className="text-xs text-muted-foreground truncate">{entry.comment}</span>
               )}
               {entry.distractionCount > 0 && (
-                <span className="text-xs text-gray-400">
+                <span className="text-xs text-muted-foreground">
                   {entry.distractionCount} distraction{entry.distractionCount !== 1 ? 's' : ''}
                 </span>
               )}
               <button
                 onClick={handleEditStart}
-                className="text-xs text-indigo-600 hover:text-indigo-500"
+                className="text-xs text-primary hover:text-primary/80"
               >
                 Edit
               </button>
@@ -225,10 +231,10 @@ export function TimeEntryRow({
         <div className="mt-2 flex items-center gap-2 flex-wrap">
           {entry.rating && <RatingStars value={entry.rating} onChange={() => { }} disabled />}
           {entry.comment && (
-            <span className="text-xs text-gray-500 truncate">{entry.comment}</span>
+            <span className="text-xs text-muted-foreground truncate">{entry.comment}</span>
           )}
           {entry.distractionCount > 0 && (
-            <span className="text-xs text-gray-400">
+            <span className="text-xs text-muted-foreground">
               {entry.distractionCount} distraction{entry.distractionCount !== 1 ? 's' : ''}
             </span>
           )}
@@ -242,7 +248,7 @@ export function TimeEntryRow({
       <Link
         to="/activities/$activityId"
         params={{ activityId: entry.activityId }}
-        className="block border-b border-gray-200 py-3 last:border-0 hover:bg-gray-50 -mx-2 px-2 rounded"
+        className="block border-b border-border py-3 last:border-0 hover:bg-accent/50 -mx-2 px-2 rounded transition-colors"
       >
         {content}
       </Link>
@@ -250,7 +256,7 @@ export function TimeEntryRow({
   }
 
   return (
-    <div className="border-b border-gray-200 py-3 last:border-0">
+    <div className="border-b border-border py-3 last:border-0">
       {content}
     </div>
   );

@@ -18,9 +18,11 @@ function RootComponent() {
   useGlobalHotkeys();
 
   return (
-    <>
+    <div className="min-h-screen bg-background">
       <Header />
-      <Outlet />
+      <main className="mx-auto w-full max-w-[1200px] px-4">
+        <Outlet />
+      </main>
       <CommandPalette />
       <TanStackDevtools
         config={{
@@ -34,7 +36,7 @@ function RootComponent() {
           TanStackQueryDevtools,
         ]}
       />
-    </>
+    </div>
   );
 }
 

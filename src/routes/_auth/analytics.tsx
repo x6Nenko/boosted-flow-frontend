@@ -6,8 +6,23 @@ import {
   formatDuration,
   getDefaultDateRange,
 } from '@/features/analytics';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Calendar } from '@/components/ui/calendar';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { Button } from '@/components/ui/button';
+import { CalendarIcon } from 'lucide-react';
+import { format } from 'date-fns';
 
 export const Route = createFileRoute('/_auth/analytics')({
   component: AnalyticsPage,
@@ -18,6 +33,10 @@ function AnalyticsPage() {
   const [from, setFrom] = useState(defaultRange.from);
   const [to, setTo] = useState(defaultRange.to);
   const [activityId, setActivityId] = useState<string>('');
+
+  // Parse dates for Calendar component
+  const fromDate = from ? new Date(from) : undefined;
+  const toDate = to ? new Date(to) : undefined;
 
   const { data: activities } = useActivities();
   const { data: analytics, isLoading } = useAnalytics({
@@ -39,51 +58,80 @@ function AnalyticsPage() {
       : null;
 
   return (
-    <div className="p-4">
-      <h1 className="text-xl font-bold text-gray-900 mb-4">Analytics</h1>
+    <div className="py-8">
+      <h1 className="text-2xl font-bold text-foreground mb-6">Analytics</h1>
 
       {/* Filters */}
-      <div className="rounded border border-gray-200 bg-white p-4 mb-4">
-        <h2 className="text-sm font-medium text-gray-900 mb-3">Filters</h2>
+      <div className="rounded-xl border border-border bg-card p-6 mb-6">
+        <h2 className="text-base font-semibold text-foreground mb-4">Filters</h2>
         <div className="flex flex-wrap gap-4">
           <div>
-            <Label className="block text-sm text-gray-600 mb-1">From</Label>
-            <Input
-              type="date"
-              value={from}
-              onChange={(e) => setFrom(e.target.value)}
-            />
+            <Label className="block text-sm text-muted-foreground mb-2">From</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="w-[200px] justify-start text-left font-normal"
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {fromDate ? format(fromDate, 'PPP') : <span>Pick a date</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={fromDate}
+                  onSelect={(date) => setFrom(date ? format(date, 'yyyy-MM-dd') : '')}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
           </div>
           <div>
-            <Label className="block text-sm text-gray-600 mb-1">To</Label>
-            <Input
-              type="date"
-              value={to}
-              onChange={(e) => setTo(e.target.value)}
-            />
+            <Label className="block text-sm text-muted-foreground mb-2">To</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="w-[200px] justify-start text-left font-normal"
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {toDate ? format(toDate, 'PPP') : <span>Pick a date</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={toDate}
+                  onSelect={(date) => setTo(date ? format(date, 'yyyy-MM-dd') : '')}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
           </div>
           <div>
-            <Label className="block text-sm text-gray-600 mb-1">Activity</Label>
-            <select
-              value={activityId}
-              onChange={(e) => setActivityId(e.target.value)}
-              className="rounded border border-gray-300 px-3 py-2 text-sm"
-            >
-              <option value="">All activities</option>
-              {activities?.map((a) => (
-                <option key={a.id} value={a.id}>
-                  {a.name}
-                </option>
-              ))}
-            </select>
+            <Label className="block text-sm text-muted-foreground mb-2">Activity</Label>
+            <Select value={activityId} onValueChange={setActivityId}>
+              <SelectTrigger className="w-[200px]">
+                <SelectValue placeholder="All activities" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">All activities</SelectItem>
+                {activities?.map((a) => (
+                  <SelectItem key={a.id} value={a.id}>
+                    {a.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </div>
 
       {isLoading ? (
-        <p className="text-sm text-gray-500">Loading...</p>
+        <p className="text-sm text-muted-foreground">Loading...</p>
       ) : !analytics ? (
-        <p className="text-sm text-gray-500">No data</p>
+        <p className="text-sm text-muted-foreground">No data</p>
       ) : (
         <>
           {/* Metrics Grid */}
@@ -129,8 +177,8 @@ function AnalyticsPage() {
 
           {/* Time by Activity */}
           {!activityId && Object.keys(analytics.timeByActivity).length > 0 && (
-            <div className="rounded border border-gray-200 bg-white p-4 mb-4">
-              <h2 className="text-sm font-medium text-gray-900 mb-3">
+            <div className="rounded-xl border border-border bg-card p-6 mb-6">
+              <h2 className="text-base font-semibold text-foreground mb-4">
                 Time per Activity
               </h2>
               <div className="space-y-2">
@@ -138,10 +186,10 @@ function AnalyticsPage() {
                   .sort((a, b) => b[1] - a[1])
                   .map(([id, ms]) => (
                     <div key={id} className="flex justify-between text-sm">
-                      <span className="text-gray-700">
+                      <span className="text-muted-foreground">
                         {activityMap.get(id) || id}
                       </span>
-                      <span className="text-gray-900 font-medium">
+                      <span className="text-foreground font-medium">
                         {formatDuration(ms)}
                       </span>
                     </div>
@@ -152,8 +200,8 @@ function AnalyticsPage() {
 
           {/* Peak Hours Breakdown */}
           {Object.keys(analytics.peakHours).length > 0 && (
-            <div className="rounded border border-gray-200 bg-white p-4">
-              <h2 className="text-sm font-medium text-gray-900 mb-3">
+            <div className="rounded-xl border border-border bg-card p-6">
+              <h2 className="text-base font-semibold text-foreground mb-4">
                 Hours Breakdown
               </h2>
               <div className="grid grid-cols-6 md:grid-cols-12 gap-1">
@@ -161,6 +209,10 @@ function AnalyticsPage() {
                   const ms = analytics.peakHours[hour] || 0;
                   const maxMs = Math.max(...Object.values(analytics.peakHours));
                   const intensity = maxMs > 0 ? ms / maxMs : 0;
+                  const bgColor =
+                    intensity > 0
+                      ? `rgba(255, 244, 189, ${0.2 + intensity * 0.8})`
+                      : 'hsl(var(--color-muted))';
                   return (
                     <div
                       key={hour}
@@ -168,15 +220,12 @@ function AnalyticsPage() {
                       title={`${hour}:00 - ${formatDuration(ms)}`}
                     >
                       <div
-                        className="h-8 rounded"
+                        className="h-8 rounded mb-1"
                         style={{
-                          backgroundColor:
-                            intensity > 0
-                              ? `rgba(99, 102, 241, ${0.2 + intensity * 0.8})`
-                              : '#f3f4f6',
+                          backgroundColor: bgColor,
                         }}
                       />
-                      <span className="text-xs text-gray-500">{hour}</span>
+                      <span className="text-xs text-muted-foreground">{hour}</span>
                     </div>
                   );
                 })}
@@ -199,10 +248,10 @@ function MetricCard({
   subtitle?: string;
 }) {
   return (
-    <div className="rounded border border-gray-200 bg-white p-4">
-      <p className="text-sm text-gray-600">{label}</p>
-      <p className="text-2xl font-bold text-gray-900">{value}</p>
-      {subtitle && <p className="text-xs text-gray-500">{subtitle}</p>}
+    <div className="rounded-xl border border-border bg-card p-6">
+      <p className="text-sm text-muted-foreground">{label}</p>
+      <p className="text-3xl font-bold text-foreground mt-1">{value}</p>
+      {subtitle && <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>}
     </div>
   );
 }

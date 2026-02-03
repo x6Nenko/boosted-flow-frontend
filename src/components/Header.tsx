@@ -35,7 +35,7 @@ export default function Header() {
   return (
     <>
       {/* Navbar Container with Glass Effect */}
-      <nav className="mx-auto mt-6 w-full max-w-[1200px] bg-[var(--color-surface-low)]/80 backdrop-blur-md border border-[var(--color-border-subtle)] rounded-2xl px-5 py-3.5 flex items-center justify-between sticky top-6 z-50">
+      <nav className="mx-auto mt-6 w-full max-w-[1200px] bg-surface-low/80 backdrop-blur-md border border-border rounded-2xl px-5 py-3.5 flex items-center justify-between sticky top-6 z-50">
         {/* Left Side: Logo */}
         <Link to="/" className="flex items-center gap-3">
           <div className="text-cream">
@@ -44,7 +44,7 @@ export default function Header() {
               <path d="M10 12H14" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
             </svg>
           </div>
-          <span className="font-bold text-lg tracking-tight text-white">Boosted Flow</span>
+          <span className="font-bold text-lg tracking-tight text-foreground">Boosted Flow</span>
         </Link>
 
         {/* Center: Navigation Links */}
@@ -53,22 +53,22 @@ export default function Header() {
             <>
               <Link
                 to="/dashboard"
-                className="text-[15px] font-medium text-gray-400 hover:text-white transition-colors duration-200"
-                activeProps={{ className: 'text-[15px] font-medium text-white transition-colors duration-200' }}
+                className="text-[15px] font-medium text-muted-foreground hover:text-foreground transition-colors duration-200"
+                activeProps={{ className: 'text-[15px] font-medium text-foreground transition-colors duration-200' }}
               >
                 Dashboard
               </Link>
               <Link
                 to="/activities"
-                className="text-[15px] font-medium text-gray-400 hover:text-white transition-colors duration-200"
-                activeProps={{ className: 'text-[15px] font-medium text-white transition-colors duration-200' }}
+                className="text-[15px] font-medium text-muted-foreground hover:text-foreground transition-colors duration-200"
+                activeProps={{ className: 'text-[15px] font-medium text-foreground transition-colors duration-200' }}
               >
                 Activities
               </Link>
               <Link
                 to="/analytics"
-                className="text-[15px] font-medium text-gray-400 hover:text-white transition-colors duration-200"
-                activeProps={{ className: 'text-[15px] font-medium text-white transition-colors duration-200' }}
+                className="text-[15px] font-medium text-muted-foreground hover:text-foreground transition-colors duration-200"
+                activeProps={{ className: 'text-[15px] font-medium text-foreground transition-colors duration-200' }}
               >
                 Analytics
               </Link>
@@ -113,11 +113,11 @@ export default function Header() {
 
       {/* Mobile Sidebar */}
       <aside
-        className={`fixed top-0 left-0 h-full w-64 bg-black border-r border-white/10 shadow-xl z-50 transform transition-transform duration-200 flex flex-col md:hidden ${isOpen ? 'translate-x-0' : '-translate-x-full'
+        className={`fixed top-0 left-0 h-full w-64 bg-background border-r border-border shadow-xl z-50 transform transition-transform duration-200 flex flex-col md:hidden ${isOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
       >
-        <div className="flex items-center justify-between p-4 border-b border-white/10">
-          <span className="font-semibold text-white">Menu</span>
+        <div className="flex items-center justify-between p-4 border-b border-border">
+          <span className="font-semibold text-foreground">Menu</span>
           <Button
             onClick={() => setIsOpen(false)}
             variant="ghost"
@@ -134,8 +134,8 @@ export default function Header() {
               <Link
                 to="/dashboard"
                 onClick={() => setIsOpen(false)}
-                className="flex items-center gap-3 p-3 rounded-lg hover:bg-white/10 transition-colors mb-1 text-white"
-                activeProps={{ className: 'flex items-center gap-3 p-3 rounded-lg bg-white/20 transition-colors mb-1 text-white' }}
+                className="flex items-center gap-3 p-3 rounded-lg hover:bg-accent transition-colors mb-1 text-foreground"
+                activeProps={{ className: 'flex items-center gap-3 p-3 rounded-lg bg-accent transition-colors mb-1 text-accent-foreground' }}
               >
                 <Home size={20} />
                 <span>Dashboard</span>
@@ -143,8 +143,8 @@ export default function Header() {
               <Link
                 to="/activities"
                 onClick={() => setIsOpen(false)}
-                className="flex items-center gap-3 p-3 rounded-lg hover:bg-white/10 transition-colors mb-1 text-white"
-                activeProps={{ className: 'flex items-center gap-3 p-3 rounded-lg bg-white/20 transition-colors mb-1 text-white' }}
+                className="flex items-center gap-3 p-3 rounded-lg hover:bg-accent transition-colors mb-1 text-foreground"
+                activeProps={{ className: 'flex items-center gap-3 p-3 rounded-lg bg-accent transition-colors mb-1 text-accent-foreground' }}
               >
                 <Layers size={20} />
                 <span>Activities</span>
@@ -152,8 +152,8 @@ export default function Header() {
               <Link
                 to="/analytics"
                 onClick={() => setIsOpen(false)}
-                className="flex items-center gap-3 p-3 rounded-lg hover:bg-white/10 transition-colors mb-1 text-white"
-                activeProps={{ className: 'flex items-center gap-3 p-3 rounded-lg bg-white/20 transition-colors mb-1 text-white' }}
+                className="flex items-center gap-3 p-3 rounded-lg hover:bg-accent transition-colors mb-1 text-foreground"
+                activeProps={{ className: 'flex items-center gap-3 p-3 rounded-lg bg-accent transition-colors mb-1 text-accent-foreground' }}
               >
                 <BarChart3 size={20} />
                 <span>Analytics</span>

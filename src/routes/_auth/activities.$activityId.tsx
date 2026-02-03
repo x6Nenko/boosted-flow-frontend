@@ -34,6 +34,21 @@ import { getDateRangeForDays } from '@/features/analytics';
 import { ApiError } from '@/lib/api-client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Calendar } from '@/components/ui/calendar';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { CalendarIcon } from 'lucide-react';
+import { format } from 'date-fns';
 
 type TimerMode = 'stopwatch' | 'pomodoro';
 
@@ -66,6 +81,10 @@ function ActivityPage() {
   const [customTo, setCustomTo] = useState('');
   const [manualOpen, setManualOpen] = useState(false);
   const intentionInputRef = useRef<HTMLInputElement>(null);
+
+  // Parse dates for Calendar component
+  const customFromDate = customFrom ? new Date(customFrom) : undefined;
+  const customToDate = customTo ? new Date(customTo) : undefined;
 
   const pomodoroSettings = usePomodoroSettings();
   const pomodoroState = usePomodoroState();
@@ -362,17 +381,17 @@ function ActivityPage() {
 
   if (activityLoading) {
     return (
-      <div className="p-4">
-        <p className="text-sm text-gray-500">Loading...</p>
+      <div className="py-8">
+        <p className="text-sm text-muted-foreground">Loading...</p>
       </div>
     );
   }
 
   if (!activity) {
     return (
-      <div className="p-4">
-        <p className="text-sm text-gray-500">Activity not found</p>
-        <Link to="/activities" className="text-sm text-indigo-600 hover:text-indigo-500">
+      <div className="py-8">
+        <p className="text-sm text-muted-foreground">Activity not found</p>
+        <Link to="/activities" className="text-sm text-primary hover:text-primary/80">
           ← Back to activities
         </Link>
       </div>
@@ -380,15 +399,15 @@ function ActivityPage() {
   }
 
   return (
-    <div className="p-4">
-      <div className="mb-4">
-        <Link to="/activities" className="text-sm text-indigo-600 hover:text-indigo-500">
+    <div className="py-8">
+      <div className="mb-6">
+        <Link to="/activities" className="text-sm text-primary hover:text-primary/80">
           ← Activities
         </Link>
       </div>
 
       {/* Activity Header */}
-      <div className="mb-4">
+      <div className="mb-6">
         {isEditing ? (
           <div className="flex gap-2">
             <Input
@@ -413,9 +432,9 @@ function ActivityPage() {
           </div>
         ) : (
           <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold text-gray-900">{activity.name}</h1>
+            <h1 className="text-2xl font-bold text-foreground">{activity.name}</h1>
             {isArchived && (
-              <span className="text-xs text-gray-500">(archived)</span>
+              <span className="text-xs text-muted-foreground">(archived)</span>
             )}
           </div>
         )}
@@ -423,7 +442,7 @@ function ActivityPage() {
 
       {/* Activity Actions */}
       {!isEditing && (
-        <div className="mb-4 flex gap-2">
+        <div className="mb-6 flex gap-2">
           <Button
             onClick={handleEditStart}
             variant="outline"
@@ -462,25 +481,25 @@ function ActivityPage() {
       )}
 
       {/* Timer Control */}
-      <div className="rounded border border-gray-200 bg-white p-4 mb-4">
+      <div className="rounded-xl border border-border bg-card p-6 mb-6">
         {isArchived ? (
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-muted-foreground">
             This activity is archived. Unarchive it to track time.
           </p>
         ) : isRunningThisActivity ? (
           <>
-            <div className="mb-3">
+            <div className="mb-4">
               {timerMode === 'pomodoro' && (
-                <p className="text-xs text-gray-400 mb-1">
+                <p className="text-xs text-muted-foreground mb-1">
                   Session {pomodoroState.currentSession} of {pomodoroSettings.sessionsBeforeLongBreak}
                 </p>
               )}
               {currentEntry.description && (
-                <p className="text-sm text-gray-500">{currentEntry.description}</p>
+                <p className="text-sm text-muted-foreground">{currentEntry.description}</p>
               )}
             </div>
-            <div className="mb-3 text-center">
-              <span className="text-3xl font-mono text-indigo-600">
+            <div className="mb-4 text-center">
+              <span className="text-4xl font-mono text-primary timer-nums">
                 {timerMode === 'pomodoro' ? (
                   <PomodoroTimer
                     startedAt={currentEntry.startedAt}
@@ -500,7 +519,7 @@ function ActivityPage() {
             >
               {startTimer.isPending ? 'Starting...' : stopTimer.isPending ? 'Stopping...' : 'Stop'}
             </Button>
-            <div className="mt-3 flex items-center justify-center gap-2">
+            <div className="mt-4 flex items-center justify-center gap-2">
               <Button
                 onClick={() => setDistractionCount((c) => c + 1)}
                 variant="outline"
@@ -509,26 +528,26 @@ function ActivityPage() {
                 + Distraction
               </Button>
               {distractionCount > 0 && (
-                <span className="text-sm text-gray-500">{distractionCount}</span>
+                <span className="text-sm text-muted-foreground">{distractionCount}</span>
               )}
             </div>
           </>
         ) : isRunningOther ? (
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-muted-foreground">
             Timer is running on another activity. Stop it first to start tracking here.
           </p>
         ) : timerMode === 'pomodoro' && pomodoroState.phase !== 'work' ? (
           // Break phase UI
           <div>
-            <p className="text-xs text-gray-400 mb-1">
+            <p className="text-xs text-muted-foreground mb-1">
               Completed: Session {pomodoroState.currentSession} of {pomodoroSettings.sessionsBeforeLongBreak}
             </p>
-            <p className="text-sm text-gray-700 mb-2">
+            <p className="text-sm text-foreground mb-3">
               {pomodoroState.phase === 'long-break' ? 'Long break' : 'Short break'} time!
             </p>
             {pomodoroState.isBreakActive && pomodoroState.breakStartedAt ? (
-              <div className="mb-3 text-center">
-                <span className="text-3xl font-mono text-green-600">
+              <div className="mb-4 text-center">
+                <span className="text-4xl font-mono text-green-600 timer-nums">
                   <BreakTimer
                     startedAt={pomodoroState.breakStartedAt}
                     durationMinutes={pomodoroStore.getCurrentBreakDuration()}
@@ -538,7 +557,7 @@ function ActivityPage() {
                 <Button
                   onClick={handleSkipBreak}
                   variant="outline"
-                  className="mt-3 w-full"
+                  className="mt-4 w-full"
                 >
                   Skip Break
                 </Button>
@@ -567,13 +586,13 @@ function ActivityPage() {
             )}
           </div>
         ) : hasAnyActiveBreak ? (
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-muted-foreground">
             Break is active on another activity. Complete or skip it first to start tracking here.
           </p>
         ) : (
           <>
             {/* Mode toggle */}
-            <div className="mb-3 flex gap-1">
+            <div className="mb-4 flex gap-1">
               <Button
                 onClick={() => setTimerMode('stopwatch')}
                 variant={timerMode === 'stopwatch' ? 'secondary' : 'ghost'}
@@ -592,7 +611,7 @@ function ActivityPage() {
               </Button>
             </div>
 
-            <div className="mb-3">
+            <div className="mb-4">
               <Input
                 ref={intentionInputRef}
                 type="text"
@@ -613,26 +632,26 @@ function ActivityPage() {
             {timerMode === 'pomodoro' && (
               <>
                 <div className="flex items-center gap-2 mb-2">
-                  <p className="text-xs text-gray-400">
+                  <p className="text-xs text-muted-foreground">
                     Next: Session {pomodoroState.currentSession} of {pomodoroSettings.sessionsBeforeLongBreak}
                   </p>
                   {pomodoroState.currentSession > 1 && (
                     <button
                       onClick={handleResetPomodoro}
-                      className="text-xs text-gray-400 hover:text-gray-600"
+                      className="text-xs text-muted-foreground hover:text-foreground"
                       title="Reset to Session 1"
                     >
                       ↺
                     </button>
                   )}
                 </div>
-                <div className="mb-3 flex items-center justify-between">
-                  <p className="text-xs text-gray-400">
+                <div className="mb-4 flex items-center justify-between">
+                  <p className="text-xs text-muted-foreground">
                     {pomodoroSettings.workDuration}m focus • {pomodoroSettings.shortBreakDuration}m short • {pomodoroSettings.longBreakDuration}m long • {pomodoroSettings.sessionsBeforeLongBreak} sessions
                   </p>
                   <button
                     onClick={handleOpenPomodoroSettings}
-                    className="text-xs text-gray-400 hover:text-gray-600"
+                    className="text-xs text-muted-foreground hover:text-foreground"
                     title="Settings"
                   >
                     ⚙
@@ -659,39 +678,39 @@ function ActivityPage() {
       <PomodoroSettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} />
 
       {/* Manual Entry */}
-      <div className="rounded border border-gray-200 bg-white p-4 mb-4">
+      <div className="rounded-xl border border-border bg-card p-6 mb-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-medium text-gray-900">Manual entry</h2>
+          <h2 className="text-base font-semibold text-foreground">Manual entry</h2>
           <button
             onClick={() => setManualOpen((open) => !open)}
-            className="text-sm text-indigo-600 hover:text-indigo-500"
+            className="text-sm text-primary hover:text-primary/80"
           >
             {manualOpen ? 'Close' : 'Add'}
           </button>
         </div>
         {manualOpen && (
-          <form className="mt-3 space-y-2" onSubmit={handleManualSubmit(onManualSubmit)}>
-            <div className="grid gap-2 sm:grid-cols-2">
-              <label className="text-xs text-gray-500">
+          <form className="mt-4 space-y-3" onSubmit={handleManualSubmit(onManualSubmit)}>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <label className="text-xs text-muted-foreground">
                 Started at
                 <Input
                   type="datetime-local"
                   {...registerManualField('startedAt')}
-                  className="mt-1"
+                  className="mt-2"
                 />
                 {manualErrors.startedAt && (
-                  <p className="mt-1 text-xs text-red-600">{manualErrors.startedAt.message}</p>
+                  <p className="mt-1 text-xs text-destructive">{manualErrors.startedAt.message}</p>
                 )}
               </label>
-              <label className="text-xs text-gray-500">
+              <label className="text-xs text-muted-foreground">
                 Stopped at
                 <Input
                   type="datetime-local"
                   {...registerManualField('stoppedAt')}
-                  className="mt-1"
+                  className="mt-2"
                 />
                 {manualErrors.stoppedAt && (
-                  <p className="mt-1 text-xs text-red-600">{manualErrors.stoppedAt.message}</p>
+                  <p className="mt-1 text-xs text-destructive">{manualErrors.stoppedAt.message}</p>
                 )}
               </label>
             </div>
@@ -703,12 +722,12 @@ function ActivityPage() {
                 {...registerManualField('description')}
               />
               {manualErrors.description && (
-                <p className="mt-1 text-xs text-red-600">{manualErrors.description.message}</p>
+                <p className="mt-1 text-xs text-destructive">{manualErrors.description.message}</p>
               )}
             </div>
             {manualApiErrorMessage && (
-              <div className="rounded border border-red-200 bg-red-50 px-3 py-2">
-                <p className="text-xs text-red-700">{manualApiErrorMessage}</p>
+              <div className="rounded-lg border border-destructive/20 bg-destructive/10 px-4 py-3">
+                <p className="text-xs text-destructive">{manualApiErrorMessage}</p>
               </div>
             )}
             <div className="flex gap-2">
@@ -739,7 +758,7 @@ function ActivityPage() {
               </Button>
             </div>
             {(isArchived || isRunningThisActivity || isRunningOther || hasAnyActiveBreak) && (
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-muted-foreground">
                 Manual entry is disabled while archived, another timer is running, or a break is active.
               </p>
             )}
@@ -748,39 +767,66 @@ function ActivityPage() {
       </div>
 
       {/* Entries List */}
-      <div className="rounded border border-gray-200 bg-white p-4">
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-sm font-medium text-gray-900">History</h2>
-          <select
-            value={period}
-            onChange={(e) => setPeriod(e.target.value)}
-            className="rounded border border-gray-300 px-2 py-1 text-sm"
-          >
-            {PERIOD_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
+      <div className="rounded-xl border border-border bg-card p-6">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-base font-semibold text-foreground">History</h2>
+          <Select value={period} onValueChange={setPeriod}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {PERIOD_OPTIONS.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         {period === 'custom' && (
-          <div className="mb-3 flex gap-2">
-            <input
-              type="date"
-              value={customFrom}
-              onChange={(e) => setCustomFrom(e.target.value)}
-              className="rounded border border-gray-300 px-2 py-1 text-sm"
-            />
-            <input
-              type="date"
-              value={customTo}
-              onChange={(e) => setCustomTo(e.target.value)}
-              className="rounded border border-gray-300 px-2 py-1 text-sm"
-            />
+          <div className="mb-4 flex gap-2">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="w-[200px] justify-start text-left font-normal"
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {customFromDate ? format(customFromDate, 'PPP') : <span>From date</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={customFromDate}
+                  onSelect={(date) => setCustomFrom(date ? format(date, 'yyyy-MM-dd') : '')}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="w-[200px] justify-start text-left font-normal"
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {customToDate ? format(customToDate, 'PPP') : <span>To date</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={customToDate}
+                  onSelect={(date) => setCustomTo(date ? format(date, 'yyyy-MM-dd') : '')}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
           </div>
         )}
         {entriesLoading ? (
-          <p className="text-sm text-gray-500">Loading...</p>
+          <p className="text-sm text-muted-foreground">Loading...</p>
         ) : entries && entries.length > 0 ? (
           <div>
             {entries.map((entry) => (
@@ -788,7 +834,7 @@ function ActivityPage() {
             ))}
           </div>
         ) : (
-          <p className="text-sm text-gray-500">No time entries yet.</p>
+          <p className="text-sm text-muted-foreground">No time entries yet.</p>
         )}
       </div>
     </div>

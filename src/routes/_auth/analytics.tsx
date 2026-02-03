@@ -6,6 +6,8 @@ import {
   formatDuration,
   getDefaultDateRange,
 } from '@/features/analytics';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 export const Route = createFileRoute('/_auth/analytics')({
   component: AnalyticsPage,
@@ -45,25 +47,23 @@ function AnalyticsPage() {
         <h2 className="text-sm font-medium text-gray-900 mb-3">Filters</h2>
         <div className="flex flex-wrap gap-4">
           <div>
-            <label className="block text-sm text-gray-600 mb-1">From</label>
-            <input
+            <Label className="block text-sm text-gray-600 mb-1">From</Label>
+            <Input
               type="date"
               value={from}
               onChange={(e) => setFrom(e.target.value)}
-              className="rounded border border-gray-300 px-3 py-2 text-sm"
             />
           </div>
           <div>
-            <label className="block text-sm text-gray-600 mb-1">To</label>
-            <input
+            <Label className="block text-sm text-gray-600 mb-1">To</Label>
+            <Input
               type="date"
               value={to}
               onChange={(e) => setTo(e.target.value)}
-              className="rounded border border-gray-300 px-3 py-2 text-sm"
             />
           </div>
           <div>
-            <label className="block text-sm text-gray-600 mb-1">Activity</label>
+            <Label className="block text-sm text-gray-600 mb-1">Activity</Label>
             <select
               value={activityId}
               onChange={(e) => setActivityId(e.target.value)}

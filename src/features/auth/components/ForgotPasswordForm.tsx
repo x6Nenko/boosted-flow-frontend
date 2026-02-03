@@ -5,6 +5,9 @@ import type { ForgotPasswordFormData } from '@/features/auth/auth.schema';
 import { forgotPasswordSchema } from '@/features/auth/auth.schema';
 import { useForgotPassword } from '@/features/auth/hooks';
 import { ApiError } from '@/lib/api-client';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 export function ForgotPasswordForm() {
   const forgotPassword = useForgotPassword();
@@ -58,14 +61,13 @@ export function ForgotPasswordForm() {
 
       <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
         <div>
-          <label htmlFor="email" className="sr-only">
+          <Label htmlFor="email" className="sr-only">
             Email address
-          </label>
-          <input
+          </Label>
+          <Input
             id="email"
             type="email"
             autoComplete="email"
-            className="relative block w-full rounded-md border-0 px-3 py-2 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
             placeholder="Email address"
             {...registerField('email')}
           />
@@ -81,13 +83,13 @@ export function ForgotPasswordForm() {
         )}
 
         <div>
-          <button
+          <Button
             type="submit"
             disabled={isSubmitting || forgotPassword.isPending}
-            className="group relative flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50"
+            className="w-full"
           >
             {forgotPassword.isPending ? 'Sending...' : 'Send reset link'}
-          </button>
+          </Button>
         </div>
 
         <div className="text-center text-sm">

@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate, useSearch } from '@tanstack/react-router'
 import { useEffect } from 'react';
 import { useGoogleAuth } from '@/features/auth/hooks';
 import { ApiError } from '@/lib/api-client';
+import { Button } from '@/components/ui/button';
 
 type AuthCallbackSearch = {
   code?: string;
@@ -42,12 +43,13 @@ function AuthCallbackPage() {
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
           <p className="text-red-600">{errorMessage}</p>
-          <button
+          <Button
             onClick={() => navigate({ to: '/login' })}
-            className="mt-4 text-indigo-600 hover:underline"
+            variant="link"
+            className="mt-4"
           >
             Back to login
-          </button>
+          </Button>
         </div>
       </div>
     );

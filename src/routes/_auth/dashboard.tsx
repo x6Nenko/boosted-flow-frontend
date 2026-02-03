@@ -8,6 +8,8 @@ import { useCurrentEntry, useTimeEntries } from '@/features/time-entries/hooks';
 import { TimeEntryRow } from '@/features/time-entries/components/TimeEntryRow';
 import { ActivityHeatmap } from '@/features/time-entries/components/ActivityHeatmap';
 import { getDateRangeForDays } from '@/features/analytics';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 export const Route = createFileRoute('/_auth/dashboard')({
   component: DashboardPage,
@@ -62,13 +64,14 @@ function DashboardPage() {
       <div className="p-4">
         <div className="mb-4 flex items-center justify-between">
           <h1 className="text-xl font-bold text-gray-900">Dashboard</h1>
-          <button
+          <Button
             onClick={() => logout.mutate()}
             disabled={logout.isPending}
-            className="rounded bg-gray-100 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-200 disabled:opacity-50"
+            variant="secondary"
+            size="sm"
           >
             {logout.isPending ? 'Logging out...' : 'Logout'}
-          </button>
+          </Button>
         </div>
         <div className="rounded border border-gray-200 bg-white p-4">
           <h2 className="mb-3 text-sm font-medium text-gray-900">Create your first activity</h2>
@@ -89,13 +92,14 @@ function DashboardPage() {
     <div className="p-4">
       <div className="mb-4 flex items-center justify-between">
         <h1 className="text-xl font-bold text-gray-900">Dashboard</h1>
-        <button
+        <Button
           onClick={() => logout.mutate()}
           disabled={logout.isPending}
-          className="rounded bg-gray-100 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-200 disabled:opacity-50"
+          variant="secondary"
+          size="sm"
         >
           {logout.isPending ? 'Logging out...' : 'Logout'}
-        </button>
+        </Button>
       </div>
 
       {/* Current Tracking Indicator */}
@@ -148,17 +152,15 @@ function DashboardPage() {
         </div>
         {period === 'custom' && (
           <div className="mb-3 flex gap-2">
-            <input
+            <Input
               type="date"
               value={customFrom}
               onChange={(e) => setCustomFrom(e.target.value)}
-              className="rounded border border-gray-300 px-2 py-1 text-sm"
             />
-            <input
+            <Input
               type="date"
               value={customTo}
               onChange={(e) => setCustomTo(e.target.value)}
-              className="rounded border border-gray-300 px-2 py-1 text-sm"
             />
           </div>
         )}

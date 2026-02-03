@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { BarChart3, Home, Layers, Menu, Search, X } from 'lucide-react'
 import { commandPaletteStore } from '@/features/command-palette'
 import { useAuth } from '@/features/auth/hooks/use-auth'
+import { Button } from '@/components/ui/button'
 
 function SearchButton() {
   const [isMac, setIsMac] = useState(false);
@@ -14,14 +15,16 @@ function SearchButton() {
   }, []);
 
   return (
-    <button
+    <Button
       type="button"
       onClick={() => commandPaletteStore.open()}
-      className="flex items-center gap-1 rounded-full bg-white/10 px-3 py-1.5 text-sm hover:bg-white/20 transition-colors"
+      variant="ghost"
+      size="sm"
+      className="gap-1 rounded-full"
     >
       <Search size={14} />
       <kbd className="text-xs">{isMac ? '⌘K' : 'Ctrl K'}</kbd>
-    </button>
+    </Button>
   );
 }
 
@@ -37,8 +40,8 @@ export default function Header() {
         <Link to="/" className="flex items-center gap-3">
           <div className="text-cream">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="3" strokeLinecap="round" stroke-dasharray="12 12" transform="rotate(30 12 12)"/>
-              <path d="M10 12H14" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
+              <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="3" strokeLinecap="round" stroke-dasharray="12 12" transform="rotate(30 12 12)" />
+              <path d="M10 12H14" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
             </svg>
           </div>
           <span className="font-bold text-lg tracking-tight text-white">Boosted Flow</span>
@@ -86,23 +89,25 @@ export default function Header() {
                 Log in
               </Link>
 
-              <Link
-                to="/register"
-                className="group relative flex items-center gap-2 bg-white hover:bg-gray-100 text-black px-4 py-2 rounded-lg font-medium transition-all duration-200 shadow-[0_0_15px_rgba(255,255,255,0.1)] hover:shadow-[0_0_20px_rgba(255,255,255,0.3)]"
+              <Button
+                asChild
+                className="shadow-[0_0_15px_rgba(255,255,255,0.1)] hover:shadow-[0_0_20px_rgba(255,255,255,0.3)]"
               >
-                <span className="text-[15px]">Sign Up</span>
-              </Link>
+                <Link to="/register">Sign Up</Link>
+              </Button>
             </>
           )}
 
           {/* Mobile Menu Button */}
-          <button
+          <Button
             onClick={() => setIsOpen(true)}
-            className="p-2 hover:bg-white/10 rounded-lg transition-colors md:hidden"
+            variant="ghost"
+            size="icon-sm"
+            className="md:hidden"
             aria-label="Open menu"
           >
             <Menu size={20} />
-          </button>
+          </Button>
         </div>
       </nav>
 
@@ -113,13 +118,14 @@ export default function Header() {
       >
         <div className="flex items-center justify-between p-4 border-b border-white/10">
           <span className="font-semibold text-white">Menu</span>
-          <button
+          <Button
             onClick={() => setIsOpen(false)}
-            className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+            variant="ghost"
+            size="icon-sm"
             aria-label="Close menu"
           >
             <X size={20} />
-          </button>
+          </Button>
         </div>
 
         <nav className="flex-1 p-4">
@@ -155,20 +161,16 @@ export default function Header() {
             </>
           ) : (
             <div className="space-y-2">
-              <Link
-                to="/login"
-                onClick={() => setIsOpen(false)}
-                className="block w-full p-3 text-center rounded-lg text-white/80 hover:bg-white/10 transition-colors"
-              >
-                Log in
-              </Link>
-              <Link
-                to="/register"
-                onClick={() => setIsOpen(false)}
-                className="block w-full p-3 text-center rounded-lg bg-white text-black hover:bg-white/90 transition-colors font-medium"
-              >
-                Sign Up
-              </Link>
+              <Button asChild variant="ghost" className="w-full">
+                <Link to="/login" onClick={() => setIsOpen(false)}>
+                  Log in
+                </Link>
+              </Button>
+              <Button asChild className="w-full">
+                <Link to="/register" onClick={() => setIsOpen(false)}>
+                  Sign Up
+                </Link>
+              </Button>
             </div>
           )}
         </nav>

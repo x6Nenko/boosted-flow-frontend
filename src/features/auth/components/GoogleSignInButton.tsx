@@ -1,4 +1,5 @@
 import { useGoogleAuth } from '../hooks';
+import { Button } from '@/components/ui/button';
 
 type GoogleSignInButtonProps = {
   mode?: 'signin' | 'signup';
@@ -16,15 +17,16 @@ export function GoogleSignInButton({ mode = 'signin', disabled }: GoogleSignInBu
   const buttonText = mode === 'signup' ? 'Sign up with Google' : 'Sign in with Google';
 
   return (
-    <button
+    <Button
       type="button"
       onClick={initiateGoogleAuth}
       disabled={disabled}
-      className="flex w-full items-center justify-center gap-3 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+      variant="outline"
+      className="w-full gap-3"
     >
       <GoogleIcon />
       {buttonText}
-    </button>
+    </Button>
   );
 }
 

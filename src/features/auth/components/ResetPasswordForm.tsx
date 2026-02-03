@@ -5,6 +5,9 @@ import type { ResetPasswordFormData } from '@/features/auth/auth.schema';
 import { resetPasswordSchema } from '@/features/auth/auth.schema';
 import { useResetPassword } from '@/features/auth/hooks';
 import { ApiError } from '@/lib/api-client';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 type ResetPasswordFormProps = {
   token: string;
@@ -63,14 +66,13 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
       <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
         <div className="space-y-4">
           <div>
-            <label htmlFor="password" className="sr-only">
+            <Label htmlFor="password" className="sr-only">
               New Password
-            </label>
-            <input
+            </Label>
+            <Input
               id="password"
               type="password"
               autoComplete="new-password"
-              className="relative block w-full rounded-md border-0 px-3 py-2 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
               placeholder="New password (8-72 characters)"
               {...registerField('password')}
             />
@@ -79,14 +81,13 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
             )}
           </div>
           <div>
-            <label htmlFor="confirmPassword" className="sr-only">
+            <Label htmlFor="confirmPassword" className="sr-only">
               Confirm Password
-            </label>
-            <input
+            </Label>
+            <Input
               id="confirmPassword"
               type="password"
               autoComplete="new-password"
-              className="relative block w-full rounded-md border-0 px-3 py-2 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
               placeholder="Confirm new password"
               {...registerField('confirmPassword')}
             />
@@ -103,13 +104,13 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
         )}
 
         <div>
-          <button
+          <Button
             type="submit"
             disabled={isSubmitting || resetPassword.isPending}
-            className="group relative flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50"
+            className="w-full"
           >
             {resetPassword.isPending ? 'Resetting...' : 'Reset password'}
-          </button>
+          </Button>
         </div>
 
         <div className="text-center text-sm">

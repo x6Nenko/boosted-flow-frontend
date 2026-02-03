@@ -2,6 +2,8 @@ import { useMemo, useRef, useState } from 'react';
 import { useCreateActivity } from '../hooks';
 import { ACTIVITY_SUGGESTIONS } from '../types';
 import { useRegisterCommand } from '@/features/command-palette';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 type ActivityFormProps = {
   onCreated?: (id: string) => void;
@@ -51,7 +53,7 @@ export function ActivityForm({ onCreated }: ActivityFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-3">
       <div className="relative">
-        <input
+        <Input
           ref={inputRef}
           type="text"
           value={name}
@@ -60,7 +62,6 @@ export function ActivityForm({ onCreated }: ActivityFormProps) {
           onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
           placeholder="Enter activity name..."
           maxLength={255}
-          className="w-full rounded border border-gray-300 px-3 py-2 text-sm"
         />
         {showSuggestions && filteredSuggestions.length > 0 && name.length === 0 && (
           <div className="absolute z-10 mt-1 w-full rounded border border-gray-200 bg-white shadow-lg">
@@ -78,13 +79,13 @@ export function ActivityForm({ onCreated }: ActivityFormProps) {
           </div>
         )}
       </div>
-      <button
+      <Button
         type="submit"
         disabled={!name.trim() || createActivity.isPending}
-        className="w-full rounded bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-50"
+        className="w-full"
       >
         {createActivity.isPending ? 'Creating...' : 'Create Activity'}
-      </button>
+      </Button>
     </form>
   );
 }

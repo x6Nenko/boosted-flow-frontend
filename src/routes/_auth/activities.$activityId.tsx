@@ -32,6 +32,8 @@ import { manualEntrySchema, type ManualEntryFormData } from '@/features/time-ent
 import { toIsoFromLocal } from '@/features/time-entries/time-entries.utils';
 import { getDateRangeForDays } from '@/features/analytics';
 import { ApiError } from '@/lib/api-client';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 type TimerMode = 'stopwatch' | 'pomodoro';
 
@@ -389,26 +391,25 @@ function ActivityPage() {
       <div className="mb-4">
         {isEditing ? (
           <div className="flex gap-2">
-            <input
+            <Input
               type="text"
               value={editName}
               onChange={(e) => setEditName(e.target.value)}
               maxLength={255}
-              className="flex-1 rounded border border-gray-300 px-3 py-2 text-sm"
+              className="flex-1"
             />
-            <button
+            <Button
               onClick={handleEditSave}
               disabled={!editName.trim() || updateActivity.isPending}
-              className="rounded bg-indigo-600 px-3 py-2 text-sm text-white hover:bg-indigo-500 disabled:opacity-50"
             >
               Save
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => setIsEditing(false)}
-              className="rounded border border-gray-300 px-3 py-2 text-sm hover:bg-gray-50"
+              variant="outline"
             >
               Cancel
-            </button>
+            </Button>
           </div>
         ) : (
           <div className="flex items-center gap-2">
@@ -423,36 +424,40 @@ function ActivityPage() {
       {/* Activity Actions */}
       {!isEditing && (
         <div className="mb-4 flex gap-2">
-          <button
+          <Button
             onClick={handleEditStart}
-            className="rounded border border-gray-300 px-3 py-1 text-sm hover:bg-gray-50"
+            variant="outline"
+            size="sm"
           >
             Edit
-          </button>
+          </Button>
           {isArchived ? (
-            <button
+            <Button
               onClick={handleUnarchive}
               disabled={unarchiveActivity.isPending}
-              className="rounded border border-gray-300 px-3 py-1 text-sm hover:bg-gray-50 disabled:opacity-50"
+              variant="outline"
+              size="sm"
             >
               Unarchive
-            </button>
+            </Button>
           ) : (
-            <button
+            <Button
               onClick={handleArchive}
               disabled={archiveActivity.isPending || isRunningThisActivity || hasAnyActiveBreak}
-              className="rounded border border-gray-300 px-3 py-1 text-sm hover:bg-gray-50 disabled:opacity-50"
+              variant="outline"
+              size="sm"
             >
               Archive
-            </button>
+            </Button>
           )}
-          <button
+          <Button
             onClick={handleDelete}
             disabled={deleteActivity.isPending || isRunningThisActivity || hasAnyActiveBreak}
-            className="rounded border border-red-300 px-3 py-1 text-sm text-red-600 hover:bg-red-50 disabled:opacity-50"
+            variant="destructive"
+            size="sm"
           >
             Delete
-          </button>
+          </Button>
         </div>
       )}
 
@@ -487,20 +492,22 @@ function ActivityPage() {
                 )}
               </span>
             </div>
-            <button
+            <Button
               onClick={handleStopTimer}
               disabled={stopTimer.isPending || startTimer.isPending}
-              className="w-full rounded bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-500 disabled:opacity-50"
+              variant="destructive"
+              className="w-full"
             >
               {startTimer.isPending ? 'Starting...' : stopTimer.isPending ? 'Stopping...' : 'Stop'}
-            </button>
+            </Button>
             <div className="mt-3 flex items-center justify-center gap-2">
-              <button
+              <Button
                 onClick={() => setDistractionCount((c) => c + 1)}
-                className="rounded border border-gray-300 px-3 py-1 text-sm hover:bg-gray-50"
+                variant="outline"
+                size="sm"
               >
                 + Distraction
-              </button>
+              </Button>
               {distractionCount > 0 && (
                 <span className="text-sm text-gray-500">{distractionCount}</span>
               )}
@@ -528,33 +535,34 @@ function ActivityPage() {
                     onComplete={handleSkipBreak}
                   />
                 </span>
-                <button
+                <Button
                   onClick={handleSkipBreak}
-                  className="mt-3 w-full rounded border border-gray-300 px-4 py-2 text-sm hover:bg-gray-50"
+                  variant="outline"
+                  className="mt-3 w-full"
                 >
                   Skip Break
-                </button>
+                </Button>
               </div>
             ) : (
               <div className="flex gap-2">
-                <button
+                <Button
                   onClick={handleStartBreak}
-                  className="flex-1 rounded bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-500"
+                  className="flex-1 bg-green-600 hover:bg-green-500"
                 >
                   Start Break
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={handleSkipBreak}
-                  className="rounded border border-gray-300 px-4 py-2 text-sm hover:bg-gray-50"
+                  variant="outline"
                 >
                   Skip
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={handleResetPomodoro}
-                  className="rounded border border-gray-300 px-4 py-2 text-sm hover:bg-gray-50"
+                  variant="outline"
                 >
                   Reset
-                </button>
+                </Button>
               </div>
             )}
           </div>
@@ -566,28 +574,26 @@ function ActivityPage() {
           <>
             {/* Mode toggle */}
             <div className="mb-3 flex gap-1">
-              <button
+              <Button
                 onClick={() => setTimerMode('stopwatch')}
-                className={`flex-1 rounded px-3 py-1 text-sm ${timerMode === 'stopwatch'
-                  ? 'bg-gray-200 text-gray-900'
-                  : 'text-gray-500 hover:bg-gray-100'
-                  }`}
+                variant={timerMode === 'stopwatch' ? 'secondary' : 'ghost'}
+                className="flex-1"
+                size="sm"
               >
                 Stopwatch
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => setTimerMode('pomodoro')}
-                className={`flex-1 rounded px-3 py-1 text-sm ${timerMode === 'pomodoro'
-                  ? 'bg-gray-200 text-gray-900'
-                  : 'text-gray-500 hover:bg-gray-100'
-                  }`}
+                variant={timerMode === 'pomodoro' ? 'secondary' : 'ghost'}
+                className="flex-1"
+                size="sm"
               >
                 Pomodoro
-              </button>
+              </Button>
             </div>
 
             <div className="mb-3">
-              <input
+              <Input
                 ref={intentionInputRef}
                 type="text"
                 value={description}
@@ -600,7 +606,6 @@ function ActivityPage() {
                 }}
                 placeholder="What are your intention? (optional)"
                 maxLength={500}
-                className="w-full rounded border border-gray-300 px-3 py-2 text-sm"
               />
             </div>
 
@@ -636,17 +641,17 @@ function ActivityPage() {
               </>
             )}
 
-            <button
+            <Button
               onClick={handleStart}
               disabled={startTimer.isPending}
-              className="w-full rounded bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-50"
+              className="w-full"
             >
               {startTimer.isPending
                 ? 'Starting...'
                 : timerMode === 'pomodoro'
                   ? 'Start Pomodoro Session'
                   : 'Start Tracking'}
-            </button>
+            </Button>
           </>
         )}
       </div>
@@ -669,10 +674,10 @@ function ActivityPage() {
             <div className="grid gap-2 sm:grid-cols-2">
               <label className="text-xs text-gray-500">
                 Started at
-                <input
+                <Input
                   type="datetime-local"
                   {...registerManualField('startedAt')}
-                  className="mt-1 w-full rounded border border-gray-300 px-2 py-1 text-sm"
+                  className="mt-1"
                 />
                 {manualErrors.startedAt && (
                   <p className="mt-1 text-xs text-red-600">{manualErrors.startedAt.message}</p>
@@ -680,10 +685,10 @@ function ActivityPage() {
               </label>
               <label className="text-xs text-gray-500">
                 Stopped at
-                <input
+                <Input
                   type="datetime-local"
                   {...registerManualField('stoppedAt')}
-                  className="mt-1 w-full rounded border border-gray-300 px-2 py-1 text-sm"
+                  className="mt-1"
                 />
                 {manualErrors.stoppedAt && (
                   <p className="mt-1 text-xs text-red-600">{manualErrors.stoppedAt.message}</p>
@@ -691,12 +696,11 @@ function ActivityPage() {
               </label>
             </div>
             <div>
-              <input
+              <Input
                 type="text"
                 placeholder="Description (optional)"
                 maxLength={500}
                 {...registerManualField('description')}
-                className="w-full rounded border border-gray-300 px-2 py-1 text-sm"
               />
               {manualErrors.description && (
                 <p className="mt-1 text-xs text-red-600">{manualErrors.description.message}</p>
@@ -708,7 +712,7 @@ function ActivityPage() {
               </div>
             )}
             <div className="flex gap-2">
-              <button
+              <Button
                 type="submit"
                 disabled={
                   isManualSubmitting ||
@@ -718,20 +722,21 @@ function ActivityPage() {
                   isRunningOther ||
                   hasAnyActiveBreak
                 }
-                className="rounded bg-indigo-600 px-3 py-1 text-sm text-white hover:bg-indigo-500 disabled:opacity-50"
+                size="sm"
               >
                 {createManual.isPending ? 'Saving...' : 'Save'}
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
                 onClick={() => {
                   resetManualForm();
                   setManualOpen(false);
                 }}
-                className="rounded border border-gray-300 px-3 py-1 text-sm hover:bg-gray-50"
+                variant="outline"
+                size="sm"
               >
                 Cancel
-              </button>
+              </Button>
             </div>
             {(isArchived || isRunningThisActivity || isRunningOther || hasAnyActiveBreak) && (
               <p className="text-xs text-gray-500">

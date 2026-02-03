@@ -1,4 +1,5 @@
 import { Link } from '@tanstack/react-router';
+import { Button } from '@/components/ui/button';
 
 export default function Hero() {
   return (
@@ -14,18 +15,16 @@ export default function Hero() {
       </p>
 
       <div className="flex items-center justify-center gap-4">
-        <Link
-          to="/register"
-          className="rounded-lg bg-white px-6 py-3 text-base font-medium text-black hover:bg-white/90 transition-colors shadow-[0_0_15px_rgba(255,255,255,0.1)] hover:shadow-[0_0_20px_rgba(255,255,255,0.3)]"
+        <Button
+          asChild
+          size="lg"
+          className="shadow-[0_0_15px_rgba(255,255,255,0.1)] hover:shadow-[0_0_20px_rgba(255,255,255,0.3)]"
         >
-          Sign Up
-        </Link>
-        <Link
-          to="/login"
-          className="rounded-lg border border-white/20 bg-white/10 px-6 py-3 text-base font-medium text-white hover:bg-white/20 transition-colors"
-        >
-          Log In
-        </Link>
+          <Link to="/register">Sign Up</Link>
+        </Button>
+        <Button asChild variant="outline" size="lg">
+          <Link to="/login">Log In</Link>
+        </Button>
       </div>
     </div>
   );

@@ -1,95 +1,105 @@
 @import 'tailwindcss';
-
 @import 'tw-animate-css';
 
-@custom-variant dark (&:is(.dark *));
-
-body {
-  @apply m-0;
-  font-family:
-    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
-    'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-code {
-  font-family:
-    source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
-}
-
+/* --- 1. THEME VARIABLES (Dark Mode Only) --- */
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.141 0.005 285.823);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.141 0.005 285.823);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.141 0.005 285.823);
-  --primary: oklch(0.21 0.006 285.885);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.967 0.001 286.375);
-  --secondary-foreground: oklch(0.21 0.006 285.885);
-  --muted: oklch(0.967 0.001 286.375);
-  --muted-foreground: oklch(0.552 0.016 285.938);
-  --accent: oklch(0.967 0.001 286.375);
-  --accent-foreground: oklch(0.21 0.006 285.885);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.577 0.245 27.325);
-  --border: oklch(0.92 0.004 286.32);
-  --input: oklch(0.92 0.004 286.32);
-  --ring: oklch(0.871 0.006 286.286);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.141 0.005 285.823);
-  --sidebar-primary: oklch(0.21 0.006 285.885);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.967 0.001 286.375);
-  --sidebar-accent-foreground: oklch(0.21 0.006 285.885);
-  --sidebar-border: oklch(0.92 0.004 286.32);
-  --sidebar-ring: oklch(0.871 0.006 286.286);
-}
+  /* Core Brand Tokens */
+  --color-black: #080708;
+  /* Deepest Canvas */
+  --color-cream: #FFF4BD;
+  /* Primary Action / Focus */
+  --color-white: #FCFCFA;
+  /* Main Content */
 
-.dark {
-  --background: oklch(0.141 0.005 285.823);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.141 0.005 285.823);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.141 0.005 285.823);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.21 0.006 285.885);
-  --secondary: oklch(0.274 0.006 286.033);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.274 0.006 286.033);
-  --muted-foreground: oklch(0.705 0.015 286.067);
-  --accent: oklch(0.274 0.006 286.033);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.396 0.141 25.723);
-  --destructive-foreground: oklch(0.637 0.237 25.331);
-  --border: oklch(0.274 0.006 286.033);
-  --input: oklch(0.274 0.006 286.033);
-  --ring: oklch(0.442 0.017 285.786);
+  /* Architectural Layers (Raycast-inspired) */
+  --color-surface-low: #111011;
+  /* Subtle containers */
+  --color-surface-med: #1A191A;
+  /* Hover states / Active cards */
+  --color-border-subtle: #222122;
+  /* Fine-line separation */
+  --color-text-muted: #737373;
+  /* Timestamps / Secondary info */
+
+  /* Feature Tokens */
+  --color-distraction: #FF6B6B;
+  /* Flash color for keybinds */
+  --color-flow: var(--color-cream);
+
+  /* Typography & Spacing */
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  --radius-lg: 12px;
+  --radius-md: 8px;
+  --radius-sm: 4px;
+
+  /* Effects */
+  --shadow-glow: 0 0 20px rgba(255, 244, 189, 0.1);
+
+  /* --- Semantic Mapping (Shadcn/Tailwind) --- */
+
+  /* Backgrounds & Foreground */
+  --background: var(--color-black);
+  --foreground: var(--color-white);
+
+  /* Card / Surface */
+  --card: var(--color-surface-low);
+  --card-foreground: var(--color-white);
+
+  /* Popover */
+  --popover: var(--color-surface-low);
+  --popover-foreground: var(--color-white);
+
+  /* Primary Action */
+  --primary: var(--color-cream);
+  --primary-foreground: var(--color-black);
+
+  /* Secondary / Muted / Accent */
+  --secondary: var(--color-surface-med);
+  --secondary-foreground: var(--color-white);
+  --muted: var(--color-surface-med);
+  --muted-foreground: var(--color-text-muted);
+  --accent: var(--color-surface-med);
+  --accent-foreground: var(--color-cream);
+
+  /* Destructive */
+  --destructive: var(--color-distraction);
+  --destructive-foreground: var(--color-black);
+
+  /* Borders & Inputs */
+  --border: var(--color-border-subtle);
+  --input: var(--color-border-subtle);
+  --ring: var(--color-cream);
+
+  /* Radius */
+  --radius: var(--radius-md);
+
+  /* Sidebar (Matches Surface) */
+  --sidebar: var(--color-surface-low);
+  --sidebar-foreground: var(--color-white);
+  --sidebar-primary: var(--color-cream);
+  --sidebar-primary-foreground: var(--color-black);
+  --sidebar-accent: var(--color-surface-med);
+  --sidebar-accent-foreground: var(--color-white);
+  --sidebar-border: var(--color-border-subtle);
+  --sidebar-ring: var(--color-cream);
+
+  /* Charts */
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
   --chart-4: oklch(0.627 0.265 303.9);
   --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.21 0.006 285.885);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.274 0.006 286.033);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(0.274 0.006 286.033);
-  --sidebar-ring: oklch(0.442 0.017 285.786);
 }
 
+/* --- 2. TAILWIND CONFIGURATION --- */
 @theme inline {
+  --color-cream: var(--color-cream);
+  --color-black: var(--color-black);
+  --color-white: var(--color-white);
+  --color-distraction: var(--color-distraction);
+  
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -109,15 +119,7 @@ code {
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -126,77 +128,93 @@ code {
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+
+  --animate-distraction-flash: flash 0.2s ease-out;
+  --animate-flow-pulse: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+
+  @keyframes flash {
+    0% {
+      background-color: rgba(255, 107, 107, 0.2);
+    }
+
+    100% {
+      background-color: transparent;
+    }
+  }
 }
 
+/* --- 3. BASE LAYER & RESETS --- */
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased m-0;
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  code {
+    font-family: var(--font-mono);
+  }
+
+  .timer-nums {
+    font-variant-numeric: tabular-nums;
   }
 }
 
-/* Command Palette (cmdk) */
+/* --- 4. COMPONENT OVERRIDES (CMDK) --- */
 .cmdk-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  background: rgba(0, 0, 0, 0.5);
+  @apply fixed inset-0 z-50 bg-black/50 backdrop-blur-sm;
 }
 
 .cmdk-content {
-  position: fixed;
-  top: 20vh;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 101;
-  width: 100%;
-  max-width: 400px;
+  @apply fixed left-1/2 top-[20vh] z-50 w-full max-w-[400px] -translate-x-1/2;
 }
 
 [cmdk-root] {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  @apply w-full overflow-hidden rounded-xl border bg-card text-foreground shadow-2xl;
+  box-shadow: var(--shadow-glow);
+  border-color: var(--border);
 }
 
 [cmdk-input] {
-  width: 100%;
-  padding: 12px 16px;
-  font-size: 14px;
-  border: none;
-  border-bottom: 1px solid #e5e7eb;
-  outline: none;
+  @apply flex h-12 w-full border-b border-border bg-transparent px-4 text-sm outline-none placeholder:text-muted-foreground;
+  font-family: var(--font-sans);
 }
 
 [cmdk-list] {
-  max-height: 300px;
-  overflow: auto;
-  padding: 8px;
-}
-
-[cmdk-group-heading] {
-  padding: 8px;
-  font-size: 12px;
-  color: #6b7280;
-}
-
-[cmdk-item] {
-  padding: 8px 12px;
-  font-size: 14px;
-  cursor: pointer;
-  border-radius: 4px;
-}
-
-[cmdk-item][data-selected='true'] {
-  background: #f3f4f6;
+  @apply max-h-[300px] overflow-y-auto overflow-x-hidden p-2;
 }
 
 [cmdk-empty] {
-  padding: 16px;
-  font-size: 14px;
-  color: #6b7280;
-  text-align: center;
+  @apply py-6 text-center text-sm text-muted-foreground;
 }
+
+[cmdk-group-heading] {
+  @apply px-2 py-1.5 text-xs font-semibold text-muted-foreground/70;
+}
+
+[cmdk-item] {
+  @apply relative flex cursor-default select-none items-center rounded-md px-2 py-1.5 text-sm outline-none transition-colors;
+  @apply data-[selected=true]:bg-accent data-[selected=true]:text-accent-foreground;
+  @apply data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50;
+}
+
+/* --- 5. COMPONENT PRIMITIVES --- */
+@layer components {}

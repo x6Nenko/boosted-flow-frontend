@@ -84,6 +84,21 @@ Domain-specific logic belongs in `features/` or `layout/`.
 - `--color-cream` (#FFF4BD) - Action/brand
 - `--color-surface-med` (#1A191A) - Secondary/muted
 
+**Contextual Overrides:**
+Ghost buttons default to cream hover (`accent-foreground`). For landing page CTAs, override to white:
+
+```tsx
+// Landing page - white hover
+<Button variant="ghost" className="hover:text-white">
+  Log in
+</Button>
+
+// App context - cream hover (default)
+<Button variant="ghost">
+  Cancel
+</Button>
+```
+
 ### Design Tokens
 
 All styling uses CSS custom properties from `styles.css`:

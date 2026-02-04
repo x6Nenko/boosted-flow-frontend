@@ -84,7 +84,7 @@ export default function Header() {
             onClick={() => setIsOpen(true)}
             variant="ghost"
             size="icon-sm"
-            className="md:hidden"
+            className="md:hidden hover:text-white"
             aria-label="Open menu"
           >
             <Menu size={20} />
@@ -103,6 +103,7 @@ export default function Header() {
             onClick={() => setIsOpen(false)}
             variant="ghost"
             size="icon-sm"
+            className="hover:text-white"
             aria-label="Close menu"
           >
             <X size={20} />
@@ -124,7 +125,7 @@ export default function Header() {
             </>
           ) : (
             <div className="space-y-2">
-              <Button asChild variant="ghost" className="w-full">
+              <Button asChild variant="ghost" className="w-full hover:text-white">
                 <Link to="/login" onClick={() => setIsOpen(false)}>
                   Log in
                 </Link>

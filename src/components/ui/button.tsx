@@ -9,7 +9,20 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        primary: [
+          "relative text-base font-semibold",
+          "bg-origin-border bg-[linear-gradient(104deg,rgba(253,253,253,0.05)_5%,rgba(240,240,228,0.1)_100%)]",
+          "border-[1px] border-white/5 backdrop-blur-[25px]",
+          "text-white shadow-sm",
+          "hover:bg-white/90 hover:text-black hover:shadow-lg",
+          "focus-visible:bg-white/90 focus-visible:text-black focus-visible:ring-4 focus-visible:ring-white/30",
+          "active:scale-[0.98]",
+          "after:absolute after:w-[calc(100%+4px)] after:h-[calc(100%+4px)]",
+          "after:top-[-2px] after:left-[-2px] after:rounded-[1rem]",
+          "after:pointer-events-none",
+        ],
+        // Brand cream button (standard actions)
+        action: "bg-primary text-primary-foreground hover:bg-primary/90",
         destructive:
           "bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
         outline:
@@ -32,7 +45,7 @@ const buttonVariants = cva(
       },
     },
     defaultVariants: {
-      variant: "default",
+      variant: "action",
       size: "default",
     },
   }
@@ -40,7 +53,7 @@ const buttonVariants = cva(
 
 function Button({
   className,
-  variant = "default",
+  variant = "action",
   size = "default",
   asChild = false,
   ...props

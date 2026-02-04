@@ -66,18 +66,15 @@ export default function Header() {
             <SearchButton />
           ) : (
             <>
-              <Link
+              <NavLink
                 to="/login"
-                className="text-[15px] font-medium text-gray-400 hover:text-white transition-colors duration-200 hidden sm:block"
+                className="hidden sm:block"
               >
                 Log in
-              </Link>
+              </NavLink>
 
-              <Button
-                asChild
-                className="shadow-[0_0_15px_rgba(255,255,255,0.1)] hover:shadow-[0_0_20px_rgba(255,255,255,0.3)]"
-              >
-                <Link to="/register">Sign Up</Link>
+              <Button asChild variant="primary">
+                <Link to="/register">Get Started</Link>
               </Button>
             </>
           )}
@@ -132,9 +129,9 @@ export default function Header() {
                   Log in
                 </Link>
               </Button>
-              <Button asChild className="w-full">
+              <Button asChild variant="primary" className="w-full">
                 <Link to="/register" onClick={() => setIsOpen(false)}>
-                  Sign Up
+                  Get Started
                 </Link>
               </Button>
             </div>

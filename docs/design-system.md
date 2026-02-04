@@ -71,12 +71,18 @@ Domain-specific logic belongs in `features/` or `layout/`.
 
 ### Button Strategy
 
-**Primary (Cream):** Default actions, forms, general CTAs  
-**Primary + White Glow:** High-emphasis conversion points (navbar Sign Up)  
-**Ghost:** Secondary actions, icon buttons  
-**Outline:** Alternative actions on dark backgrounds
+| Variant | Usage | Color |
+|---------|-------|-------|
+| **primary** | High-intent conversion (Get Started, Upgrade, Save) | White Glass |
+| **action** | Core app functionality (Start/Stop, Add Task) | Brand Cream |
+| **secondary** | Non-critical path (Cancel, Settings) | Muted Surface |
+| **ghost** | Icon buttons, subtle actions | Transparent |
+| **outline** | Alternative actions | Border only |
 
-Primary color is defined in `styles.css` as `--color-cream` (#FFF4BD).
+**Color tokens:**
+- `--color-white` (#FCFCFA) - Primary/high-emphasis
+- `--color-cream` (#FFF4BD) - Action/brand
+- `--color-surface-med` (#1A191A) - Secondary/muted
 
 ### Design Tokens
 

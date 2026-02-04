@@ -1,5 +1,6 @@
 import { Link } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
+import { NavLink } from '@/components/primitives/nav-link';
 
 export default function Hero() {
   return (
@@ -14,12 +15,10 @@ export default function Hero() {
       </p>
 
       <div className="flex items-center justify-center gap-4">
-        <Button asChild size="lg">
-          <Link to="/register">Sign Up</Link>
+        <Button asChild variant="primary" size="lg">
+          <Link to="/register">Get Started</Link>
         </Button>
-        <Button asChild variant="outline" size="lg">
-          <Link to="/login">Log In</Link>
-        </Button>
+        <NavLink to="/login">Log in</NavLink>
       </div>
     </div>
   );

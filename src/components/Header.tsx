@@ -4,6 +4,8 @@ import { BarChart3, Home, Layers, Menu, Search, X } from 'lucide-react'
 import { commandPaletteStore } from '@/features/command-palette'
 import { useAuth } from '@/features/auth/hooks/use-auth'
 import { Button } from '@/components/ui/button'
+import { GlassContainer } from '@/components/primitives/glass-container'
+import { NavLink, MobileNavLink } from '@/components/primitives/nav-link'
 
 function SearchButton() {
   const [isMac, setIsMac] = useState(false);
@@ -35,7 +37,7 @@ export default function Header() {
   return (
     <>
       {/* Navbar Container with Glass Effect */}
-      <nav className="mx-auto mt-6 w-full max-w-[1200px] bg-surface-low/80 backdrop-blur-md border border-border rounded-2xl px-5 py-3.5 flex items-center justify-between sticky top-6 z-50">
+      <GlassContainer className="mx-auto mt-6 w-full max-w-[1200px] px-5 py-3.5 flex items-center justify-between sticky top-6 z-50">
         {/* Left Side: Logo */}
         <Link to="/" className="flex items-center gap-3">
           <div className="text-cream">
@@ -51,27 +53,9 @@ export default function Header() {
         <div className="hidden md:flex items-center gap-6">
           {isAuthenticated && (
             <>
-              <Link
-                to="/dashboard"
-                className="text-[15px] font-medium text-muted-foreground hover:text-foreground transition-colors duration-200"
-                activeProps={{ className: 'text-[15px] font-medium text-foreground transition-colors duration-200' }}
-              >
-                Dashboard
-              </Link>
-              <Link
-                to="/activities"
-                className="text-[15px] font-medium text-muted-foreground hover:text-foreground transition-colors duration-200"
-                activeProps={{ className: 'text-[15px] font-medium text-foreground transition-colors duration-200' }}
-              >
-                Activities
-              </Link>
-              <Link
-                to="/analytics"
-                className="text-[15px] font-medium text-muted-foreground hover:text-foreground transition-colors duration-200"
-                activeProps={{ className: 'text-[15px] font-medium text-foreground transition-colors duration-200' }}
-              >
-                Analytics
-              </Link>
+              <NavLink to="/dashboard">Dashboard</NavLink>
+              <NavLink to="/activities">Activities</NavLink>
+              <NavLink to="/analytics">Analytics</NavLink>
             </>
           )}
         </div>
@@ -109,7 +93,7 @@ export default function Header() {
             <Menu size={20} />
           </Button>
         </div>
-      </nav>
+      </GlassContainer>
 
       {/* Mobile Sidebar */}
       <aside
@@ -131,33 +115,15 @@ export default function Header() {
         <nav className="flex-1 p-4">
           {isAuthenticated ? (
             <>
-              <Link
-                to="/dashboard"
-                onClick={() => setIsOpen(false)}
-                className="flex items-center gap-3 p-3 rounded-lg hover:bg-accent transition-colors mb-1 text-foreground"
-                activeProps={{ className: 'flex items-center gap-3 p-3 rounded-lg bg-accent transition-colors mb-1 text-accent-foreground' }}
-              >
-                <Home size={20} />
-                <span>Dashboard</span>
-              </Link>
-              <Link
-                to="/activities"
-                onClick={() => setIsOpen(false)}
-                className="flex items-center gap-3 p-3 rounded-lg hover:bg-accent transition-colors mb-1 text-foreground"
-                activeProps={{ className: 'flex items-center gap-3 p-3 rounded-lg bg-accent transition-colors mb-1 text-accent-foreground' }}
-              >
-                <Layers size={20} />
-                <span>Activities</span>
-              </Link>
-              <Link
-                to="/analytics"
-                onClick={() => setIsOpen(false)}
-                className="flex items-center gap-3 p-3 rounded-lg hover:bg-accent transition-colors mb-1 text-foreground"
-                activeProps={{ className: 'flex items-center gap-3 p-3 rounded-lg bg-accent transition-colors mb-1 text-accent-foreground' }}
-              >
-                <BarChart3 size={20} />
-                <span>Analytics</span>
-              </Link>
+              <MobileNavLink to="/dashboard" icon={<Home size={20} />} onClick={() => setIsOpen(false)}>
+                Dashboard
+              </MobileNavLink>
+              <MobileNavLink to="/activities" icon={<Layers size={20} />} onClick={() => setIsOpen(false)}>
+                Activities
+              </MobileNavLink>
+              <MobileNavLink to="/analytics" icon={<BarChart3 size={20} />} onClick={() => setIsOpen(false)}>
+                Analytics
+              </MobileNavLink>
             </>
           ) : (
             <div className="space-y-2">
@@ -186,4 +152,3 @@ export default function Header() {
     </>
   )
 }
-

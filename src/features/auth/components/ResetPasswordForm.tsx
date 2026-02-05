@@ -1,4 +1,4 @@
-import { Link } from '@tanstack/react-router';
+import { NavLink } from '@/components/primitives/nav-link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { ResetPasswordFormData } from '@/features/auth/auth.schema';
@@ -44,9 +44,9 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
           </p>
         </div>
         <div className="text-center">
-          <Link to="/login" className="font-medium text-primary hover:text-primary/80">
+          <NavLink to="/login" className="font-medium text-white hover:text-white/80">
             Continue to login
-          </Link>
+          </NavLink>
         </div>
       </div>
     );
@@ -74,6 +74,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
               type="password"
               autoComplete="new-password"
               placeholder="New password (8-72 characters)"
+              className="focus-visible:border-white/50 focus-visible:outline-white/50"
               {...registerField('password')}
             />
             {errors.password && (
@@ -89,6 +90,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
               type="password"
               autoComplete="new-password"
               placeholder="Confirm new password"
+              className="focus-visible:border-white/50 focus-visible:outline-white/50"
               {...registerField('confirmPassword')}
             />
             {errors.confirmPassword && (
@@ -106,17 +108,18 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
         <div>
           <Button
             type="submit"
+            variant="primary"
             disabled={isSubmitting || resetPassword.isPending}
-            className="w-full"
+            className="w-full cursor-pointer"
           >
             {resetPassword.isPending ? 'Resetting...' : 'Reset password'}
           </Button>
         </div>
 
         <div className="text-center text-sm">
-          <Link to="/login" className="font-medium text-primary hover:text-primary/80">
+          <NavLink to="/login" className="font-medium text-white hover:text-white/80">
             Back to login
-          </Link>
+          </NavLink>
         </div>
       </form>
     </div>

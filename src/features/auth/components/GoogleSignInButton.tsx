@@ -22,7 +22,7 @@ export function GoogleSignInButton({ mode = 'signin', disabled }: GoogleSignInBu
       onClick={initiateGoogleAuth}
       disabled={disabled}
       variant="outline"
-      className="w-full gap-3"
+      className="w-full gap-3 hover:text-white cursor-pointer"
     >
       <GoogleIcon />
       {buttonText}

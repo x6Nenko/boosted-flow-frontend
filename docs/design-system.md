@@ -99,6 +99,15 @@ Ghost buttons default to cream hover (`accent-foreground`). For landing page CTA
 </Button>
 ```
 
+### Auth Page Color Strategy
+
+Auth pages (login, register, forgot-password, reset-password) use **monochrome white** instead of brand cream to create a clean, focused experience before users enter the app.
+
+**Pattern:**
+- Submit buttons: `variant="primary"` (white glass)
+- Text links: `text-white hover:text-white/80`
+- Cream color introduced only after authentication (inside the app)
+
 ### Design Tokens
 
 All styling uses CSS custom properties from `styles.css`:

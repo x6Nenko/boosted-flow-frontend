@@ -1,4 +1,4 @@
-import { Link } from '@tanstack/react-router';
+import { NavLink } from '@/components/primitives/nav-link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { LoginFormData } from '@/features/auth/auth.schema';
@@ -49,6 +49,7 @@ export function LoginForm() {
               type="email"
               autoComplete="email"
               placeholder="Email address"
+              className="focus-visible:border-white/50 focus-visible:outline-white/50"
               {...registerField('email')}
             />
             {errors.email && (
@@ -64,6 +65,7 @@ export function LoginForm() {
               type="password"
               autoComplete="current-password"
               placeholder="Password"
+              className="focus-visible:border-white/50 focus-visible:outline-white/50"
               {...registerField('password')}
             />
             {errors.password && (
@@ -73,9 +75,9 @@ export function LoginForm() {
         </div>
 
         <div className="text-right text-sm">
-          <Link to="/forgot-password" className="font-medium text-primary hover:text-primary/80">
+          <NavLink to="/forgot-password" className="font-medium text-white hover:text-white/80">
             Forgot your password?
-          </Link>
+          </NavLink>
         </div>
 
         {apiErrorMessage && (
@@ -87,8 +89,9 @@ export function LoginForm() {
         <div>
           <Button
             type="submit"
+            variant="primary"
             disabled={isSubmitting || login.isPending}
-            className="w-full"
+            className="w-full cursor-pointer"
           >
             {login.isPending ? 'Signing in...' : 'Sign in'}
           </Button>
@@ -107,9 +110,9 @@ export function LoginForm() {
 
         <div className="text-center text-sm">
           <span className="text-muted-foreground">Don't have an account? </span>
-          <Link to="/register" className="font-medium text-primary hover:text-primary/80">
+          <NavLink to="/register" className="font-medium text-white hover:text-white/80">
             Register
-          </Link>
+          </NavLink>
         </div>
       </form>
     </div>

@@ -182,8 +182,12 @@
   input:-webkit-autofill:hover,
   input:-webkit-autofill:focus,
   input:-webkit-autofill:active {
-    -webkit-box-shadow: 0 0 0 30px var(--color-background) inset !important;
+    color-scheme: dark;
+    -webkit-box-shadow: 0 0 0 1000px var(--card) inset !important;
+    box-shadow: 0 0 0 1000px var(--card) inset !important;
     -webkit-text-fill-color: var(--color-foreground) !important;
+    border-color: var(--input) !important;
+    caret-color: var(--color-foreground);
   }
 }
 

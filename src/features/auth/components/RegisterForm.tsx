@@ -1,4 +1,4 @@
-import { Link } from '@tanstack/react-router';
+import { NavLink } from '@/components/primitives/nav-link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { RegisterFormData } from '@/features/auth/auth.schema';
@@ -49,6 +49,7 @@ export function RegisterForm() {
               type="email"
               autoComplete="email"
               placeholder="Email address"
+              className="focus-visible:border-white/50 focus-visible:outline-white/50"
               {...registerField('email')}
             />
             {errors.email && (
@@ -64,6 +65,7 @@ export function RegisterForm() {
               type="password"
               autoComplete="new-password"
               placeholder="Password (8-72 characters)"
+              className="focus-visible:border-white/50 focus-visible:outline-white/50"
               {...registerField('password')}
             />
             {errors.password && (
@@ -79,6 +81,7 @@ export function RegisterForm() {
               type="password"
               autoComplete="new-password"
               placeholder="Confirm password"
+              className="focus-visible:border-white/50 focus-visible:outline-white/50"
               {...registerField('confirmPassword')}
             />
             {errors.confirmPassword && (
@@ -96,8 +99,9 @@ export function RegisterForm() {
         <div>
           <Button
             type="submit"
+            variant="primary"
             disabled={isSubmitting || register.isPending}
-            className="w-full"
+            className="w-full cursor-pointer"
           >
             {register.isPending ? 'Creating account...' : 'Register'}
           </Button>
@@ -116,9 +120,9 @@ export function RegisterForm() {
 
         <div className="text-center text-sm">
           <span className="text-muted-foreground">Already have an account? </span>
-          <Link to="/login" className="font-medium text-primary hover:text-primary/80">
+          <NavLink to="/login" className="font-medium text-white hover:text-white/80">
             Sign in
-          </Link>
+          </NavLink>
         </div>
       </form>
     </div>

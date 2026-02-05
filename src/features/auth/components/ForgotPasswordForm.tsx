@@ -1,4 +1,4 @@
-import { Link } from '@tanstack/react-router';
+import { NavLink } from '@/components/primitives/nav-link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { ForgotPasswordFormData } from '@/features/auth/auth.schema';
@@ -40,9 +40,9 @@ export function ForgotPasswordForm() {
           </p>
         </div>
         <div className="text-center">
-          <Link to="/login" className="font-medium text-primary hover:text-primary/80">
+          <NavLink to="/login" className="font-medium text-white hover:text-white/80">
             Back to login
-          </Link>
+          </NavLink>
         </div>
       </div>
     );
@@ -69,6 +69,7 @@ export function ForgotPasswordForm() {
             type="email"
             autoComplete="email"
             placeholder="Email address"
+            className="focus-visible:border-white/50 focus-visible:outline-white/50"
             {...registerField('email')}
           />
           {errors.email && (
@@ -85,17 +86,18 @@ export function ForgotPasswordForm() {
         <div>
           <Button
             type="submit"
+            variant="primary"
             disabled={isSubmitting || forgotPassword.isPending}
-            className="w-full"
+            className="w-full cursor-pointer"
           >
             {forgotPassword.isPending ? 'Sending...' : 'Send reset link'}
           </Button>
         </div>
 
         <div className="text-center text-sm">
-          <Link to="/login" className="font-medium text-primary hover:text-primary/80">
+          <NavLink to="/login" className="font-medium text-white hover:text-white/80">
             Back to login
-          </Link>
+          </NavLink>
         </div>
       </form>
     </div>

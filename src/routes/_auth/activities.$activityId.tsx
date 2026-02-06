@@ -231,7 +231,7 @@ function ActivityPage() {
       id: 'timer.addDistraction',
       group: 'Timer',
       label: 'Add Distraction',
-      shortcut: '⇧D',
+      shortcut: 'Shift + D',
       run: handleAddDistraction,
     }),
     [handleAddDistraction]

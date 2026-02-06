@@ -26,7 +26,7 @@ export function CommandPalette() {
       id: 'nav.dashboard',
       group: 'Navigation',
       label: 'Go to Dashboard',
-      shortcut: 'g d',
+      shortcut: 'G → D',
       run: () => navigate({ to: '/dashboard' }),
     }),
     [navigate]
@@ -37,7 +37,7 @@ export function CommandPalette() {
       id: 'nav.activities',
       group: 'Navigation',
       label: 'Go to Activities',
-      shortcut: 'g a',
+      shortcut: 'G → A',
       run: () => navigate({ to: '/activities' }),
     }),
     [navigate]
@@ -48,7 +48,7 @@ export function CommandPalette() {
       id: 'nav.analytics',
       group: 'Navigation',
       label: 'Go to Analytics',
-      shortcut: 'g n',
+      shortcut: 'G → N',
       run: () => navigate({ to: '/analytics' }),
     }),
     [navigate]

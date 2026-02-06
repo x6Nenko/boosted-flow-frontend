@@ -25,7 +25,7 @@ function SearchButton() {
       className="gap-1 rounded-full"
     >
       <Search size={14} />
-      <kbd className="text-xs">{isMac ? '⌘K' : 'Ctrl K'}</kbd>
+      <kbd className="text-xs">{isMac ? '⌘ + K' : 'Ctrl + K'}</kbd>
     </Button>
   );
 }

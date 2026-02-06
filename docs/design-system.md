@@ -157,6 +157,50 @@ All styling uses CSS custom properties from `styles.css`:
 ### Mobile Sidebar Pattern
 Use `MobileNavLink` with icons for mobile navigation. Close sidebar via `onClick` handler.
 
+### Card Pattern
+Standard container for grouped content with border and background.
+
+```tsx
+<div className="rounded-xl border border-border bg-card p-6">
+  <h2 className="text-base font-semibold text-foreground mb-4">Section Title</h2>
+  {/* Content */}
+</div>
+```
+
+**Common combinations:**
+- Card with bottom margin: `mb-6` (separates from next section)
+- Nested card content: `space-y-2` or `gap-4` for internal spacing
+
+### Page Title Pattern
+Main page heading with consistent styling.
+
+```tsx
+<h1 className="text-2xl font-bold text-foreground mb-6">Page Title</h1>
+```
+
+### Section Title Pattern
+Subsection headings within cards or content areas.
+
+```tsx
+<h2 className="text-base font-semibold text-foreground mb-4">Section Title</h2>
+```
+
+**Use for:**
+- Card headers
+- Form section labels
+- Content group titles
+
+### Label Pattern
+Standard form field labels with consistent spacing.
+
+```tsx
+<Label className="block text-sm text-muted-foreground mb-2">Field Label</Label>
+```
+
+**Use with:**
+- Select, Input, Calendar components
+- Always pair with `mb-2` for spacing to the control
+
 ## Adding New Primitives
 
 1. Create file in `components/primitives/`

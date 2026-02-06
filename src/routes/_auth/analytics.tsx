@@ -32,7 +32,7 @@ function AnalyticsPage() {
   const defaultRange = getDefaultDateRange();
   const [from, setFrom] = useState(defaultRange.from);
   const [to, setTo] = useState(defaultRange.to);
-  const [activityId, setActivityId] = useState<string>('');
+  const [activityId, setActivityId] = useState<string>('all');
 
   // Parse dates for Calendar component
   const fromDate = from ? new Date(from) : undefined;
@@ -42,7 +42,7 @@ function AnalyticsPage() {
   const { data: analytics, isLoading } = useAnalytics({
     from: from ? new Date(from).toISOString() : undefined,
     to: to ? new Date(to + 'T23:59:59').toISOString() : undefined,
-    activityId: activityId || undefined,
+    activityId: activityId === 'all' ? undefined : activityId,
   });
 
   const activityMap = new Map(activities?.map((a) => [a.id, a.name]) || []);
@@ -82,7 +82,6 @@ function AnalyticsPage() {
                   mode="single"
                   selected={fromDate}
                   onSelect={(date) => setFrom(date ? format(date, 'yyyy-MM-dd') : '')}
-                  initialFocus
                 />
               </PopoverContent>
             </Popover>
@@ -104,7 +103,6 @@ function AnalyticsPage() {
                   mode="single"
                   selected={toDate}
                   onSelect={(date) => setTo(date ? format(date, 'yyyy-MM-dd') : '')}
-                  initialFocus
                 />
               </PopoverContent>
             </Popover>
@@ -116,7 +114,7 @@ function AnalyticsPage() {
                 <SelectValue placeholder="All activities" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All activities</SelectItem>
+                <SelectItem value="all">All activities</SelectItem>
                 {activities?.map((a) => (
                   <SelectItem key={a.id} value={a.id}>
                     {a.name}
@@ -176,7 +174,7 @@ function AnalyticsPage() {
           </div>
 
           {/* Time by Activity */}
-          {!activityId && Object.keys(analytics.timeByActivity).length > 0 && (
+          {activityId === 'all' && Object.keys(analytics.timeByActivity).length > 0 && (
             <div className="rounded-xl border border-border bg-card p-6 mb-6">
               <h2 className="text-base font-semibold text-foreground mb-4">
                 Time per Activity
@@ -211,8 +209,8 @@ function AnalyticsPage() {
                   const intensity = maxMs > 0 ? ms / maxMs : 0;
                   const bgColor =
                     intensity > 0
-                      ? `rgba(255, 244, 189, ${0.2 + intensity * 0.8})`
-                      : 'hsl(var(--color-muted))';
+                      ? `color-mix(in srgb, var(--color-cream) ${20 + Math.round(intensity * 60)}%, transparent)`
+                      : 'var(--muted)';
                   return (
                     <div
                       key={hour}

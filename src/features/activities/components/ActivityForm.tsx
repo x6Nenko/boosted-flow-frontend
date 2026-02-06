@@ -64,14 +64,14 @@ export function ActivityForm({ onCreated }: ActivityFormProps) {
           maxLength={255}
         />
         {showSuggestions && filteredSuggestions.length > 0 && name.length === 0 && (
-          <div className="absolute z-10 mt-1 w-full rounded border border-gray-200 bg-white shadow-lg">
-            <div className="p-2 text-xs text-gray-500">Suggestions:</div>
+          <div className="absolute z-10 mt-1 w-full rounded border border-border bg-popover shadow-lg">
+            <div className="p-2 text-xs text-muted-foreground">Suggestions:</div>
             {filteredSuggestions.map((s) => (
               <button
                 key={s}
                 type="button"
                 onClick={() => handleSuggestionClick(s)}
-                className="block w-full px-3 py-2 text-left text-sm hover:bg-gray-50"
+                className="block w-full px-3 py-2 text-left text-sm hover:bg-accent hover:text-accent-foreground"
               >
                 {s}
               </button>

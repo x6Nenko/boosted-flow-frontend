@@ -11,6 +11,27 @@ src/
     └── features/        <-- Domain-specific logic (Timer, DistractionList)
 ```
 
+## Spacing Guidelines
+
+### Spacing Scale Reference
+
+| Token | Value | Common Usage |
+|-------|-------|--------------|
+| `gap-1` | 4px | Tight icon+text pairs, legend items |
+| `gap-1.5` | 6px | Compact related elements |
+| `gap-2` | 8px | Button groups, form field clusters |
+| `gap-3` | 12px | Logo with text, tight card content |
+| `gap-4` | 16px | Card internal spacing, form sections |
+| `gap-6` | 24px | **Major layout sections** (navbar items, page sections) |
+| `gap-8` | 32px | Large page sections |
+
+### Decision Rules
+
+1. **Major layout divisions** → `gap-6` (24px)
+2. **Related component groups** → `gap-2` to `gap-4` (8-16px)
+3. **Icon + text pairs** → `gap-1` to `gap-1.5` (4-6px)
+4. **Section margins** → `mb-4` (16px) for headers, `mb-2` (8px) for tight spacing
+
 ## Available Primitives
 
 ### GlassContainer
@@ -47,7 +68,7 @@ import { Home } from "lucide-react"
 </MobileNavLink>
 ```
 
-## Senior Implementation Tips
+## Implementation Tips
 
 ### Use cn for Flexibility
 All primitives use the `cn` utility for style composition. This allows runtime overrides without breaking base styles.

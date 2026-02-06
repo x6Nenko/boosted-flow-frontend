@@ -4,7 +4,7 @@
 
 Use Conventional Commits: Type(scope): short summary
 
-- Types: feat (feat is a feature), fix, refactor, chore, docs, test, perf
+- Types: feat (feat is a feature), fix, refactor, chore, docs, test, perf, style
 - Scope: small, lowercase, single word (e.g., auth, deps, time-entries)
 - Example: feat(auth): add JwtStrategy for JWT validation
 

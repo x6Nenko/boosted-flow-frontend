@@ -5,6 +5,7 @@ export function useActivities(includeArchived = false) {
   return useQuery({
     queryKey: ['activities', { includeArchived }],
     queryFn: () => activitiesApi.list(includeArchived),
+    placeholderData: (previousData) => previousData,
     staleTime: 60 * 60 * 1000, // 60 minutes
   });
 }

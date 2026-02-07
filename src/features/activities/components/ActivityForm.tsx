@@ -64,7 +64,7 @@ export function ActivityForm({ onCreated }: ActivityFormProps) {
           maxLength={255}
         />
         {showSuggestions && filteredSuggestions.length > 0 && name.length === 0 && (
-          <div className="absolute z-10 mt-1 w-full rounded border border-border bg-popover shadow-lg">
+          <div className="absolute z-10 mt-1 w-full rounded-md border border-border bg-popover shadow-lg">
             <div className="p-2 text-xs text-muted-foreground">Suggestions:</div>
             {filteredSuggestions.map((s) => (
               <button

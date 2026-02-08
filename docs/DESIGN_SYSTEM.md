@@ -112,3 +112,9 @@ Source: `lucide-react`. Default stroke: `2px`.
 - `--border` - Border color
 - `--input` - Input border
 - `--ring` - Focus ring
+
+**Feature tokens:**
+- `--color-distraction` - Destructive / distraction flash. Pattern: `text-destructive/80 bg-destructive/5`
+- `--color-clean` - Positive state / 0 distractions. Pattern: `text-clean/80 bg-clean/5`
+- `--color-flow` - Active timer glow (cream)
+- `--color-streak` - Streak indicator (orange)

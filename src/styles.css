@@ -24,6 +24,8 @@
   /* Feature Tokens */
   --color-distraction: #FF6B6B;
   /* Flash color for keybinds */
+  --color-clean: #4ADE80;
+  /* Positive state / 0 distractions */
   --color-flow: var(--color-cream);
   --color-streak: #F97316;
   /* Streak indicator (orange-500) */
@@ -145,6 +147,7 @@
   --color-chart-5: var(--chart-5);
 
   --color-streak: var(--color-streak);
+  --color-clean: var(--color-clean);
   --color-heatmap-1: var(--color-heatmap-1);
   --color-heatmap-2: var(--color-heatmap-2);
   --color-heatmap-3: var(--color-heatmap-3);

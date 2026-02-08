@@ -52,13 +52,13 @@ function RatingStars({
 function DistractionChip({ count }: { count: number }) {
   if (count > 0) {
     return (
-      <span className="text-xs font-medium text-destructive/80 bg-destructive/5 px-1.5 py-0.5 rounded-md">
+      <span className="text-xs font-medium text-destructive/70 bg-destructive/5 px-1.5 py-0.5 rounded-md">
         {count} distraction{count !== 1 ? 's' : ''}
       </span>
     );
   }
   return (
-    <span className="text-xs font-medium text-clean/80 bg-clean/5 px-1.5 py-0.5 rounded-md">
+    <span className="text-xs font-medium text-clean/70 bg-clean/5 px-1.5 py-0.5 rounded-md">
       0 distractions
     </span>
   );
@@ -69,6 +69,7 @@ type TimeEntryRowProps = {
   activity?: Activity;
   showActivityName?: boolean;
   editable?: boolean;
+  showDetails?: boolean;
 };
 
 export function TimeEntryRow({
@@ -76,6 +77,7 @@ export function TimeEntryRow({
   activity,
   showActivityName = false,
   editable = false,
+  showDetails = false,
 }: TimeEntryRowProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [comment, setComment] = useState(entry.comment || '');
@@ -140,6 +142,36 @@ export function TimeEntryRow({
     setIsEditing(true);
   };
 
+  const detailsContent = (
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pb-5 pt-4 border-t border-border/10 mt-1">
+      {/* Intention */}
+      <div className="space-y-2">
+        <div className="flex items-center gap-2 text-xs uppercase font-semibold text-muted-foreground tracking-wide">
+          <Lightbulb size={14} className="text-primary/60" />
+          Intention
+        </div>
+        <div className="text-sm text-foreground/90 leading-relaxed font-medium pl-4 border-l border-primary/20">
+          {entry.description || (
+            <span className="text-muted-foreground/40 font-normal">No intention defined</span>
+          )}
+        </div>
+      </div>
+
+      {/* Reflection */}
+      <div className="space-y-2">
+        <div className="flex items-center gap-2 text-xs uppercase font-semibold text-muted-foreground tracking-wide">
+          <MessageSquare size={14} className="text-primary/60" />
+          Reflection
+        </div>
+        <div className="text-sm text-foreground/80 leading-relaxed pl-4 border-l border-border/60">
+          {entry.comment || (
+            <span className="text-muted-foreground/40 font-normal">No reflection provided</span>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
   /* ═══════════════════════════════════════════
      Dashboard mode — compact row
      Activity name + date/time + duration only
@@ -183,13 +215,16 @@ export function TimeEntryRow({
     );
 
     return (
-      <Link
-        to="/activities/$activityId"
-        params={{ activityId: entry.activityId }}
-        className="block border-b border-border/40 hover:bg-secondary/10 -mx-2 px-2 rounded-lg transition-colors duration-200"
-      >
-        {dashboardContent}
-      </Link>
+      <div className="border-b border-border/40">
+        <Link
+          to="/activities/$activityId"
+          params={{ activityId: entry.activityId }}
+          className="block hover:bg-secondary/10 -mx-2 px-2 rounded-lg transition-colors duration-200"
+        >
+          {dashboardContent}
+        </Link>
+        {isStopped && showDetails && <div className="px-2">{detailsContent}</div>}
+      </div>
     );
   }
 
@@ -263,38 +298,10 @@ export function TimeEntryRow({
       )}
 
       {/* Detail Block (Intention & Reflection) - Stopped entries only */}
-      {isStopped && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pb-5 pt-4 border-t border-border/10 mt-1">
-          {/* Intention */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-xs uppercase font-semibold text-muted-foreground tracking-wide">
-              <Lightbulb size={14} className="text-primary/60" />
-              Intention
-            </div>
-            <div className="text-sm text-foreground/90 leading-relaxed font-medium pl-4 border-l border-primary/20">
-              {entry.description || (
-                <span className="text-muted-foreground/40 font-normal">No intention defined</span>
-              )}
-            </div>
-          </div>
-
-          {/* Reflection */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-xs uppercase font-semibold text-muted-foreground tracking-wide">
-              <MessageSquare size={14} className="text-primary/60" />
-              Reflection
-            </div>
-            <div className="text-sm text-foreground/80 leading-relaxed pl-4 border-l border-border/60">
-              {entry.comment || (
-                <span className="text-muted-foreground/40 font-normal">No reflection provided</span>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+      {isStopped && showDetails && detailsContent}
 
       {/* Line 2 alt: Intention for running entries */}
-      {!isStopped && (
+      {!isStopped && showDetails && (
         <div className="pb-2">
           <div className="flex items-center gap-2">
             <Lightbulb size={14} className="text-muted-foreground/50 shrink-0" />

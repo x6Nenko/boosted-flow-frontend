@@ -33,7 +33,9 @@ import { toIsoFromLocal } from '@/features/time-entries/time-entries.utils';
 import { getDateRangeForDays } from '@/features/analytics';
 import { ApiError } from '@/lib/api-client';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
@@ -79,6 +81,7 @@ function ActivityPage() {
   const [period, setPeriod] = useState('7');
   const [customFrom, setCustomFrom] = useState('');
   const [customTo, setCustomTo] = useState('');
+  const [showDetails, setShowDetails] = useState(false);
   const [manualOpen, setManualOpen] = useState(false);
   const intentionInputRef = useRef<HTMLInputElement>(null);
 
@@ -770,18 +773,30 @@ function ActivityPage() {
       <div className="rounded-xl border border-border bg-card p-6">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-base font-semibold text-foreground">History</h2>
-          <Select value={period} onValueChange={setPeriod}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {PERIOD_OPTIONS.map((opt) => (
-                <SelectItem key={opt.value} value={opt.value}>
-                  {opt.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <Checkbox
+                id="show-details-history"
+                checked={showDetails}
+                onCheckedChange={(checked) => setShowDetails(checked === true)}
+              />
+              <Label htmlFor="show-details-history" className="text-sm text-muted-foreground">
+                Show details
+              </Label>
+            </div>
+            <Select value={period} onValueChange={setPeriod}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {PERIOD_OPTIONS.map((opt) => (
+                  <SelectItem key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
         {period === 'custom' && (
           <div className="mb-4 flex gap-2">
@@ -830,7 +845,12 @@ function ActivityPage() {
         ) : entries && entries.length > 0 ? (
           <div>
             {entries.map((entry) => (
-              <TimeEntryRow key={entry.id} entry={entry} editable />
+              <TimeEntryRow
+                key={entry.id}
+                entry={entry}
+                editable
+                showDetails={showDetails}
+              />
             ))}
           </div>
         ) : (

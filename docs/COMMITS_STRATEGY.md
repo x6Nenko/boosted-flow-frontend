@@ -27,3 +27,9 @@ For refactors that change behavior (e.g., token payload change):
 For security-related changes: use security: or fix: + scope, and mention in the body.
 
 Include issue or task IDs when relevant (e.g., (#123)).
+
+## Emergency commits
+
+```
+outage: save progress before shutdown
+```

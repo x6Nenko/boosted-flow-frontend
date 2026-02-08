@@ -263,7 +263,7 @@
 }
 
 [cmdk-item] {
-  @apply relative flex cursor-pointer select-none items-center rounded-md px-2 py-1.5 text-sm outline-none transition-colors;
+  @apply relative flex cursor-pointer select-none items-center rounded-md px-2 py-1.5 text-sm outline-none transition-colors duration-200;
   @apply data-[selected=true]:bg-accent data-[selected=true]:text-accent-foreground;
   @apply data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50;
 }

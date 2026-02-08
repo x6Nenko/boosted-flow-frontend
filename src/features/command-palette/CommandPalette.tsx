@@ -7,7 +7,7 @@ import { commandPaletteStore } from './command-palette-store';
 import { useAuth } from '@/features/auth/hooks/use-auth';
 
 function Kbd({ children }: { children: React.ReactNode }) {
-  return <kbd className="ml-auto text-xs text-gray-400">{children}</kbd>;
+  return <kbd className="ml-auto text-xs text-muted-foreground">{children}</kbd>;
 }
 
 export function CommandPalette() {
@@ -61,8 +61,8 @@ export function CommandPalette() {
   const loginCommand = useMemo(
     () => ({
       id: 'nav.login',
-      group: 'Navigation',
-      label: 'Go to Login',
+      group: 'App',
+      label: 'Log in',
       run: () => navigate({ to: '/login' }),
     }),
     [navigate]
@@ -71,8 +71,8 @@ export function CommandPalette() {
   const registerCommand = useMemo(
     () => ({
       id: 'nav.register',
-      group: 'Navigation',
-      label: 'Go to Register',
+      group: 'App',
+      label: 'Sign Up',
       run: () => navigate({ to: '/register' }),
     }),
     [navigate]
@@ -104,7 +104,11 @@ export function CommandPalette() {
       }
       groups.get(command.group)?.push(command);
     });
-    return Array.from(groups.entries());
+
+    const groupOrder = ['App', 'Navigation'];
+    return Array.from(groups.entries()).sort(
+      ([a], [b]) => groupOrder.indexOf(a) - groupOrder.indexOf(b)
+    );
   }, [commands]);
 
   return (

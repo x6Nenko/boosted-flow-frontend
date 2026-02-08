@@ -36,6 +36,7 @@
 | **Body** | `text-base` | Default content. |
 | **Small** | `text-sm` | Secondary info, timestamps. |
 | **Muted** | `text-sm text-muted-foreground` | Labels, hints, disabled states. Pair with `mb-2`. |
+| **Compact** | `text-xs` | Group headings, keyboard shortcuts, tiny labels. |
 
 ## 4. Surfaces & Cards
 **Glassmorphism Rule:** Use `backdrop-blur` only on floating elements.

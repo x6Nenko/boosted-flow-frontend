@@ -1,6 +1,6 @@
 import { Link } from '@tanstack/react-router'
 import { useState, useEffect } from 'react'
-import { BarChart3, Home, Layers, Menu, Search, X } from 'lucide-react'
+import { Menu, Search, X } from 'lucide-react'
 import { commandPaletteStore } from '@/features/command-palette'
 import { useAuth } from '@/features/auth/hooks/use-auth'
 import { Button } from '@/components/ui/button'
@@ -22,7 +22,7 @@ function SearchButton() {
       onClick={() => commandPaletteStore.open()}
       variant="ghost"
       size="sm"
-      className="gap-1 rounded-full"
+      className="gap-1 rounded-md"
     >
       <Search size={14} />
       <kbd className="text-xs">{isMac ? '⌘ + K' : 'Ctrl + K'}</kbd>
@@ -53,9 +53,15 @@ export default function Header() {
         <div className="hidden md:flex items-center gap-6">
           {isAuthenticated && (
             <>
-              <NavLink to="/dashboard">Dashboard</NavLink>
-              <NavLink to="/activities">Activities</NavLink>
-              <NavLink to="/analytics">Analytics</NavLink>
+              <Button asChild variant="tertiary" className="px-0 font-medium">
+                <NavLink to="/dashboard">Dashboard</NavLink>
+              </Button>
+              <Button asChild variant="tertiary" className="px-0 font-medium">
+                <NavLink to="/activities">Activities</NavLink>
+              </Button>
+              <Button asChild variant="tertiary" className="px-0 font-medium">
+                <NavLink to="/analytics">Analytics</NavLink>
+              </Button>
             </>
           )}
         </div>
@@ -66,14 +72,11 @@ export default function Header() {
             <SearchButton />
           ) : (
             <>
-              <NavLink
-                to="/login"
-                className="hidden sm:block"
-              >
-                Log in
-              </NavLink>
+              <Button asChild variant="tertiary" className="hidden sm:block font-bold">
+                <NavLink to="/login">Log in</NavLink>
+              </Button>
 
-              <Button asChild variant="primary">
+              <Button asChild variant="primary" className="hidden sm:inline-flex">
                 <Link to="/register">Get Started</Link>
               </Button>
             </>
@@ -84,7 +87,7 @@ export default function Header() {
             onClick={() => setIsOpen(true)}
             variant="ghost"
             size="icon-sm"
-            className="md:hidden hover:text-white"
+            className="md:hidden hover:text-cream"
             aria-label="Open menu"
           >
             <Menu size={20} />
@@ -103,7 +106,7 @@ export default function Header() {
             onClick={() => setIsOpen(false)}
             variant="ghost"
             size="icon-sm"
-            className="hover:text-white"
+            className="hover:text-cream"
             aria-label="Close menu"
           >
             <X size={20} />
@@ -112,23 +115,23 @@ export default function Header() {
 
         <nav className="flex-1 p-4">
           {isAuthenticated ? (
-            <>
-              <MobileNavLink to="/dashboard" icon={<Home size={20} />} onClick={() => setIsOpen(false)}>
+            <div className="space-y-2">
+              <MobileNavLink to="/dashboard" onClick={() => setIsOpen(false)}>
                 Dashboard
               </MobileNavLink>
-              <MobileNavLink to="/activities" icon={<Layers size={20} />} onClick={() => setIsOpen(false)}>
+              <MobileNavLink to="/activities" onClick={() => setIsOpen(false)}>
                 Activities
               </MobileNavLink>
-              <MobileNavLink to="/analytics" icon={<BarChart3 size={20} />} onClick={() => setIsOpen(false)}>
+              <MobileNavLink to="/analytics" onClick={() => setIsOpen(false)}>
                 Analytics
               </MobileNavLink>
-            </>
+            </div>
           ) : (
             <div className="space-y-2">
-              <Button asChild variant="ghost" className="w-full hover:text-white">
-                <Link to="/login" onClick={() => setIsOpen(false)}>
+              <Button asChild variant="tertiary" className="w-full font-bold">
+                <MobileNavLink to="/login" onClick={() => setIsOpen(false)}>
                   Log in
-                </Link>
+                </MobileNavLink>
               </Button>
               <Button asChild variant="primary" className="w-full">
                 <Link to="/register" onClick={() => setIsOpen(false)}>

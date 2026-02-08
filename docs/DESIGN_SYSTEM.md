@@ -85,7 +85,7 @@ Source: `lucide-react`. Default stroke: `2px`.
 | Token | Value | Usage |
 |-------|-------|-------|
 | `rounded-xl` | 12px | Cards, containers, major sections |
-| `rounded-lg` | 8px | List items, interactive rows, buttons |
+| `rounded-lg` | 8px | List items, interactive rows |
 | `rounded-md` | 4px | Inputs, small buttons, badges |
 | `rounded-sm` | 2px | Heatmap cells, tiny elements |
 | `rounded-full` | 9999px | Pills, avatars, circular buttons |

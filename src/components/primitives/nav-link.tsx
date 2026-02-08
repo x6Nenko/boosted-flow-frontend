@@ -14,12 +14,12 @@ const NavLink = React.forwardRef<HTMLAnchorElement, NavLinkProps>(
       <Link
         ref={ref}
         className={cn(
-          "text-[15px] font-medium text-muted-foreground hover:text-foreground transition-colors duration-200",
+          "text-sm text-muted-foreground hover:text-foreground transition-colors duration-200",
           className
         )}
         activeProps={{
           className: cn(
-            "text-[15px] font-medium text-foreground transition-colors duration-200",
+            "text-sm text-foreground transition-colors duration-200",
             activeClassName
           ),
         }}
@@ -34,31 +34,29 @@ NavLink.displayName = "NavLink";
 
 interface MobileNavLinkProps extends Omit<LinkProps, "className" | "activeProps"> {
   children: React.ReactNode;
-  icon?: React.ReactNode;
   className?: string;
   activeClassName?: string;
   onClick?: () => void;
 }
 
 const MobileNavLink = React.forwardRef<HTMLAnchorElement, MobileNavLinkProps>(
-  ({ children, icon, className, activeClassName, ...props }, ref) => {
+  ({ children, className, activeClassName, ...props }, ref) => {
     return (
       <Link
         ref={ref}
         className={cn(
-          "flex items-center gap-3 p-3 rounded-lg hover:bg-accent transition-colors mb-1 text-foreground",
+          "flex items-center py-3 rounded-lg transition-colors duration-200 text-sm text-muted-foreground hover:text-foreground",
           className
         )}
         activeProps={{
           className: cn(
-            "flex items-center gap-3 p-3 rounded-lg bg-accent transition-colors mb-1 text-accent-foreground",
+            "flex items-center py-3 rounded-lg transition-colors duration-200 text-sm text-foreground",
             activeClassName
           ),
         }}
         {...props}
       >
-        {icon}
-        <span>{children}</span>
+        {children}
       </Link>
     );
   }

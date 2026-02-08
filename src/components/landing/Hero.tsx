@@ -18,7 +18,9 @@ export default function Hero() {
         <Button asChild variant="primary" size="lg">
           <Link to="/register">Get Started</Link>
         </Button>
-        <NavLink to="/login">Log in</NavLink>
+        <Button asChild variant="tertiary" className="font-bold">
+          <NavLink to="/login">Log in</NavLink>
+        </Button>
       </div>
     </div>
   );

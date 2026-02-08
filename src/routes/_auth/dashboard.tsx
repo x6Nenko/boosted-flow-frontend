@@ -77,7 +77,7 @@ function DashboardPage() {
             variant="secondary"
             size="sm"
           >
-            {logout.isPending ? 'Logging out...' : 'Logout'}
+            {logout.isPending ? 'Logging out...' : 'Log out'}
           </Button>
         </div>
         <div className="rounded-xl border border-border bg-card p-6">
@@ -105,7 +105,7 @@ function DashboardPage() {
           variant="secondary"
           size="sm"
         >
-          {logout.isPending ? 'Logging out...' : 'Logout'}
+          {logout.isPending ? 'Logging out...' : 'Log out'}
         </Button>
       </div>
 

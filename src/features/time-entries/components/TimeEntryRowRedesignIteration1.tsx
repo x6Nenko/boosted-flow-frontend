@@ -13,15 +13,8 @@ import { Input } from '@/components/ui/input';
 import type { TimeEntry } from '../types';
 import type { Activity } from '@/features/activities/types';
 
-function RatingStars({
-  value,
-  onChange,
-  disabled,
-}: {
-  value: number | null;
-  onChange: (rating: number) => void;
-  disabled?: boolean;
-}) {
+// Updated RatingStars with Lucide icons
+function RatingStars({ value, onChange, disabled }: { value: number | null; onChange: (rating: number) => void; disabled?: boolean; }) {
   return (
     <div className="flex gap-0.5">
       {[1, 2, 3, 4, 5].map((star) => (
@@ -113,71 +106,64 @@ export function TimeEntryRow({
 
   const content = (
     <div className="relative group/row">
-      <div className="flex items-start justify-between py-3">
-        <div className="flex-1 min-w-0 space-y-1">
-          {showActivityName && (
-            <div className="flex items-center gap-1.5 mb-1">
-              <span className="text-[10px] uppercase font-bold tracking-widest text-primary/70">
-                {activity?.name || 'Unknown'}
-              </span>
-              <ChevronRight size={10} className="text-muted-foreground/30" />
-            </div>
-          )}
-          
-          {entry.description && (
-            <p className="text-sm font-medium text-foreground leading-snug truncate">
-              {entry.description}
-            </p>
-          )}
-
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-muted-foreground font-mono">
-            <span className="flex items-center gap-1.5">
-              <Calendar size={11} className="opacity-60" /> {formatDate(entry.startedAt)}
-            </span>
-            <span className="flex items-center gap-1.5">
-              <Clock size={11} className="opacity-60" /> {formatTime(entry.startedAt)}
-              {entry.stoppedAt && ` – ${formatTime(entry.stoppedAt)}`}
-            </span>
-            {entry.comment && (
-              <span className="flex items-center gap-1.5 text-muted-foreground/60 font-sans italic truncate max-w-[250px]">
-                <MessageSquare size={11} className="opacity-50" /> {entry.comment}
-              </span>
+      <div className="flex items-center justify-between gap-4 py-3">
+        <div className="flex items-center gap-4 flex-1 min-w-0">
+          <div className="hidden sm:flex items-center justify-center w-8 h-8 rounded-lg bg-secondary/30 text-muted-foreground transition-colors group-hover/row:bg-secondary/50">
+            <Clock size={14} />
+          </div>
+          <div className="flex-1 min-w-0">
+            {showActivityName && (
+              <div className="flex items-center gap-1.5 mb-0.5">
+                <span className="text-[10px] uppercase font-bold tracking-widest text-primary/70">
+                  {activity?.name || 'Unknown'}
+                </span>
+                <ChevronRight size={10} className="text-muted-foreground/30" />
+              </div>
             )}
+            <p className="text-sm font-medium text-foreground truncate select-none">
+              {entry.description || 'No description'}
+            </p>
+            <div className="flex items-center gap-3 mt-1">
+              <span className="flex items-center gap-1 text-[11px] text-muted-foreground font-mono">
+                <Calendar size={11} className="opacity-70" /> {formatDate(entry.startedAt)}
+              </span>
+              <span className="flex items-center gap-1 text-[11px] text-muted-foreground font-mono">
+                <Clock size={11} className="opacity-70" /> {formatTime(entry.startedAt)}
+                {entry.stoppedAt && ` – ${formatTime(entry.stoppedAt)}`}
+              </span>
+            </div>
           </div>
         </div>
 
-        <div className="flex flex-col items-end gap-1.5 ml-6">
-          <div className="flex items-center gap-3">
-            {editable && isStopped && !isEditing && (
-              <button
-                onClick={handleEditStart}
-                className="opacity-0 group-hover/row:opacity-100 p-1 hover:bg-accent rounded text-muted-foreground transition-opacity"
-              >
-                <Edit2 size={12} />
-              </button>
-            )}
-            <div
-              className={cn(
-                'text-sm font-bold font-mono tracking-tighter timer-nums text-right',
-                !entry.stoppedAt && 'text-primary animate-flow-pulse'
-              )}
-            >
-              {entry.stoppedAt ? (
-                formatStoppedDuration(entry.startedAt, entry.stoppedAt)
-              ) : (
-                <TimerDuration startedAt={entry.startedAt} />
-              )}
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-2.5 h-4">
+        <div className="flex items-center gap-6">
+          <div className="hidden md:flex items-center gap-4">
             {entry.rating && <RatingStars value={entry.rating} onChange={() => {}} disabled />}
             {entry.distractionCount > 0 && (
-              <span className="text-[9px] font-bold text-destructive/80 uppercase tracking-tighter bg-destructive/5 px-1 rounded">
-                {entry.distractionCount} Distraction{entry.distractionCount !== 1 ? 's' : ''}
-              </span>
+              <div className="px-1.5 py-0.5 rounded bg-destructive/10 text-[10px] font-bold text-destructive uppercase tracking-tight border border-destructive/20">
+                {entry.distractionCount}D
+              </div>
             )}
           </div>
+          <div
+            className={cn(
+              'text-sm font-bold font-mono tracking-tighter w-16 text-right timer-nums',
+              !entry.stoppedAt && 'text-primary animate-flow-pulse'
+            )}
+          >
+            {entry.stoppedAt ? (
+              formatStoppedDuration(entry.startedAt, entry.stoppedAt)
+            ) : (
+              <TimerDuration startedAt={entry.startedAt} />
+            )}
+          </div>
+          {editable && isStopped && !isEditing && (
+            <button
+              onClick={handleEditStart}
+              className="opacity-0 group-hover/row:opacity-100 p-1.5 hover:bg-accent rounded-md text-muted-foreground hover:text-foreground transition-all"
+            >
+              <Edit2 size={12} />
+            </button>
+          )}
         </div>
       </div>
 
@@ -211,12 +197,12 @@ export function TimeEntryRow({
 
             <div className="space-y-1.5">
               <label className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest px-1">
-                Reflections
+                Comment
               </label>
               <textarea
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
-                placeholder="How did this flow session go?"
+                placeholder="Session notes..."
                 rows={2}
                 className="w-full rounded-lg border border-input bg-background/50 px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring transition-all"
               />
@@ -234,7 +220,7 @@ export function TimeEntryRow({
                   <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest block mb-1">
                     Distractions
                   </span>
-                  <div className="flex items-center gap-1.5 bg-secondary/30 p-0.5 rounded-md">
+                  <div className="flex items-center gap-2 bg-secondary/30 p-1 rounded-md">
                     <button
                       type="button"
                       onClick={() => setDistractionCount((c) => Math.max(0, c - 1))}

@@ -250,27 +250,45 @@ export function TimeEntryRow({
         </div>
       </div>
 
-      {/* Line 2: Intention + Reflection (always visible for stopped entries) */}
+      {/* Line 2: Rating + Distractions (stopped entries only) */}
       {isStopped && (
-        <div className="space-y-1 pb-2">
+        <div className="flex items-center gap-3 pb-3">
+          <DistractionChip count={entry.distractionCount} />
+          <RatingStars
+            value={entry.rating}
+            onChange={editable ? handleRatingChange : () => { }}
+            disabled={!editable}
+          />
+        </div>
+      )}
+
+      {/* Detail Block (Intention & Reflection) - Stopped entries only */}
+      {isStopped && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pb-5 pt-4 border-t border-border/10 mt-1">
           {/* Intention */}
-          <div className="flex items-center gap-2">
-            <Lightbulb size={14} className="text-muted-foreground/50 shrink-0" />
-            {entry.description ? (
-              <p className="text-sm text-foreground truncate">{entry.description}</p>
-            ) : (
-              <p className="text-sm text-muted-foreground italic">No intention</p>
-            )}
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-xs uppercase font-semibold text-muted-foreground tracking-wide">
+              <Lightbulb size={14} className="text-primary/60" />
+              Intention
+            </div>
+            <div className="text-sm text-foreground/90 leading-relaxed font-medium pl-4 border-l border-primary/20">
+              {entry.description || (
+                <span className="text-muted-foreground/40 font-normal">No intention defined</span>
+              )}
+            </div>
           </div>
 
           {/* Reflection */}
-          <div className="flex items-center gap-2">
-            <MessageSquare size={14} className="text-muted-foreground/50 shrink-0" />
-            {entry.comment ? (
-              <p className="text-sm text-foreground truncate">{entry.comment}</p>
-            ) : (
-              <p className="text-sm text-muted-foreground italic">No reflection</p>
-            )}
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-xs uppercase font-semibold text-muted-foreground tracking-wide">
+              <MessageSquare size={14} className="text-primary/60" />
+              Reflection
+            </div>
+            <div className="text-sm text-foreground/80 leading-relaxed pl-4 border-l border-border/60">
+              {entry.comment || (
+                <span className="text-muted-foreground/40 font-normal">No reflection provided</span>
+              )}
+            </div>
           </div>
         </div>
       )}
@@ -283,21 +301,9 @@ export function TimeEntryRow({
             {entry.description ? (
               <p className="text-sm text-foreground truncate">{entry.description}</p>
             ) : (
-              <p className="text-sm text-muted-foreground italic">No intention</p>
+              <p className="text-sm text-muted-foreground">No intention</p>
             )}
           </div>
-        </div>
-      )}
-
-      {/* Line 3: Rating + Distractions (stopped entries only) */}
-      {isStopped && (
-        <div className="flex items-center gap-3 pb-3">
-          <DistractionChip count={entry.distractionCount} />
-          <RatingStars
-            value={entry.rating}
-            onChange={editable ? handleRatingChange : () => { }}
-            disabled={!editable}
-          />
         </div>
       )}
 

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from '@tanstack/react-router';
 import {
   Star, Trash2, Edit2, Check, MessageSquare,
-  Clock, Calendar, Plus, Minus, ChevronRight, Lightbulb,
+  Clock, Calendar as CalendarIcon, Plus, Minus, ChevronRight, Lightbulb,
 } from 'lucide-react';
 import { useUpdateTimeEntry, useDeleteTimeEntry } from '../hooks';
 import { formatStoppedDuration, TimerDuration } from './TimerDuration';
@@ -10,6 +10,9 @@ import { formatTime, formatDate, cn } from '@/lib/utils';
 import { toDateTimeLocalValue, toIsoFromLocal } from '../time-entries.utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { format } from 'date-fns';
 import type { TimeEntry } from '../types';
 import type { Activity } from '@/features/activities/types';
 
@@ -64,6 +67,84 @@ function DistractionChip({ count }: { count: number }) {
   );
 }
 
+function parseDateTimeLocal(value: string) {
+  const [dateStr, timeStr] = value.split('T');
+  return {
+    date: new Date(`${dateStr}T00:00`),
+    time: timeStr,
+  };
+}
+
+function getLocalDateTimeParts(iso?: string | null) {
+  if (!iso) return { date: undefined, time: '' };
+  return parseDateTimeLocal(toDateTimeLocalValue(iso));
+}
+
+function buildDateTimeLocal(date: Date, time: string) {
+  const dateStr = format(date, 'yyyy-MM-dd');
+  return `${dateStr}T${time}`;
+}
+
+type DateTimeInputProps = {
+  label: string;
+  date: Date | undefined;
+  time: string;
+  onDateChange: (date: Date | undefined) => void;
+  onTimeChange: (time: string) => void;
+  dateId: string;
+  timeId: string;
+};
+
+function DateTimeInput({
+  label,
+  date,
+  time,
+  onDateChange,
+  onTimeChange,
+  dateId,
+  timeId,
+}: DateTimeInputProps) {
+  return (
+    <div className="space-y-2">
+      <label
+        htmlFor={dateId}
+        className="text-xs uppercase font-semibold text-muted-foreground tracking-wide px-1"
+      >
+        {label}
+      </label>
+      <div className="flex items-center gap-2">
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              id={dateId}
+              className="h-8 flex-1 justify-start text-xs font-normal"
+            >
+              {date ? format(date, 'PPP') : <span>Pick a date</span>}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar
+              mode="single"
+              selected={date}
+              defaultMonth={date}
+              onSelect={onDateChange}
+            />
+          </PopoverContent>
+        </Popover>
+        <Input
+          type="time"
+          id={timeId}
+          step="1"
+          value={time}
+          onChange={(e) => onTimeChange(e.target.value)}
+          className="h-8 w-fit text-xs bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+        />
+      </div>
+    </div>
+  );
+}
+
 type TimeEntryRowProps = {
   entry: TimeEntry;
   activity?: Activity;
@@ -82,12 +163,12 @@ export function TimeEntryRow({
   const [isEditing, setIsEditing] = useState(false);
   const [comment, setComment] = useState(entry.comment || '');
   const [distractionCount, setDistractionCount] = useState(entry.distractionCount);
-  const [startedAtLocal, setStartedAtLocal] = useState(
-    entry.startedAt ? toDateTimeLocalValue(entry.startedAt) : ''
-  );
-  const [stoppedAtLocal, setStoppedAtLocal] = useState(
-    entry.stoppedAt ? toDateTimeLocalValue(entry.stoppedAt) : ''
-  );
+  const initialStarted = getLocalDateTimeParts(entry.startedAt);
+  const initialStopped = getLocalDateTimeParts(entry.stoppedAt);
+  const [startedDate, setStartedDate] = useState<Date | undefined>(initialStarted.date);
+  const [startedTime, setStartedTime] = useState(initialStarted.time);
+  const [stoppedDate, setStoppedDate] = useState<Date | undefined>(initialStopped.date);
+  const [stoppedTime, setStoppedTime] = useState(initialStopped.time);
   const updateEntry = useUpdateTimeEntry();
   const deleteEntry = useDeleteTimeEntry();
 
@@ -103,6 +184,10 @@ export function TimeEntryRow({
 
   /* ── Edit form: save timestamps, reflection, distractions ── */
   const handleSave = () => {
+    const startedAtLocal =
+      startedDate && startedTime ? buildDateTimeLocal(startedDate, startedTime) : undefined;
+    const stoppedAtLocal =
+      stoppedDate && stoppedTime ? buildDateTimeLocal(stoppedDate, stoppedTime) : undefined;
     const startedAtIso = startedAtLocal ? toIsoFromLocal(startedAtLocal) : undefined;
     const stoppedAtIso = stoppedAtLocal ? toIsoFromLocal(stoppedAtLocal) : undefined;
     const startedAtChanged =
@@ -137,8 +222,12 @@ export function TimeEntryRow({
     e.stopPropagation();
     setComment(entry.comment || '');
     setDistractionCount(entry.distractionCount);
-    setStartedAtLocal(entry.startedAt ? toDateTimeLocalValue(entry.startedAt) : '');
-    setStoppedAtLocal(entry.stoppedAt ? toDateTimeLocalValue(entry.stoppedAt) : '');
+    const nextStarted = getLocalDateTimeParts(entry.startedAt);
+    const nextStopped = getLocalDateTimeParts(entry.stoppedAt);
+    setStartedDate(nextStarted.date);
+    setStartedTime(nextStarted.time);
+    setStoppedDate(nextStopped.date);
+    setStoppedTime(nextStopped.time);
     setIsEditing(true);
   };
 
@@ -188,7 +277,7 @@ export function TimeEntryRow({
           </div>
           <div className="flex items-center gap-3 text-xs text-muted-foreground font-mono">
             <span className="flex items-center gap-1.5">
-              <Calendar size={14} className="opacity-60" />
+              <CalendarIcon size={14} className="opacity-60" />
               {formatDate(entry.startedAt)}
             </span>
             <span className="flex items-center gap-1.5">
@@ -240,7 +329,7 @@ export function TimeEntryRow({
       <div className="flex items-center justify-between py-3">
         <div className="flex items-center gap-3 text-xs text-muted-foreground font-mono">
           <span className="flex items-center gap-1.5">
-            <Calendar size={14} className="opacity-60" />
+            <CalendarIcon size={14} className="opacity-60" />
             {formatDate(entry.startedAt)}
           </span>
           <span className="flex items-center gap-1.5">
@@ -320,32 +409,28 @@ export function TimeEntryRow({
           <div className="space-y-4">
             {/* Timestamps */}
             <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-1.5">
-                <label className="text-xs uppercase font-semibold text-muted-foreground tracking-wide px-1">
-                  Started
-                </label>
-                <Input
-                  type="datetime-local"
-                  value={startedAtLocal}
-                  onChange={(e) => setStartedAtLocal(e.target.value)}
-                  className="h-8 text-xs bg-background"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-xs uppercase font-semibold text-muted-foreground tracking-wide px-1">
-                  Stopped
-                </label>
-                <Input
-                  type="datetime-local"
-                  value={stoppedAtLocal}
-                  onChange={(e) => setStoppedAtLocal(e.target.value)}
-                  className="h-8 text-xs bg-background"
-                />
-              </div>
+              <DateTimeInput
+                label="Started"
+                date={startedDate}
+                time={startedTime}
+                onDateChange={setStartedDate}
+                onTimeChange={setStartedTime}
+                dateId={`started-date-${entry.id}`}
+                timeId={`started-time-${entry.id}`}
+              />
+              <DateTimeInput
+                label="Stopped"
+                date={stoppedDate}
+                time={stoppedTime}
+                onDateChange={setStoppedDate}
+                onTimeChange={setStoppedTime}
+                dateId={`stopped-date-${entry.id}`}
+                timeId={`stopped-time-${entry.id}`}
+              />
             </div>
 
             {/* Reflection */}
-            <div className="space-y-1.5">
+            <div className="space-y-2">
               <label className="text-xs uppercase font-semibold text-muted-foreground tracking-wide px-1">
                 Reflection
               </label>
@@ -365,7 +450,7 @@ export function TimeEntryRow({
                 <span className="text-xs uppercase font-semibold text-muted-foreground tracking-wide block mb-1">
                   Distractions
                 </span>
-                <div className="flex items-center gap-1.5 bg-secondary/30 p-0.5 rounded-md">
+                <div className="flex items-center justify-center gap-1.5 bg-secondary/30 p-0.5 rounded-md">
                   <button
                     type="button"
                     onClick={() => setDistractionCount((c) => Math.max(0, c - 1))}

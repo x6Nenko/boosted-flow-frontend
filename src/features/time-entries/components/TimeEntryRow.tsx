@@ -114,17 +114,17 @@ function DateTimeInput({
     <div className="space-y-2">
       <label
         htmlFor={dateId}
-        className="text-xs uppercase font-semibold text-muted-foreground tracking-wide px-1"
+        className="text-sm font-semibold text-muted-foreground tracking-wide px-1"
       >
         {label}
       </label>
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         <Popover>
           <PopoverTrigger asChild>
             <Button
               variant="outline"
               id={dateId}
-              className="h-8 flex-1 justify-start text-xs font-normal"
+              className="h-8 flex-1 justify-start text-sm font-normal"
             >
               <CalendarIcon className="mr-2 h-4 w-4" />
               {date ? format(date, 'PPP') : <span>Pick a date</span>}
@@ -145,7 +145,7 @@ function DateTimeInput({
           step="1"
           value={time}
           onChange={(e) => onTimeChange(e.target.value)}
-          className="h-8 w-fit text-xs bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+          className="h-8 w-fit text-sm bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
         />
       </div>
     </div>
@@ -242,26 +242,26 @@ export function TimeEntryRow({
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pb-5 pt-4 border-t border-border/10 mt-1">
       {/* Intention */}
       <div className="space-y-2">
-        <div className="flex items-center gap-2 text-xs uppercase font-semibold text-muted-foreground tracking-wide">
+        <div className="flex items-center gap-2 text-sm font-semibold text-muted-foreground tracking-wide">
           <Lightbulb size={14} className="text-primary/60" />
           Intention
         </div>
-        <div className="text-sm text-foreground/90 leading-relaxed font-medium pl-4 border-l border-primary/20">
+        <div className="text-sm text-foreground/80 leading-relaxed pl-4 border-l border-primary/20">
           {entry.description || (
-            <span className="text-muted-foreground/40 font-normal">No intention defined</span>
+            <span className="text-muted-foreground/40 font-normal">No intention</span>
           )}
         </div>
       </div>
 
       {/* Reflection */}
       <div className="space-y-2">
-        <div className="flex items-center gap-2 text-xs uppercase font-semibold text-muted-foreground tracking-wide">
+        <div className="flex items-center gap-2 text-sm font-semibold text-muted-foreground tracking-wide">
           <MessageSquare size={14} className="text-primary/60" />
           Reflection
         </div>
-        <div className="text-sm text-foreground/80 leading-relaxed pl-4 border-l border-border/60">
+        <div className="text-sm text-foreground/80 leading-relaxed pl-4 border-l border-primary/20">
           {entry.comment || (
-            <span className="text-muted-foreground/40 font-normal">No reflection provided</span>
+            <span className="text-muted-foreground/40 font-normal">No reflection</span>
           )}
         </div>
       </div>
@@ -277,12 +277,12 @@ export function TimeEntryRow({
       <div className="flex items-center justify-between py-3">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 mb-0.5">
-            <span className="text-xs uppercase font-semibold tracking-wide text-primary/80">
+            <span className="text-sm font-semibold tracking-wide text-primary/80">
               {activity?.name || 'Unknown'}
             </span>
             <ChevronRight size={10} className="text-muted-foreground/30" />
           </div>
-          <div className="flex items-center gap-3 text-xs text-muted-foreground font-mono">
+          <div className="flex items-center gap-3 text-sm text-muted-foreground font-mono">
             <span className="flex items-center gap-1.5">
               <CalendarIcon size={14} className="opacity-60" />
               {formatDate(entry.startedAt)}
@@ -334,7 +334,7 @@ export function TimeEntryRow({
     <div className="relative group/row">
       {/* Line 1: Date/time + actions + duration */}
       <div className="flex items-center justify-between py-3">
-        <div className="flex items-center gap-3 text-xs text-muted-foreground font-mono">
+        <div className="flex items-center gap-3 text-sm text-muted-foreground font-mono">
           <span className="flex items-center gap-1.5">
             <CalendarIcon size={14} className="opacity-60" />
             {formatDate(entry.startedAt)}
@@ -384,12 +384,12 @@ export function TimeEntryRow({
       {/* Line 2: Rating + Distractions (stopped entries only) */}
       {isStopped && (
         <div className="flex items-center gap-3 pb-3">
-          <DistractionChip count={entry.distractionCount} />
           <RatingStars
             value={entry.rating}
             onChange={editable ? handleRatingChange : () => { }}
             disabled={!editable}
           />
+          <DistractionChip count={entry.distractionCount} />
         </div>
       )}
 
@@ -439,7 +439,7 @@ export function TimeEntryRow({
             </div>
 
             <div className="space-y-2">
-              <label className="text-xs uppercase font-semibold text-muted-foreground tracking-wide px-1">
+              <label className="text-sm font-semibold text-muted-foreground tracking-wide px-1">
                 Reflection
               </label>
               <textarea
@@ -448,13 +448,13 @@ export function TimeEntryRow({
                 placeholder="How did this flow session go?"
                 maxLength={1000}
                 rows={2}
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring transition-colors duration-200"
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring transition-colors duration-200"
               />
             </div>
 
             <div className="flex items-center justify-between flex-wrap gap-4 pt-2 border-t border-border/50">
               <div className="space-y-1">
-                <span className="text-xs uppercase font-semibold text-muted-foreground tracking-wide block mb-1">
+                <span className="text-sm font-semibold text-muted-foreground tracking-wide block mb-1">
                   Distractions
                 </span>
                 <div className="flex items-center justify-center gap-1.5 bg-secondary/30 p-0.5 rounded-md">
@@ -465,7 +465,7 @@ export function TimeEntryRow({
                   >
                     <Minus size={14} />
                   </button>
-                  <span className="text-xs font-mono w-5 text-center">{distractionCount}</span>
+                  <span className="text-sm font-mono w-5 text-center">{distractionCount}</span>
                   <button
                     type="button"
                     onClick={() => setDistractionCount((c) => c + 1)}
@@ -481,7 +481,7 @@ export function TimeEntryRow({
                   onClick={() => setIsEditing(false)}
                   variant="ghost"
                   size="sm"
-                  className="h-8 text-xs"
+                  className="text-sm"
                 >
                   Cancel
                 </Button>
@@ -490,7 +490,7 @@ export function TimeEntryRow({
                   disabled={updateEntry.isPending}
                   variant="action"
                   size="sm"
-                  className="h-8 text-xs"
+                  className="text-sm"
                 >
                   Save
                 </Button>

@@ -12,6 +12,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { format } from 'date-fns';
 import type { TimeEntry } from '../types';
 import type { Activity } from '@/features/activities/types';
@@ -120,6 +126,7 @@ function DateTimeInput({
               id={dateId}
               className="h-8 flex-1 justify-start text-xs font-normal"
             >
+              <CalendarIcon className="mr-2 h-4 w-4" />
               {date ? format(date, 'PPP') : <span>Pick a date</span>}
             </Button>
           </PopoverTrigger>
@@ -340,7 +347,7 @@ export function TimeEntryRow({
         </div>
 
         <div className="flex items-center gap-2">
-          {editable && isStopped && !isEditing && (
+          {editable && isStopped && (
             <>
               <button
                 onClick={handleEditStart}
@@ -403,12 +410,14 @@ export function TimeEntryRow({
         </div>
       )}
 
-      {/* Inline edit form */}
-      {isEditing && (
-        <div className="mb-4 p-4 rounded-xl border border-border bg-card animate-in fade-in slide-in-from-top-2 duration-200">
-          <div className="space-y-4">
-            {/* Timestamps */}
-            <div className="grid gap-4 sm:grid-cols-2">
+      {/* Edit Dialog */}
+      <Dialog open={isEditing} onOpenChange={setIsEditing}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Edit Time Entry</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-2">
+            <div className="grid gap-4">
               <DateTimeInput
                 label="Started"
                 date={startedDate}
@@ -429,7 +438,6 @@ export function TimeEntryRow({
               />
             </div>
 
-            {/* Reflection */}
             <div className="space-y-2">
               <label className="text-xs uppercase font-semibold text-muted-foreground tracking-wide px-1">
                 Reflection
@@ -444,7 +452,6 @@ export function TimeEntryRow({
               />
             </div>
 
-            {/* Distractions + Actions */}
             <div className="flex items-center justify-between flex-wrap gap-4 pt-2 border-t border-border/50">
               <div className="space-y-1">
                 <span className="text-xs uppercase font-semibold text-muted-foreground tracking-wide block mb-1">
@@ -485,14 +492,13 @@ export function TimeEntryRow({
                   size="sm"
                   className="h-8 text-xs"
                 >
-                  <Check size={14} className="mr-1.5" />
                   Save
                 </Button>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 

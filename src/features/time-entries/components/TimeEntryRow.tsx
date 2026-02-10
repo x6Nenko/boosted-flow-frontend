@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from '@tanstack/react-router';
 import {
-  Star, Trash2, Edit2, Check, MessageSquare,
+  Star, Trash2, Edit2, MessageSquare,
   Clock, Calendar as CalendarIcon, Plus, Minus, ChevronRight, Lightbulb,
 } from 'lucide-react';
 import { useUpdateTimeEntry, useDeleteTimeEntry } from '../hooks';
@@ -10,6 +10,7 @@ import { formatTime, formatDate, cn } from '@/lib/utils';
 import { toDateTimeLocalValue, toIsoFromLocal } from '../time-entries.utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import {
@@ -111,13 +112,13 @@ function DateTimeInput({
   timeId,
 }: DateTimeInputProps) {
   return (
-    <div className="space-y-2">
-      <label
+    <div>
+      <Label
         htmlFor={dateId}
-        className="text-sm font-semibold text-muted-foreground tracking-wide px-1"
+        className="mb-2 text-sm font-semibold text-muted-foreground tracking-wide px-1"
       >
         {label}
-      </label>
+      </Label>
       <div className="flex flex-wrap items-center gap-2">
         <Popover>
           <PopoverTrigger asChild>
@@ -276,11 +277,16 @@ export function TimeEntryRow({
     const dashboardContent = (
       <div className="flex items-center justify-between py-3">
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-1.5 mb-0.5">
-            <span className="text-sm font-semibold tracking-wide text-primary/80">
-              {activity?.name || 'Unknown'}
-            </span>
-            <ChevronRight size={10} className="text-muted-foreground/30" />
+          <div className="mb-2">
+            <div className="relative inline-flex items-center pl-0 transition-all duration-200 ease-out group-hover:pl-4 group-focus-visible:pl-4">
+              <ChevronRight
+                size={14}
+                className="absolute left-0 text-muted-foreground/80 opacity-0 -translate-x-2 transition-all duration-200 ease-out group-hover:opacity-100 group-hover:translate-x-0 group-focus-visible:opacity-100 group-focus-visible:translate-x-0"
+              />
+              <span className="text-sm font-semibold tracking-wide text-primary/80">
+                {activity?.name || 'Unknown'}
+              </span>
+            </div>
           </div>
           <div className="flex items-center gap-3 text-sm text-muted-foreground font-mono">
             <span className="flex items-center gap-1.5">
@@ -315,7 +321,7 @@ export function TimeEntryRow({
         <Link
           to="/activities/$activityId"
           params={{ activityId: entry.activityId }}
-          className="block hover:bg-secondary/10 -mx-2 px-2 rounded-lg transition-colors duration-200"
+          className="group block -mx-2 px-2 rounded-lg"
         >
           {dashboardContent}
         </Link>
@@ -333,7 +339,7 @@ export function TimeEntryRow({
   const activityContent = (
     <div className="relative group/row">
       {/* Line 1: Date/time + actions + duration */}
-      <div className="flex items-center justify-between py-3">
+      <div className="flex items-center justify-between pt-3 pb-2">
         <div className="flex items-center gap-3 text-sm text-muted-foreground font-mono">
           <span className="flex items-center gap-1.5">
             <CalendarIcon size={14} className="opacity-60" />
@@ -438,10 +444,10 @@ export function TimeEntryRow({
               />
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-semibold text-muted-foreground tracking-wide px-1">
+            <div>
+              <Label className="mb-2 text-sm font-semibold text-muted-foreground tracking-wide px-1">
                 Reflection
-              </label>
+              </Label>
               <textarea
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
@@ -453,10 +459,10 @@ export function TimeEntryRow({
             </div>
 
             <div className="flex items-center justify-between flex-wrap gap-4 pt-2 border-t border-border/50">
-              <div className="space-y-1">
-                <span className="text-sm font-semibold text-muted-foreground tracking-wide block mb-1">
+              <div>
+                <Label className="mb-2 text-sm font-semibold text-muted-foreground tracking-wide block">
                   Distractions
-                </span>
+                </Label>
                 <div className="flex items-center justify-center gap-1.5 bg-secondary/30 p-0.5 rounded-md">
                   <button
                     type="button"

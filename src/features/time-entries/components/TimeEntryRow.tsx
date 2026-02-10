@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from '@tanstack/react-router';
 import {
   Star, Trash2, Edit2, MessageSquare,
-  Clock, Calendar as CalendarIcon, Plus, Minus, ChevronRight, Lightbulb,
+  Clock, Calendar as CalendarIcon, Plus, Minus, ChevronRight, ChevronDown, Lightbulb,
 } from 'lucide-react';
 import { useUpdateTimeEntry, useDeleteTimeEntry } from '../hooks';
 import { formatStoppedDuration, TimerDuration } from './TimerDuration';
@@ -35,7 +35,7 @@ function RatingStars({
   return (
     <div className="flex gap-1">
       {[1, 2, 3, 4, 5].map((star) => (
-        <button
+        <Button
           key={star}
           type="button"
           onClick={(e) => {
@@ -44,16 +44,18 @@ function RatingStars({
             onChange(star);
           }}
           disabled={disabled}
+          variant="ghost"
+          size="icon-xs"
           className={cn(
-            'transition-all duration-150',
-            disabled ? 'cursor-default' : 'cursor-pointer hover:scale-110',
+            'transition-all duration-150 hover:bg-transparent disabled:opacity-100',
+            !disabled && 'hover:scale-110',
             value && star <= value
               ? 'text-primary fill-primary'
               : 'text-muted-foreground/70 fill-transparent'
           )}
         >
           <Star size={14} strokeWidth={2} />
-        </button>
+        </Button>
       ))}
     </div>
   );
@@ -169,6 +171,7 @@ export function TimeEntryRow({
   showDetails = false,
 }: TimeEntryRowProps) {
   const [isEditing, setIsEditing] = useState(false);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [comment, setComment] = useState(entry.comment || '');
   const [distractionCount, setDistractionCount] = useState(entry.distractionCount);
   const initialStarted = getLocalDateTimeParts(entry.startedAt);
@@ -181,6 +184,7 @@ export function TimeEntryRow({
   const deleteEntry = useDeleteTimeEntry();
 
   const isStopped = !!entry.stoppedAt;
+  const detailsId = `time-entry-details-${entry.id}`;
 
   /* ── Quick-action: save rating immediately ── */
   const handleRatingChange = (newRating: number) => {
@@ -237,6 +241,12 @@ export function TimeEntryRow({
     setStoppedDate(nextStopped.date);
     setStoppedTime(nextStopped.time);
     setIsEditing(true);
+  };
+
+  const handleToggleDetails = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDetailsOpen((open) => !open);
   };
 
   const detailsContent = (
@@ -353,23 +363,64 @@ export function TimeEntryRow({
         </div>
 
         <div className="flex items-center gap-2">
+          {isStopped && !showDetails && (
+            <Button
+              type="button"
+              onClick={handleToggleDetails}
+              aria-expanded={isDetailsOpen}
+              aria-controls={detailsId}
+              title={isDetailsOpen ? 'Hide details' : 'Show details'}
+              variant="ghost"
+              size="icon-xs"
+              className={cn(
+                'text-muted-foreground hover:text-foreground transition-all duration-200',
+                isDetailsOpen
+                  ? 'opacity-100'
+                  : 'opacity-0 group-hover/row:opacity-100 focus-visible:opacity-100'
+              )}
+            >
+              <ChevronDown
+                size={14}
+                className={cn(
+                  'transition-transform duration-200 ease-out',
+                  isDetailsOpen && 'rotate-180'
+                )}
+              />
+            </Button>
+          )}
           {editable && isStopped && (
             <>
-              <button
+              <Button
+                type="button"
                 onClick={handleEditStart}
-                className="opacity-0 group-hover/row:opacity-100 p-1.5 hover:bg-accent rounded-md text-muted-foreground hover:text-foreground transition-all duration-200"
+                variant="ghost"
+                size="icon-xs"
+                className={cn(
+                  'text-muted-foreground hover:text-foreground transition-all duration-200',
+                  isDetailsOpen
+                    ? 'opacity-100'
+                    : 'opacity-0 group-hover/row:opacity-100 focus-visible:opacity-100'
+                )}
                 title="Edit entry"
               >
                 <Edit2 size={14} />
-              </button>
-              <button
+              </Button>
+              <Button
+                type="button"
                 onClick={handleDelete}
                 disabled={deleteEntry.isPending}
-                className="opacity-0 group-hover/row:opacity-100 p-1.5 hover:bg-destructive/10 rounded-md text-muted-foreground hover:text-destructive transition-all duration-200"
+                variant="ghost"
+                size="icon-xs"
+                className={cn(
+                  'text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all duration-200',
+                  isDetailsOpen
+                    ? 'opacity-100'
+                    : 'opacity-0 group-hover/row:opacity-100 focus-visible:opacity-100'
+                )}
                 title="Delete entry"
               >
                 <Trash2 size={14} />
-              </button>
+              </Button>
             </>
           )}
           <div
@@ -400,7 +451,7 @@ export function TimeEntryRow({
       )}
 
       {/* Detail Block (Intention & Reflection) - Stopped entries only */}
-      {isStopped && showDetails && detailsContent}
+      {isStopped && (showDetails || isDetailsOpen) && <div id={detailsId}>{detailsContent}</div>}
 
       {/* Line 2 alt: Intention for running entries */}
       {!isStopped && showDetails && (
@@ -464,21 +515,25 @@ export function TimeEntryRow({
                   Distractions
                 </Label>
                 <div className="flex items-center justify-center gap-1.5 bg-secondary/30 p-0.5 rounded-md">
-                  <button
+                  <Button
                     type="button"
                     onClick={() => setDistractionCount((c) => Math.max(0, c - 1))}
-                    className="p-1 hover:bg-background rounded-md transition-colors duration-150"
+                    variant="ghost"
+                    size="icon-xs"
+                    className="hover:bg-background transition-colors duration-150"
                   >
                     <Minus size={14} />
-                  </button>
+                  </Button>
                   <span className="text-sm font-mono w-5 text-center">{distractionCount}</span>
-                  <button
+                  <Button
                     type="button"
                     onClick={() => setDistractionCount((c) => c + 1)}
-                    className="p-1 hover:bg-background rounded-md transition-colors duration-150"
+                    variant="ghost"
+                    size="icon-xs"
+                    className="hover:bg-background transition-colors duration-150"
                   >
                     <Plus size={14} />
-                  </button>
+                  </Button>
                 </div>
               </div>
 

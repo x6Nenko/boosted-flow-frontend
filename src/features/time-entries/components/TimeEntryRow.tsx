@@ -32,8 +32,10 @@ function RatingStars({
   onChange: (rating: number) => void;
   disabled?: boolean;
 }) {
+  const [hoverValue, setHoverValue] = useState<number | null>(null);
+
   return (
-    <div className="flex gap-1">
+    <div className="flex">
       {[1, 2, 3, 4, 5].map((star) => (
         <Button
           key={star}
@@ -43,13 +45,15 @@ function RatingStars({
             e.stopPropagation();
             onChange(star);
           }}
+          onMouseEnter={() => !disabled && setHoverValue(star)}
+          onMouseLeave={() => setHoverValue(null)}
           disabled={disabled}
           variant="ghost"
           size="icon-xs"
           className={cn(
             'transition-all duration-150 hover:bg-transparent disabled:opacity-100',
             !disabled && 'hover:scale-110',
-            value && star <= value
+            (hoverValue !== null && star <= hoverValue) || (value && star <= value)
               ? 'text-primary fill-primary'
               : 'text-muted-foreground/70 fill-transparent'
           )}
@@ -62,17 +66,11 @@ function RatingStars({
 }
 
 function DistractionChip({ count }: { count: number }) {
-  if (count > 0) {
-    return (
-      <span className="text-xs font-medium text-destructive/70 bg-destructive/5 px-1.5 py-0.5 rounded-md">
-        {count} distraction{count !== 1 ? 's' : ''}
-      </span>
-    );
-  }
   return (
-    <span className="text-xs font-medium text-clean/70 bg-clean/5 px-1.5 py-0.5 rounded-md">
-      0 distractions
-    </span>
+    <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full border border-border/50 text-xs font-medium text-muted-foreground">
+      <div className={cn("w-1.5 h-1.5 rounded-full", count > 0 ? "bg-destructive/60" : "bg-clean/60")} />
+      {count} {count === 1 ? 'distraction' : 'distractions'}
+    </div>
   );
 }
 
@@ -371,7 +369,7 @@ export function TimeEntryRow({
               aria-controls={detailsId}
               title={isDetailsOpen ? 'Hide details' : 'Show details'}
               variant="ghost"
-              size="icon-xs"
+              size="icon-sm"
               className={cn(
                 'text-muted-foreground hover:text-foreground transition-all duration-200',
                 isDetailsOpen
@@ -394,7 +392,7 @@ export function TimeEntryRow({
                 type="button"
                 onClick={handleEditStart}
                 variant="ghost"
-                size="icon-xs"
+                size="icon-sm"
                 className={cn(
                   'text-muted-foreground hover:text-foreground transition-all duration-200',
                   isDetailsOpen
@@ -410,7 +408,7 @@ export function TimeEntryRow({
                 onClick={handleDelete}
                 disabled={deleteEntry.isPending}
                 variant="ghost"
-                size="icon-xs"
+                size="icon-sm"
                 className={cn(
                   'text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all duration-200',
                   isDetailsOpen
@@ -423,18 +421,12 @@ export function TimeEntryRow({
               </Button>
             </>
           )}
-          <div
-            className={cn(
-              'text-sm font-bold font-mono tracking-tighter timer-nums min-w-[70px] text-right',
-              !entry.stoppedAt && 'text-primary animate-flow-pulse'
-            )}
-          >
-            {entry.stoppedAt ? (
-              formatStoppedDuration(entry.startedAt, entry.stoppedAt)
-            ) : (
-              <TimerDuration startedAt={entry.startedAt} />
-            )}
-          </div>
+          <div className={cn(
+              "text-base font-bold font-mono tracking-tight tabular-nums text-right",
+              !isStopped && "text-primary animate-pulse"
+            )}>
+              {isStopped ? formatStoppedDuration(entry.startedAt, entry.stoppedAt!) : <TimerDuration startedAt={entry.startedAt} />}
+            </div>
         </div>
       </div>
 

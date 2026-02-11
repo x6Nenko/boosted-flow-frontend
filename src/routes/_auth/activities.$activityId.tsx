@@ -815,7 +815,7 @@ function ActivityPage() {
                   mode="single"
                   selected={customFromDate}
                   onSelect={(date) => setCustomFrom(date ? format(date, 'yyyy-MM-dd') : '')}
-                  initialFocus
+                  autoFocus
                 />
               </PopoverContent>
             </Popover>
@@ -834,7 +834,7 @@ function ActivityPage() {
                   mode="single"
                   selected={customToDate}
                   onSelect={(date) => setCustomTo(date ? format(date, 'yyyy-MM-dd') : '')}
-                  initialFocus
+                  autoFocus
                 />
               </PopoverContent>
             </Popover>

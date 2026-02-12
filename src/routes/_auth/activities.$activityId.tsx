@@ -771,10 +771,10 @@ function ActivityPage() {
 
       {/* Entries List */}
       <div className="rounded-xl border border-border bg-card p-6">
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-base font-semibold text-foreground">History</h2>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
+        <div className="mb-4 flex max-sm:flex-col gap-y-4 items-center justify-between">
+          <h2 className="text-base max-sm:mr-auto font-semibold text-foreground">History</h2>
+          <div className="flex items-center gap-4 max-sm:w-full max-sm:flex-col">
+            <div className="flex max-sm:mr-auto items-center gap-2">
               <Checkbox
                 id="show-details-history"
                 checked={showDetails}
@@ -784,8 +784,18 @@ function ActivityPage() {
                 Show details
               </Label>
             </div>
-            <Select value={period} onValueChange={setPeriod}>
-              <SelectTrigger className="w-[180px]">
+            <Select
+              value={period}
+              onValueChange={(value) => {
+                if (value === 'custom' && !customFrom && !customTo) {
+                  const range = getDateRangeForDays(7);
+                  setCustomFrom(range.from);
+                  setCustomTo(range.to);
+                }
+                setPeriod(value);
+              }}
+            >
+              <SelectTrigger className="w-[180px] max-sm:w-full">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -799,12 +809,12 @@ function ActivityPage() {
           </div>
         </div>
         {period === 'custom' && (
-          <div className="mb-4 flex gap-2">
+          <div className="mb-4 flex max-sm:flex-col gap-2">
             <Popover>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className="w-[200px] justify-start text-left font-normal"
+                  className="w-[200px] max-sm:w-full justify-start text-left font-normal"
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {customFromDate ? format(customFromDate, 'PPP') : <span>From date</span>}
@@ -823,7 +833,7 @@ function ActivityPage() {
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className="w-[200px] justify-start text-left font-normal"
+                  className="w-[200px] max-sm:w-full justify-start text-left font-normal"
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {customToDate ? format(customToDate, 'PPP') : <span>To date</span>}

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from '@tanstack/react-router';
 import {
   Star, Trash2, Edit2, MessageSquare,
-  Clock, Calendar as CalendarIcon, Plus, Minus, ChevronRight, ChevronDown, Lightbulb,
+  Clock, Calendar as CalendarIcon, Plus, Minus, ChevronRight, ChevronDown, Lightbulb, MoreVertical,
 } from 'lucide-react';
 import { useUpdateTimeEntry, useDeleteTimeEntry } from '../hooks';
 import { formatStoppedDuration, TimerDuration } from './TimerDuration';
@@ -13,6 +13,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import {
   Dialog,
   DialogContent,
@@ -287,7 +293,12 @@ export function TimeEntryRow({
      ═══════════════════════════════════════════ */
   if (showActivityName) {
     const dashboardContent = (
-      <div className="flex items-center justify-between py-3">
+      <div className={cn(
+        "flex items-center justify-between py-3",
+        "group/row rounded-lg border border-transparent transition-all duration-200",
+        "border-border/50 mb-2",
+        "hover:bg-secondary/50 hover:border-border/40 px-4",
+      )}>
         <div className="flex-1 min-w-0">
           <div className="mb-2">
             <div className="relative inline-flex items-center pl-0 transition-all duration-200 ease-out group-hover:pl-4 group-focus-visible:pl-4">
@@ -369,7 +380,7 @@ export function TimeEntryRow({
           </span>
         </div>
 
-        <div className="flex max-sm:flex-col max-sm:mt-auto items-center max-sm:items-start gap-3 max-sm:gap-2 col-start-1 row-start-2 min-[861px]:ml-auto min-[861px]:col-auto min-[861px]:row-auto">
+        <div className="flex max-[470px]:flex-col max-sm:mt-auto items-center max-sm:items-start gap-3 max-sm:gap-2 col-start-1 row-start-2 min-[861px]:ml-auto min-[861px]:col-auto min-[861px]:row-auto">
           <RatingStars
             value={entry.rating}
             onChange={editable ? handleRatingChange : () => { }}
@@ -378,8 +389,8 @@ export function TimeEntryRow({
           <DistractionChip count={entry.distractionCount} />
         </div>
 
-        <div className="flex max-sm:flex-col  items-center max-sm:items-end gap-2 max-sm:gap-1 col-start-2 row-start-1 row-span-2 min-[861px]:col-auto min-[861px]:row-auto">
-          <div className="flex items-center gap-2 max-sm:order-2 max-sm:flex-col">
+        <div className="flex mb-auto max-sm:flex-col items-center max-sm:items-end gap-2 max-sm:gap-1 col-start-2 row-start-1 row-span-2 min-[861px]:col-auto min-[861px]:row-auto">
+          <div className="flex max-[360px]:flex-col items-center gap-2 max-sm:order-2 ">
             {isStopped && !showDetails && (
               <Button
                 type="button"
@@ -390,7 +401,7 @@ export function TimeEntryRow({
                 variant="ghost"
                 size="icon-sm"
                 className={cn(
-                  'max-sm:size-6',
+                  '',
                   'text-muted-foreground hover:text-foreground transition-all duration-200',
                   isDetailsOpen
                     ? 'opacity-100'
@@ -400,7 +411,6 @@ export function TimeEntryRow({
                 <ChevronDown
                   size={14}
                   className={cn(
-                    'max-sm:size-3',
                     'transition-transform duration-200 ease-out',
                     isDetailsOpen && 'rotate-180'
                   )}
@@ -408,41 +418,39 @@ export function TimeEntryRow({
               </Button>
             )}
             {editable && isStopped && (
-              <>
-                <Button
-                  type="button"
-                  onClick={handleEditStart}
-                  variant="ghost"
-                  size="icon-sm"
-                  className={cn(
-                    'max-sm:size-6',
-                    'text-muted-foreground hover:text-foreground transition-all duration-200',
-                    isDetailsOpen
-                      ? 'opacity-100'
-                      : 'max-[860px]:opacity-100 opacity-0 group-hover/row:opacity-100 focus-visible:opacity-100'
-                  )}
-                  title="Edit entry"
-                >
-                  <Edit2 size={14} className="max-sm:size-3" />
-                </Button>
-                <Button
-                  type="button"
-                  onClick={handleDelete}
-                  disabled={deleteEntry.isPending}
-                  variant="ghost"
-                  size="icon-sm"
-                  className={cn(
-                    'max-sm:size-6',
-                    'text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all duration-200',
-                    isDetailsOpen
-                      ? 'opacity-100'
-                      : 'max-[860px]:opacity-100 opacity-0 group-hover/row:opacity-100 focus-visible:opacity-100'
-                  )}
-                  title="Delete entry"
-                >
-                  <Trash2 size={14} className="max-sm:size-3" />
-                </Button>
-              </>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon-sm"
+                    className={cn(
+                      '',
+                      'text-muted-foreground hover:text-foreground transition-all duration-200',
+                      isDetailsOpen
+                        ? 'opacity-100'
+                        : 'max-[860px]:opacity-100 opacity-0 group-hover/row:opacity-100 focus-visible:opacity-100'
+                    )}
+                    title="More actions"
+                  >
+                    <MoreVertical size={14} />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={handleEditStart}>
+                    <Edit2 size={14} className="mr-2" />
+                    Edit entry
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={handleDelete}
+                    disabled={deleteEntry.isPending}
+                    className="text-destructive focus:text-destructive focus:bg-destructive/10"
+                  >
+                    <Trash2 size={14} className="mr-2" />
+                    Delete entry
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
           </div>
           <div className={cn(

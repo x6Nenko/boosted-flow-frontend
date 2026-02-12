@@ -25,6 +25,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { format } from 'date-fns';
 import type { TimeEntry } from '../types';
 import type { Activity } from '@/features/activities/types';
@@ -180,6 +190,7 @@ export function TimeEntryRow({
 }: TimeEntryRowProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [comment, setComment] = useState(entry.comment || '');
   const [distractionCount, setDistractionCount] = useState(entry.distractionCount);
   const initialStarted = getLocalDateTimeParts(entry.startedAt);
@@ -232,9 +243,12 @@ export function TimeEntryRow({
   const handleDelete = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (confirm('Delete this time entry?')) {
-      deleteEntry.mutate(entry.id);
-    }
+    setIsDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = () => {
+    deleteEntry.mutate(entry.id);
+    setIsDeleteDialogOpen(false);
   };
 
   const handleEditStart = (e: React.MouseEvent) => {
@@ -478,6 +492,27 @@ export function TimeEntryRow({
           </div>
         </div>
       )}
+
+      {/* Delete Alert Dialog */}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete time entry?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete this time entry.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              className="bg-dark-destructive/80 hover:bg-dark-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Edit Dialog */}
       <Dialog open={isEditing} onOpenChange={setIsEditing}>

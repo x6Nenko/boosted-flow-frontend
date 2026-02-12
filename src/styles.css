@@ -23,6 +23,7 @@
 
   /* Feature Tokens */
   --color-distraction: #FF6B6B;
+  --color-dark-distraction: #D32F2F;
   /* Flash color for keybinds */
   --color-clean: #4ADE80;
   /* Positive state / 0 distractions */
@@ -70,6 +71,7 @@
 
   /* Destructive */
   --destructive: var(--color-distraction);
+  --dark-destructive: var(--color-dark-distraction);
   --destructive-foreground: var(--color-black);
 
   /* Borders & Inputs */
@@ -126,6 +128,7 @@
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
+  --color-dark-destructive: var(--dark-destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
   --color-input: var(--input);

@@ -301,17 +301,17 @@ export function TimeEntryRow({
       )}>
         <div className="flex-1 min-w-0">
           <div className="mb-2">
-            <div className="relative inline-flex items-center pl-0 transition-all duration-200 ease-out group-hover:pl-4 group-focus-visible:pl-4">
+            <div className="relative flex items-center pl-0 transition-all duration-200 ease-out group-hover:pl-4 group-focus-visible:pl-4 min-w-0 max-w-full">
               <ChevronRight
                 size={14}
                 className="absolute left-0 text-muted-foreground/80 opacity-0 -translate-x-2 transition-all duration-200 ease-out group-hover:opacity-100 group-hover:translate-x-0 group-focus-visible:opacity-100 group-focus-visible:translate-x-0"
               />
-              <span className="text-sm font-semibold tracking-wide text-primary/80">
+              <span className="text-sm font-semibold tracking-wide text-primary/80 truncate">
                 {activity?.name || 'Unknown'}
               </span>
             </div>
           </div>
-          <div className="flex items-center gap-3 text-sm text-muted-foreground font-mono">
+          <div className="flex max-[440px]:flex-col max-[440px]:items-start items-center gap-3 text-sm text-muted-foreground font-mono">
             <span className="flex items-center gap-1.5">
               <CalendarIcon size={14} className="opacity-60" />
               {formatDate(entry.startedAt)}
@@ -326,7 +326,7 @@ export function TimeEntryRow({
 
         <div
           className={cn(
-            'text-sm font-bold font-mono tracking-tighter timer-nums ml-4',
+            'text-base font-bold font-mono tracking-tight tabular-nums text-right ml-4',
             !entry.stoppedAt && 'text-primary animate-flow-pulse'
           )}
         >

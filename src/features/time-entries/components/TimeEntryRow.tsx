@@ -67,9 +67,13 @@ function RatingStars({
 
 function DistractionChip({ count }: { count: number }) {
   return (
-    <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full border border-border/50 text-xs font-medium text-muted-foreground">
-      <div className={cn("w-1.5 h-1.5 rounded-full", count > 0 ? "bg-destructive/60" : "bg-clean/60")} />
-      {count} {count === 1 ? 'distraction' : 'distractions'}
+    <div className="w-32 flex justify-start">
+      <div className="max-w-32 flex items-center gap-1.5 px-2 py-0.5 rounded-full border border-border/50 text-xs font-medium text-muted-foreground">
+        <div className={cn("w-1.5 h-1.5 rounded-full", count > 0 ? "bg-destructive/60" : "bg-clean/60")} />
+        <span className="truncate">
+          {count} {count === 1 ? 'distraction' : 'distractions'}
+        </span>
+      </div>
     </div>
   );
 }
@@ -345,10 +349,15 @@ export function TimeEntryRow({
      + hover edit/delete icons
      ═══════════════════════════════════════════ */
   const activityContent = (
-    <div className="relative group/row">
+    <div className={cn(
+      "group/row relative rounded-lg border border-transparent transition-all duration-200",
+      "border-border/50 mb-2",
+      "hover:bg-secondary/50 hover:border-border/40 px-4",
+      isDetailsOpen && "bg-secondary/50 border-border/40"
+    )}>
       {/* Line 1: Date/time + actions + duration */}
-      <div className="flex items-center justify-between pt-3 pb-2">
-        <div className="flex items-center gap-3 text-sm text-muted-foreground font-mono">
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center max-sm:py-4 py-2 gap-x-2 gap-y-2 min-[861px]:flex min-[861px]:items-center min-[861px]:justify-between min-[861px]:gap-2">
+        <div className="flex max-[440px]:flex-col max-sm:mb-auto max-sm:items-start items-center gap-3 max-sm:gap-2 text-sm text-muted-foreground font-mono min-w-0 col-start-1 row-start-1 min-[861px]:col-auto min-[861px]:row-auto">
           <span className="flex items-center gap-1.5">
             <CalendarIcon size={14} className="opacity-60" />
             {formatDate(entry.startedAt)}
@@ -360,79 +369,7 @@ export function TimeEntryRow({
           </span>
         </div>
 
-        <div className="flex items-center gap-2">
-          {isStopped && !showDetails && (
-            <Button
-              type="button"
-              onClick={handleToggleDetails}
-              aria-expanded={isDetailsOpen}
-              aria-controls={detailsId}
-              title={isDetailsOpen ? 'Hide details' : 'Show details'}
-              variant="ghost"
-              size="icon-sm"
-              className={cn(
-                'text-muted-foreground hover:text-foreground transition-all duration-200',
-                isDetailsOpen
-                  ? 'opacity-100'
-                  : 'opacity-0 group-hover/row:opacity-100 focus-visible:opacity-100'
-              )}
-            >
-              <ChevronDown
-                size={14}
-                className={cn(
-                  'transition-transform duration-200 ease-out',
-                  isDetailsOpen && 'rotate-180'
-                )}
-              />
-            </Button>
-          )}
-          {editable && isStopped && (
-            <>
-              <Button
-                type="button"
-                onClick={handleEditStart}
-                variant="ghost"
-                size="icon-sm"
-                className={cn(
-                  'text-muted-foreground hover:text-foreground transition-all duration-200',
-                  isDetailsOpen
-                    ? 'opacity-100'
-                    : 'opacity-0 group-hover/row:opacity-100 focus-visible:opacity-100'
-                )}
-                title="Edit entry"
-              >
-                <Edit2 size={14} />
-              </Button>
-              <Button
-                type="button"
-                onClick={handleDelete}
-                disabled={deleteEntry.isPending}
-                variant="ghost"
-                size="icon-sm"
-                className={cn(
-                  'text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all duration-200',
-                  isDetailsOpen
-                    ? 'opacity-100'
-                    : 'opacity-0 group-hover/row:opacity-100 focus-visible:opacity-100'
-                )}
-                title="Delete entry"
-              >
-                <Trash2 size={14} />
-              </Button>
-            </>
-          )}
-          <div className={cn(
-              "text-base font-bold font-mono tracking-tight tabular-nums text-right",
-              !isStopped && "text-primary animate-pulse"
-            )}>
-              {isStopped ? formatStoppedDuration(entry.startedAt, entry.stoppedAt!) : <TimerDuration startedAt={entry.startedAt} />}
-            </div>
-        </div>
-      </div>
-
-      {/* Line 2: Rating + Distractions (stopped entries only) */}
-      {isStopped && (
-        <div className="flex items-center gap-3 pb-3">
+        <div className="flex max-sm:flex-col max-sm:mt-auto items-center max-sm:items-start gap-3 max-sm:gap-2 col-start-1 row-start-2 min-[861px]:ml-auto min-[861px]:col-auto min-[861px]:row-auto">
           <RatingStars
             value={entry.rating}
             onChange={editable ? handleRatingChange : () => { }}
@@ -440,7 +377,82 @@ export function TimeEntryRow({
           />
           <DistractionChip count={entry.distractionCount} />
         </div>
-      )}
+
+        <div className="flex max-sm:flex-col  items-center max-sm:items-end gap-2 max-sm:gap-1 col-start-2 row-start-1 row-span-2 min-[861px]:col-auto min-[861px]:row-auto">
+          <div className="flex items-center gap-2 max-sm:order-2 max-sm:flex-col">
+            {isStopped && !showDetails && (
+              <Button
+                type="button"
+                onClick={handleToggleDetails}
+                aria-expanded={isDetailsOpen}
+                aria-controls={detailsId}
+                title={isDetailsOpen ? 'Hide details' : 'Show details'}
+                variant="ghost"
+                size="icon-sm"
+                className={cn(
+                  'max-sm:size-6',
+                  'text-muted-foreground hover:text-foreground transition-all duration-200',
+                  isDetailsOpen
+                    ? 'opacity-100'
+                    : 'max-[860px]:opacity-100 opacity-0 group-hover/row:opacity-100 focus-visible:opacity-100'
+                )}
+              >
+                <ChevronDown
+                  size={14}
+                  className={cn(
+                    'max-sm:size-3',
+                    'transition-transform duration-200 ease-out',
+                    isDetailsOpen && 'rotate-180'
+                  )}
+                />
+              </Button>
+            )}
+            {editable && isStopped && (
+              <>
+                <Button
+                  type="button"
+                  onClick={handleEditStart}
+                  variant="ghost"
+                  size="icon-sm"
+                  className={cn(
+                    'max-sm:size-6',
+                    'text-muted-foreground hover:text-foreground transition-all duration-200',
+                    isDetailsOpen
+                      ? 'opacity-100'
+                      : 'max-[860px]:opacity-100 opacity-0 group-hover/row:opacity-100 focus-visible:opacity-100'
+                  )}
+                  title="Edit entry"
+                >
+                  <Edit2 size={14} className="max-sm:size-3" />
+                </Button>
+                <Button
+                  type="button"
+                  onClick={handleDelete}
+                  disabled={deleteEntry.isPending}
+                  variant="ghost"
+                  size="icon-sm"
+                  className={cn(
+                    'max-sm:size-6',
+                    'text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all duration-200',
+                    isDetailsOpen
+                      ? 'opacity-100'
+                      : 'max-[860px]:opacity-100 opacity-0 group-hover/row:opacity-100 focus-visible:opacity-100'
+                  )}
+                  title="Delete entry"
+                >
+                  <Trash2 size={14} className="max-sm:size-3" />
+                </Button>
+              </>
+            )}
+          </div>
+          <div className={cn(
+            "text-base font-bold font-mono tracking-tight tabular-nums text-right max-sm:order-1",
+            !isStopped && "text-primary animate-pulse"
+          )}>
+            {isStopped ? formatStoppedDuration(entry.startedAt, entry.stoppedAt!) : <TimerDuration startedAt={entry.startedAt} />}
+          </div>
+        </div>
+      </div>
 
       {/* Detail Block (Intention & Reflection) - Stopped entries only */}
       {isStopped && (showDetails || isDetailsOpen) && <div id={detailsId}>{detailsContent}</div>}
@@ -555,5 +567,5 @@ export function TimeEntryRow({
     </div>
   );
 
-  return <div className="border-b border-border/40">{activityContent}</div>;
+  return <div className="">{activityContent}</div>;
 }

@@ -1,7 +1,5 @@
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import {
   useActivity,
   useArchiveActivity,
@@ -28,10 +26,8 @@ import {
   useStopTimer,
   useTimeEntries,
 } from '@/features/time-entries/hooks';
-import { manualEntrySchema, type ManualEntryFormData } from '@/features/time-entries/time-entries.schema';
 import { toIsoFromLocal } from '@/features/time-entries/time-entries.utils';
 import { getDateRangeForDays } from '@/features/analytics';
-import { ApiError } from '@/lib/api-client';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
@@ -49,8 +45,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { CalendarIcon } from 'lucide-react';
+import { CalendarIcon, Plus, Minus } from 'lucide-react';
 import { format } from 'date-fns';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 type TimerMode = 'stopwatch' | 'pomodoro';
 
@@ -82,7 +84,13 @@ function ActivityPage() {
   const [customFrom, setCustomFrom] = useState('');
   const [customTo, setCustomTo] = useState('');
   const [showDetails, setShowDetails] = useState(false);
-  const [manualOpen, setManualOpen] = useState(false);
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [createIntention, setCreateIntention] = useState('');
+  const [createDistractionCount, setCreateDistractionCount] = useState(0);
+  const [createStartedDate, setCreateStartedDate] = useState<Date | undefined>(new Date());
+  const [createStartedTime, setCreateStartedTime] = useState('');
+  const [createStoppedDate, setCreateStoppedDate] = useState<Date | undefined>(new Date());
+  const [createStoppedTime, setCreateStoppedTime] = useState('');
   const intentionInputRef = useRef<HTMLInputElement>(null);
 
   // Parse dates for Calendar component
@@ -118,14 +126,6 @@ function ActivityPage() {
   const startTimer = useStartTimer();
   const stopTimer = useStopTimer();
   const createManual = useCreateManualTimeEntry();
-  const {
-    register: registerManualField,
-    handleSubmit: handleManualSubmit,
-    reset: resetManualForm,
-    formState: { errors: manualErrors, isSubmitting: isManualSubmitting },
-  } = useForm<ManualEntryFormData>({
-    resolver: zodResolver(manualEntrySchema),
-  });
 
   const updateActivity = useUpdateActivity();
   const archiveActivity = useArchiveActivity();
@@ -356,31 +356,6 @@ function ActivityPage() {
       });
     }
   };
-
-  const onManualSubmit = (data: ManualEntryFormData) => {
-    const startedAtIso = toIsoFromLocal(data.startedAt);
-    const stoppedAtIso = toIsoFromLocal(data.stoppedAt);
-    if (!startedAtIso || !stoppedAtIso) return;
-    createManual.mutate(
-      {
-        activityId,
-        startedAt: startedAtIso,
-        stoppedAt: stoppedAtIso,
-        description: data.description?.trim() || undefined,
-      },
-      {
-        onSuccess: () => {
-          resetManualForm();
-          setManualOpen(false);
-        },
-      }
-    );
-  };
-
-  const manualApiErrorMessage =
-    createManual.error instanceof ApiError
-      ? (createManual.error.data as { message?: string })?.message || 'Failed to save entry'
-      : createManual.error?.message;
 
   if (activityLoading) {
     return (
@@ -680,99 +655,21 @@ function ActivityPage() {
 
       <PomodoroSettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} />
 
-      {/* Manual Entry */}
-      <div className="rounded-xl border border-border bg-card p-6 mb-6">
-        <div className="flex items-center justify-between">
-          <h2 className="text-base font-semibold text-foreground">Manual entry</h2>
-          <button
-            onClick={() => setManualOpen((open) => !open)}
-            className="text-sm text-primary hover:text-primary/80"
-          >
-            {manualOpen ? 'Close' : 'Add'}
-          </button>
-        </div>
-        {manualOpen && (
-          <form className="mt-4 space-y-3" onSubmit={handleManualSubmit(onManualSubmit)}>
-            <div className="grid gap-3 sm:grid-cols-2">
-              <label className="text-xs text-muted-foreground">
-                Started at
-                <Input
-                  type="datetime-local"
-                  {...registerManualField('startedAt')}
-                  className="mt-2"
-                />
-                {manualErrors.startedAt && (
-                  <p className="mt-1 text-xs text-destructive">{manualErrors.startedAt.message}</p>
-                )}
-              </label>
-              <label className="text-xs text-muted-foreground">
-                Stopped at
-                <Input
-                  type="datetime-local"
-                  {...registerManualField('stoppedAt')}
-                  className="mt-2"
-                />
-                {manualErrors.stoppedAt && (
-                  <p className="mt-1 text-xs text-destructive">{manualErrors.stoppedAt.message}</p>
-                )}
-              </label>
-            </div>
-            <div>
-              <Input
-                type="text"
-                placeholder="Description (optional)"
-                maxLength={500}
-                {...registerManualField('description')}
-              />
-              {manualErrors.description && (
-                <p className="mt-1 text-xs text-destructive">{manualErrors.description.message}</p>
-              )}
-            </div>
-            {manualApiErrorMessage && (
-              <div className="rounded-lg border border-destructive/20 bg-destructive/10 px-4 py-3">
-                <p className="text-xs text-destructive">{manualApiErrorMessage}</p>
-              </div>
-            )}
-            <div className="flex gap-2">
-              <Button
-                type="submit"
-                disabled={
-                  isManualSubmitting ||
-                  createManual.isPending ||
-                  isArchived ||
-                  isRunningThisActivity ||
-                  isRunningOther ||
-                  hasAnyActiveBreak
-                }
-                size="sm"
-              >
-                {createManual.isPending ? 'Saving...' : 'Save'}
-              </Button>
-              <Button
-                type="button"
-                onClick={() => {
-                  resetManualForm();
-                  setManualOpen(false);
-                }}
-                variant="outline"
-                size="sm"
-              >
-                Cancel
-              </Button>
-            </div>
-            {(isArchived || isRunningThisActivity || isRunningOther || hasAnyActiveBreak) && (
-              <p className="text-xs text-muted-foreground">
-                Manual entry is disabled while archived, another timer is running, or a break is active.
-              </p>
-            )}
-          </form>
-        )}
-      </div>
-
       {/* Entries List */}
       <div className="rounded-xl border border-border bg-card p-6">
         <div className="mb-4 flex max-sm:flex-col gap-y-4 items-center justify-between">
-          <h2 className="text-base max-sm:mr-auto font-semibold text-foreground">History</h2>
+          <div className="flex items-center gap-2 max-sm:w-full max-sm:justify-between sm:mr-auto">
+            <h2 className="text-base font-semibold text-foreground">History</h2>
+            <Button
+              onClick={() => setCreateDialogOpen(true)}
+              variant="ghost"
+              size="icon-sm"
+              className="text-primary hover:text-primary/80 hover:bg-primary/10"
+              title="Add time entry"
+            >
+              <Plus size={16} />
+            </Button>
+          </div>
           <div className="flex items-center gap-4 max-sm:w-full max-sm:flex-col">
             <div className="flex max-sm:mr-auto items-center gap-2">
               <Checkbox
@@ -867,6 +764,169 @@ function ActivityPage() {
           <p className="text-sm text-muted-foreground">No time entries yet.</p>
         )}
       </div>
+
+      {/* Create Time Entry Dialog */}
+      <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Create Time Entry</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-2">
+            <div className="grid gap-4">
+              <div>
+                <Label htmlFor="create-started-date" className="mb-2 text-sm font-semibold text-muted-foreground tracking-wide px-1">
+                  Started
+                </Label>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" id="create-started-date" className="h-8 flex-1 justify-start text-sm font-normal">
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {createStartedDate ? format(createStartedDate, 'PPP') : <span>Pick a date</span>}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar mode="single" selected={createStartedDate} defaultMonth={createStartedDate} onSelect={setCreateStartedDate} />
+                    </PopoverContent>
+                  </Popover>
+                  <Input
+                    type="time"
+                    id="create-started-time"
+                    step="1"
+                    value={createStartedTime}
+                    onChange={(e) => setCreateStartedTime(e.target.value)}
+                    className="h-8 w-fit text-sm bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+                  />
+                </div>
+              </div>
+              <div>
+                <Label htmlFor="create-stopped-date" className="mb-2 text-sm font-semibold text-muted-foreground tracking-wide px-1">
+                  Stopped
+                </Label>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" id="create-stopped-date" className="h-8 flex-1 justify-start text-sm font-normal">
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {createStoppedDate ? format(createStoppedDate, 'PPP') : <span>Pick a date</span>}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar mode="single" selected={createStoppedDate} defaultMonth={createStoppedDate} onSelect={setCreateStoppedDate} />
+                    </PopoverContent>
+                  </Popover>
+                  <Input
+                    type="time"
+                    id="create-stopped-time"
+                    step="1"
+                    value={createStoppedTime}
+                    onChange={(e) => setCreateStoppedTime(e.target.value)}
+                    className="h-8 w-fit text-sm bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <Label className="mb-2 text-sm font-semibold text-muted-foreground tracking-wide px-1">
+                Intention
+              </Label>
+              <textarea
+                value={createIntention}
+                onChange={(e) => setCreateIntention(e.target.value)}
+                placeholder="What do you plan to accomplish?"
+                maxLength={1000}
+                rows={2}
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring transition-colors duration-200"
+              />
+            </div>
+
+            <div className="flex items-center justify-between flex-wrap gap-4 pt-2 border-t border-border/50">
+              <div>
+                <Label className="mb-2 text-sm font-semibold text-muted-foreground tracking-wide block">
+                  Distractions
+                </Label>
+                <div className="flex items-center justify-center gap-1.5 bg-secondary/30 p-0.5 rounded-md">
+                  <Button
+                    type="button"
+                    onClick={() => setCreateDistractionCount((c) => Math.max(0, c - 1))}
+                    variant="ghost"
+                    size="icon-xs"
+                    className="hover:bg-background transition-colors duration-150"
+                  >
+                    <Minus size={14} />
+                  </Button>
+                  <span className="text-sm font-mono w-5 text-center">{createDistractionCount}</span>
+                  <Button
+                    type="button"
+                    onClick={() => setCreateDistractionCount((c) => c + 1)}
+                    variant="ghost"
+                    size="icon-xs"
+                    className="hover:bg-background transition-colors duration-150"
+                  >
+                    <Plus size={14} />
+                  </Button>
+                </div>
+              </div>
+
+              <div className="flex gap-2 ml-auto">
+                <Button
+                  onClick={() => {
+                    setCreateDialogOpen(false);
+                    setCreateIntention('');
+                    setCreateDistractionCount(0);
+                    setCreateStartedDate(new Date());
+                    setCreateStartedTime('');
+                    setCreateStoppedDate(new Date());
+                    setCreateStoppedTime('');
+                  }}
+                  variant="ghost"
+                  size="sm"
+                  className="text-sm"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={() => {
+                    if (!createStartedDate || !createStartedTime || !createStoppedDate || !createStoppedTime) return;
+                    const startedAtLocal = `${format(createStartedDate, 'yyyy-MM-dd')}T${createStartedTime}`;
+                    const stoppedAtLocal = `${format(createStoppedDate, 'yyyy-MM-dd')}T${createStoppedTime}`;
+                    const startedAtIso = toIsoFromLocal(startedAtLocal);
+                    const stoppedAtIso = toIsoFromLocal(stoppedAtLocal);
+                    if (!startedAtIso || !stoppedAtIso) return;
+                    createManual.mutate(
+                      {
+                        activityId,
+                        startedAt: startedAtIso,
+                        stoppedAt: stoppedAtIso,
+                        description: createIntention || undefined,
+                        distractionCount: createDistractionCount > 0 ? createDistractionCount : undefined,
+                      },
+                      {
+                        onSuccess: () => {
+                          setCreateDialogOpen(false);
+                          setCreateIntention('');
+                          setCreateDistractionCount(0);
+                          setCreateStartedDate(new Date());
+                          setCreateStartedTime('');
+                          setCreateStoppedDate(new Date());
+                          setCreateStoppedTime('');
+                        },
+                      }
+                    );
+                  }}
+                  disabled={createManual.isPending || !createStartedDate || !createStartedTime || !createStoppedDate || !createStoppedTime}
+                  variant="action"
+                  size="sm"
+                  className="text-sm"
+                >
+                  {createManual.isPending ? 'Saving...' : 'Save'}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

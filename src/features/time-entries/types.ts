@@ -41,6 +41,7 @@ export type CreateManualTimeEntryRequest = {
   startedAt: string;
   stoppedAt: string;
   description?: string;
+  distractionCount?: number;
 };
 
 /**

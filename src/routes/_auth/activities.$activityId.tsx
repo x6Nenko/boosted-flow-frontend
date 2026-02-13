@@ -45,7 +45,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { CalendarIcon, Plus, Minus } from 'lucide-react';
+import { CalendarIcon, Plus, Minus, Timer, RotateCcw } from 'lucide-react';
 import { format } from 'date-fns';
 import {
   Dialog,
@@ -569,24 +569,36 @@ function ActivityPage() {
           </p>
         ) : (
           <>
-            {/* Mode toggle */}
-            <div className="mb-4 flex gap-1">
-              <Button
-                onClick={() => setTimerMode('stopwatch')}
-                variant={timerMode === 'stopwatch' ? 'secondary' : 'ghost'}
-                className="flex-1"
-                size="sm"
-              >
-                Stopwatch
-              </Button>
-              <Button
-                onClick={() => setTimerMode('pomodoro')}
-                variant={timerMode === 'pomodoro' ? 'secondary' : 'ghost'}
-                className="flex-1"
-                size="sm"
-              >
-                Pomodoro
-              </Button>
+            {/* Mode toggle - Technical style with icons */}
+            <div className="mb-4 flex items-center justify-between">
+              <div className="flex gap-0.5 bg-background rounded-md border border-border p-0.5">
+                <Button
+                  onClick={() => setTimerMode('stopwatch')}
+                  variant={timerMode === 'stopwatch' ? 'secondary' : 'ghost'}
+                  size="sm"
+                  className="h-7 px-3 text-xs font-medium flex items-center gap-1.5"
+                >
+                  <Timer size={14} /> Stopwatch
+                </Button>
+                <Button
+                  onClick={() => setTimerMode('pomodoro')}
+                  variant={timerMode === 'pomodoro' ? 'secondary' : 'ghost'}
+                  size="sm"
+                  className="h-7 px-3 text-xs font-medium flex items-center gap-1.5"
+                >
+                  <RotateCcw size={14} /> Pomodoro
+                </Button>
+              </div>
+
+              {timerMode === 'pomodoro' && (
+                <div className="flex items-center text-xs text-muted-foreground border border-border rounded-md px-2 py-1 bg-background gap-3">
+                  <span className="flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary" /> Session {pomodoroState.currentSession}
+                  </span>
+                  <span className="w-px h-3 bg-border" />
+                  <span>{pomodoroSettings.workDuration}m / {pomodoroSettings.shortBreakDuration}m</span>
+                </div>
+              )}
             </div>
 
             <div className="mb-4">
@@ -608,10 +620,10 @@ function ActivityPage() {
 
             {/* Pomodoro settings preview */}
             {timerMode === 'pomodoro' && (
-              <>
-                <div className="flex items-center gap-2 mb-2">
+              <div className="mb-4 flex items-center justify-between">
+                <div className="flex items-center gap-2">
                   <p className="text-xs text-muted-foreground">
-                    Next: Session {pomodoroState.currentSession} of {pomodoroSettings.sessionsBeforeLongBreak}
+                    {pomodoroSettings.workDuration}m focus • {pomodoroSettings.shortBreakDuration}m short • {pomodoroSettings.longBreakDuration}m long • {pomodoroSettings.sessionsBeforeLongBreak} sessions
                   </p>
                   {pomodoroState.currentSession > 1 && (
                     <button
@@ -623,19 +635,14 @@ function ActivityPage() {
                     </button>
                   )}
                 </div>
-                <div className="mb-4 flex items-center justify-between">
-                  <p className="text-xs text-muted-foreground">
-                    {pomodoroSettings.workDuration}m focus • {pomodoroSettings.shortBreakDuration}m short • {pomodoroSettings.longBreakDuration}m long • {pomodoroSettings.sessionsBeforeLongBreak} sessions
-                  </p>
-                  <button
-                    onClick={handleOpenPomodoroSettings}
-                    className="text-xs text-muted-foreground hover:text-foreground"
-                    title="Settings"
-                  >
-                    ⚙
-                  </button>
-                </div>
-              </>
+                <button
+                  onClick={handleOpenPomodoroSettings}
+                  className="text-xs text-muted-foreground hover:text-foreground"
+                  title="Settings"
+                >
+                  ⚙
+                </button>
+              </div>
             )}
 
             <Button

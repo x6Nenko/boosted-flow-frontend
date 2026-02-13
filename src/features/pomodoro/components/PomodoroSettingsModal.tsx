@@ -1,5 +1,11 @@
 import { useState } from 'react';
 import { pomodoroStore, usePomodoroSettings } from '../index';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,8 +19,6 @@ type PomodoroSettingsModalProps = {
 export function PomodoroSettingsModal({ isOpen, onClose }: PomodoroSettingsModalProps) {
   const currentSettings = usePomodoroSettings();
   const [form, setForm] = useState<PomodoroSettings>(currentSettings);
-
-  if (!isOpen) return null;
 
   const handleSave = () => {
     pomodoroStore.updateSettings(form);
@@ -34,19 +38,15 @@ export function PomodoroSettingsModal({ isOpen, onClose }: PomodoroSettingsModal
   };
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
-      onClick={onClose}
-    >
-      <div
-        className="w-full max-w-sm rounded-xl border border-border bg-card p-6 shadow-2xl"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <h2 className="mb-6 text-xl font-semibold text-foreground">Pomodoro Settings</h2>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Pomodoro Settings</DialogTitle>
+        </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="space-y-4 pt-2">
           <div>
-            <Label htmlFor="workDuration" className="text-sm text-muted-foreground mb-2">
+            <Label htmlFor="workDuration" className="mb-2 text-sm font-semibold text-muted-foreground tracking-wide px-1">
               Work duration (minutes)
             </Label>
             <Input
@@ -59,7 +59,7 @@ export function PomodoroSettingsModal({ isOpen, onClose }: PomodoroSettingsModal
           </div>
 
           <div>
-            <Label htmlFor="shortBreak" className="text-sm text-muted-foreground mb-2">
+            <Label htmlFor="shortBreak" className="mb-2 text-sm font-semibold text-muted-foreground tracking-wide px-1">
               Short break (minutes)
             </Label>
             <Input
@@ -72,7 +72,7 @@ export function PomodoroSettingsModal({ isOpen, onClose }: PomodoroSettingsModal
           </div>
 
           <div>
-            <Label htmlFor="longBreak" className="text-sm text-muted-foreground mb-2">
+            <Label htmlFor="longBreak" className="mb-2 text-sm font-semibold text-muted-foreground tracking-wide px-1">
               Long break (minutes)
             </Label>
             <Input
@@ -85,7 +85,7 @@ export function PomodoroSettingsModal({ isOpen, onClose }: PomodoroSettingsModal
           </div>
 
           <div>
-            <Label htmlFor="sessions" className="text-sm text-muted-foreground mb-2">
+            <Label htmlFor="sessions" className="mb-2 text-sm font-semibold text-muted-foreground tracking-wide px-1">
               Sessions before long break
             </Label>
             <Input
@@ -98,18 +98,18 @@ export function PomodoroSettingsModal({ isOpen, onClose }: PomodoroSettingsModal
           </div>
         </div>
 
-        <div className="mt-6 flex gap-2">
-          <Button onClick={handleSave} className="flex-1">
-            Save
-          </Button>
-          <Button onClick={handleReset} variant="outline">
-            Reset
-          </Button>
-          <Button onClick={onClose} variant="outline">
+        <div className="flex gap-2 ml-auto pt-4">
+          <Button onClick={onClose} variant="ghost" size="sm" className="text-sm">
             Cancel
           </Button>
+          <Button onClick={handleReset} variant="ghost" size="sm" className="text-sm">
+            Reset
+          </Button>
+          <Button onClick={handleSave} variant="action" size="sm" className="text-sm">
+            Save
+          </Button>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

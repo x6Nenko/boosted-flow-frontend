@@ -234,6 +234,13 @@
   *::-webkit-scrollbar-thumb:hover {
     background: var(--color-white);
   }
+
+  /* Number input spinners for dark theme */
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    opacity: 1;
+    filter: invert(1);
+  }
 }
 
 /* --- 4. COMPONENT OVERRIDES (CMDK) --- */

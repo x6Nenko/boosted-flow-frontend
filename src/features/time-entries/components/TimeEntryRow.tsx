@@ -5,7 +5,7 @@ import {
   Clock, Calendar as CalendarIcon, Plus, Minus, ChevronRight, ChevronDown, Lightbulb, MoreVertical,
 } from 'lucide-react';
 import { useUpdateTimeEntry, useDeleteTimeEntry } from '../hooks';
-import { formatStoppedDuration, TimerDuration } from './TimerDuration';
+import { formatStoppedDuration } from './TimerDuration';
 import { formatTime, formatDate, cn } from '@/lib/utils';
 import { toDateTimeLocalValue, toIsoFromLocal } from '../time-entries.utils';
 import { Button } from '@/components/ui/button';
@@ -202,7 +202,6 @@ export function TimeEntryRow({
   const updateEntry = useUpdateTimeEntry();
   const deleteEntry = useDeleteTimeEntry();
 
-  const isStopped = !!entry.stoppedAt;
   const detailsId = `time-entry-details-${entry.id}`;
 
   /* ── Quick-action: save rating immediately ── */
@@ -332,23 +331,13 @@ export function TimeEntryRow({
             </span>
             <span className="flex items-center gap-1.5">
               <Clock size={14} className="opacity-60" />
-              {formatTime(entry.startedAt)}
-              {entry.stoppedAt && ` – ${formatTime(entry.stoppedAt)}`}
+              {formatTime(entry.startedAt)} – {formatTime(entry.stoppedAt!)}
             </span>
           </div>
         </div>
 
-        <div
-          className={cn(
-            'text-base font-bold font-mono tracking-tight tabular-nums text-right ml-4',
-            !entry.stoppedAt && 'text-primary animate-flow-pulse'
-          )}
-        >
-          {entry.stoppedAt ? (
-            formatStoppedDuration(entry.startedAt, entry.stoppedAt)
-          ) : (
-            <TimerDuration startedAt={entry.startedAt} />
-          )}
+        <div className="text-base font-bold font-mono tracking-tight tabular-nums text-right ml-4">
+          {formatStoppedDuration(entry.startedAt, entry.stoppedAt!)}
         </div>
       </div>
     );
@@ -362,7 +351,7 @@ export function TimeEntryRow({
         >
           {dashboardContent}
         </Link>
-        {isStopped && showDetails && <div className="px-2">{detailsContent}</div>}
+        {showDetails && <div className="px-2">{detailsContent}</div>}
       </div>
     );
   }
@@ -405,7 +394,7 @@ export function TimeEntryRow({
 
         <div className="flex mb-auto max-sm:flex-col items-center max-sm:items-end gap-2 max-sm:gap-1 col-start-2 row-start-1 row-span-2 min-[861px]:col-auto min-[861px]:row-auto">
           <div className="flex max-[360px]:flex-col items-center gap-2 max-sm:order-2 ">
-            {isStopped && !showDetails && (
+            {!showDetails && (
               <Button
                 type="button"
                 onClick={handleToggleDetails}
@@ -431,7 +420,7 @@ export function TimeEntryRow({
                 />
               </Button>
             )}
-            {editable && isStopped && (
+            {editable && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
@@ -467,31 +456,14 @@ export function TimeEntryRow({
               </DropdownMenu>
             )}
           </div>
-          <div className={cn(
-            "text-base font-bold font-mono tracking-tight tabular-nums text-right max-sm:order-1",
-            !isStopped && "text-primary animate-pulse"
-          )}>
-            {isStopped ? formatStoppedDuration(entry.startedAt, entry.stoppedAt!) : <TimerDuration startedAt={entry.startedAt} />}
+          <div className="text-base font-bold font-mono tracking-tight tabular-nums text-right max-sm:order-1">
+            {formatStoppedDuration(entry.startedAt, entry.stoppedAt!)}
           </div>
         </div>
       </div>
 
-      {/* Detail Block (Intention & Reflection) - Stopped entries only */}
-      {isStopped && (showDetails || isDetailsOpen) && <div id={detailsId}>{detailsContent}</div>}
-
-      {/* Line 2 alt: Intention for running entries */}
-      {!isStopped && showDetails && (
-        <div className="pb-2">
-          <div className="flex items-center gap-2">
-            <Lightbulb size={14} className="text-muted-foreground/50 shrink-0" />
-            {entry.description ? (
-              <p className="text-sm text-foreground truncate">{entry.description}</p>
-            ) : (
-              <p className="text-sm text-muted-foreground">No intention</p>
-            )}
-          </div>
-        </div>
-      )}
+      {/* Detail Block (Intention & Reflection) */}
+      {(showDetails || isDetailsOpen) && <div id={detailsId}>{detailsContent}</div>}
 
       {/* Delete Alert Dialog */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>

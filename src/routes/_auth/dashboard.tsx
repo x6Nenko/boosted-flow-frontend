@@ -175,14 +175,16 @@ function DashboardPage() {
           <p className="text-sm text-muted-foreground">Loading...</p>
         ) : entries && entries.length > 0 ? (
           <div>
-            {entries.map((entry) => (
-              <TimeEntryRow
-                key={entry.id}
-                entry={entry}
-                activity={activities.find((a) => a.id === entry.activityId)}
-                showActivityName
-              />
-            ))}
+            {entries
+              .filter((entry) => entry.stoppedAt)
+              .map((entry) => (
+                <TimeEntryRow
+                  key={entry.id}
+                  entry={entry}
+                  activity={activities.find((a) => a.id === entry.activityId)}
+                  showActivityName
+                />
+              ))}
           </div>
         ) : (
           <p className="text-sm text-muted-foreground">No time entries yet. Select an activity to start tracking.</p>

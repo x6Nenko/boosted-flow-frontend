@@ -24,7 +24,9 @@ const buttonVariants = cva(
         // Brand cream button (standard actions)
         action: "bg-primary text-primary-foreground hover:bg-primary/90",
         destructive:
-          "border border-destructive/30 text-destructive hover:bg-destructive/10 hover:text-destructive hover:border-destructive focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 bg-transparent",
+          "border border-destructive/30 text-destructive hover:bg-destructive/10 hover:text-destructive hover:border-destructive/50 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 bg-transparent",
+        success:
+          "border border-clean/30 text-clean hover:bg-clean/10 hover:text-clean hover:border-clean/50 focus-visible:ring-clean/20 dark:focus-visible:ring-clean/40 bg-transparent",
         outline:
           "border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50",
         secondary:

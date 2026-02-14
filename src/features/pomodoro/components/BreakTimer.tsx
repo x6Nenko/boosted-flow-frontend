@@ -27,11 +27,13 @@ export function BreakTimer({ startedAt, durationMinutes, onComplete }: BreakTime
 
   const remainingMs = Math.max(0, endMs - nowMs);
   const remainingSeconds = Math.floor(remainingMs / 1000);
-  const minutes = Math.floor(remainingSeconds / 60);
+  const hours = Math.floor(remainingSeconds / 3600);
+  const minutes = Math.floor((remainingSeconds % 3600) / 60);
   const seconds = remainingSeconds % 60;
 
   return (
     <>
+      {hours > 0 && `${hours.toString().padStart(2, '0')}:`}
       {minutes.toString().padStart(2, '0')}:{seconds.toString().padStart(2, '0')}
     </>
   );

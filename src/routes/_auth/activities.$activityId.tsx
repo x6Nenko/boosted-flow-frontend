@@ -459,198 +459,209 @@ function ActivityPage() {
       )}
 
       {/* Timer Control */}
-      <div className="rounded-xl border border-border bg-card p-6 mb-6">
-        {isArchived ? (
-          <p className="text-sm text-muted-foreground">
-            This activity is archived. Unarchive it to track time.
-          </p>
-        ) : isRunningThisActivity ? (
-          <>
-            <div className="mb-4">
-              {timerMode === 'pomodoro' && (
+      <div className="bg-card border border-border rounded-xl p-1 shadow-sm mb-6">
+        <div className="bg-background/30 rounded-lg border border-border/50 p-6 relative overflow-hidden">
+          {isRunningThisActivity && (
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-1/2 bg-primary/10 blur-3xl pointer-events-none" />
+          )}
+
+          <div className="relative z-10">
+            {isArchived ? (
+              <p className="text-sm text-muted-foreground">
+                This activity is archived. Unarchive it to track time.
+              </p>
+            ) : isRunningOther ? (
+              <p className="text-sm text-muted-foreground">
+                Timer is running on another activity. Stop it first to start tracking here.
+              </p>
+            ) : timerMode === 'pomodoro' && pomodoroState.phase !== 'work' ? (
+              // Break phase UI
+              <div>
                 <p className="text-xs text-muted-foreground mb-1">
-                  Session {pomodoroState.currentSession} of {pomodoroSettings.sessionsBeforeLongBreak}
+                  Completed: Session {pomodoroState.currentSession} of {pomodoroSettings.sessionsBeforeLongBreak}
                 </p>
-              )}
-              {currentEntry.description && (
-                <p className="text-sm text-muted-foreground">{currentEntry.description}</p>
-              )}
-            </div>
-            <div className="mb-4 text-center">
-              <span className="text-4xl font-mono text-primary timer-nums">
-                {timerMode === 'pomodoro' ? (
-                  <PomodoroTimer
-                    startedAt={currentEntry.startedAt}
-                    durationMinutes={pomodoroSettings.workDuration}
-                    onComplete={handlePomodoroComplete}
-                  />
+                <p className="text-sm text-foreground mb-3">
+                  {pomodoroState.phase === 'long-break' ? 'Long break' : 'Short break'} time!
+                </p>
+                {pomodoroState.isBreakActive && pomodoroState.breakStartedAt ? (
+                  <div className="mb-4 text-center">
+                    <span className="text-4xl font-mono text-green-600 timer-nums">
+                      <BreakTimer
+                        startedAt={pomodoroState.breakStartedAt}
+                        durationMinutes={pomodoroStore.getCurrentBreakDuration()}
+                        onComplete={handleSkipBreak}
+                      />
+                    </span>
+                    <Button
+                      onClick={handleSkipBreak}
+                      variant="outline"
+                      className="mt-4 w-full"
+                    >
+                      Skip Break
+                    </Button>
+                  </div>
                 ) : (
-                  <TimerDuration startedAt={currentEntry.startedAt} />
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={handleStartBreak}
+                      className="flex-1 bg-green-600 hover:bg-green-500"
+                    >
+                      Start Break
+                    </Button>
+                    <Button
+                      onClick={handleSkipBreak}
+                      variant="outline"
+                    >
+                      Skip
+                    </Button>
+                    <Button
+                      onClick={handleResetPomodoro}
+                      variant="outline"
+                    >
+                      Reset
+                    </Button>
+                  </div>
                 )}
-              </span>
-            </div>
-            <Button
-              onClick={handleStopTimer}
-              disabled={stopTimer.isPending || startTimer.isPending}
-              variant="destructive"
-              className="w-full"
-            >
-              {startTimer.isPending ? 'Starting...' : stopTimer.isPending ? 'Stopping...' : 'Stop'}
-            </Button>
-            <div className="mt-4 flex items-center justify-center gap-2">
-              <Button
-                onClick={() => setDistractionCount((c) => c + 1)}
-                variant="outline"
-                size="sm"
-              >
-                + Distraction
-              </Button>
-              {distractionCount > 0 && (
-                <span className="text-sm text-muted-foreground">{distractionCount}</span>
-              )}
-            </div>
-          </>
-        ) : isRunningOther ? (
-          <p className="text-sm text-muted-foreground">
-            Timer is running on another activity. Stop it first to start tracking here.
-          </p>
-        ) : timerMode === 'pomodoro' && pomodoroState.phase !== 'work' ? (
-          // Break phase UI
-          <div>
-            <p className="text-xs text-muted-foreground mb-1">
-              Completed: Session {pomodoroState.currentSession} of {pomodoroSettings.sessionsBeforeLongBreak}
-            </p>
-            <p className="text-sm text-foreground mb-3">
-              {pomodoroState.phase === 'long-break' ? 'Long break' : 'Short break'} time!
-            </p>
-            {pomodoroState.isBreakActive && pomodoroState.breakStartedAt ? (
-              <div className="mb-4 text-center">
-                <span className="text-4xl font-mono text-green-600 timer-nums">
-                  <BreakTimer
-                    startedAt={pomodoroState.breakStartedAt}
-                    durationMinutes={pomodoroStore.getCurrentBreakDuration()}
-                    onComplete={handleSkipBreak}
-                  />
-                </span>
-                <Button
-                  onClick={handleSkipBreak}
-                  variant="outline"
-                  className="mt-4 w-full"
-                >
-                  Skip Break
-                </Button>
               </div>
+            ) : hasAnyActiveBreak ? (
+              <p className="text-sm text-muted-foreground">
+                Break is active on another activity. Complete or skip it first to start tracking here.
+              </p>
             ) : (
-              <div className="flex gap-2">
-                <Button
-                  onClick={handleStartBreak}
-                  className="flex-1 bg-green-600 hover:bg-green-500"
-                >
-                  Start Break
-                </Button>
-                <Button
-                  onClick={handleSkipBreak}
-                  variant="outline"
-                >
-                  Skip
-                </Button>
-                <Button
-                  onClick={handleResetPomodoro}
-                  variant="outline"
-                >
-                  Reset
-                </Button>
-              </div>
+              <>
+                {!isRunningThisActivity && (
+                  <div className="mb-4 flex items-center justify-between">
+                    <div className="flex gap-0.5 bg-background rounded-md border border-border p-0.5">
+                      <Button
+                        onClick={() => setTimerMode('stopwatch')}
+                        variant={timerMode === 'stopwatch' ? 'secondary' : 'ghost'}
+                        size="sm"
+                        className="h-7 px-3 text-xs font-medium flex items-center gap-1.5"
+                      >
+                        <Timer size={14} /> Stopwatch
+                      </Button>
+                      <Button
+                        onClick={() => setTimerMode('pomodoro')}
+                        variant={timerMode === 'pomodoro' ? 'secondary' : 'ghost'}
+                        size="sm"
+                        className="h-7 px-3 text-xs font-medium flex items-center gap-1.5"
+                      >
+                        <RotateCcw size={14} /> Pomodoro
+                      </Button>
+                    </div>
+
+                    {timerMode === 'pomodoro' && (
+                      <div className="flex items-center text-xs text-muted-foreground border border-border rounded-md px-3 py-1 bg-background gap-2">
+                        <span className="flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-primary" /> Session {pomodoroState.currentSession}
+                          {pomodoroState.currentSession > 1 && (
+                            <Button
+                              onClick={handleResetPomodoro}
+                              variant="ghost"
+                              size="icon-xs"
+                              className="h-5 w-5 p-0 hover:text-foreground"
+                              title="Reset to Session 1"
+                            >
+                              <RotateCcw size={14} />
+                            </Button>
+                          )}
+                        </span>
+                        <span className="w-px h-3 bg-border" />
+                        <span>{pomodoroSettings.workDuration}m / {pomodoroSettings.shortBreakDuration}m</span>
+                        <Button
+                          onClick={handleOpenPomodoroSettings}
+                          variant="ghost"
+                          size="icon-xs"
+                          className="h-5 w-5 p-0 hover:text-foreground"
+                          title="Pomodoro Settings"
+                        >
+                          <Settings2 size={14} />
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Session info - shown when running */}
+                {isRunningThisActivity && timerMode === 'pomodoro' && (
+                  <p className="text-xs text-muted-foreground mb-1">
+                    Session {pomodoroState.currentSession} of {pomodoroSettings.sessionsBeforeLongBreak}
+                  </p>
+                )}
+
+                {/* Timer */}
+                <div className="text-6xl font-mono font-medium tracking-tighter text-foreground mb-4 tabular-nums text-center">
+                  {timerMode === 'pomodoro' ? (
+                    <PomodoroTimer
+                      startedAt={isRunningThisActivity ? currentEntry?.startedAt : undefined}
+                      durationMinutes={pomodoroSettings.workDuration}
+                      onComplete={handlePomodoroComplete}
+                    />
+                  ) : (
+                    <TimerDuration startedAt={isRunningThisActivity ? currentEntry?.startedAt : undefined} />
+                  )}
+                </div>
+
+                {/* Controls */}
+                {isRunningThisActivity ? (
+                  <>
+                    <Button
+                      onClick={handleStopTimer}
+                      disabled={stopTimer.isPending || startTimer.isPending}
+                      variant="destructive"
+                      className="w-full"
+                    >
+                      {startTimer.isPending ? 'Starting...' : stopTimer.isPending ? 'Stopping...' : 'Stop'}
+                    </Button>
+                    <div className="mt-4 flex items-center justify-center gap-2">
+                      <Button
+                        onClick={() => setDistractionCount((c) => c + 1)}
+                        variant="outline"
+                        size="sm"
+                      >
+                        + Distraction
+                      </Button>
+                      {distractionCount > 0 && (
+                        <span className="text-sm text-muted-foreground">{distractionCount}</span>
+                      )}
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="mb-4">
+                      <Input
+                        ref={intentionInputRef}
+                        type="text"
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            handleStart();
+                          }
+                        }}
+                        placeholder="What are your intention? (optional)"
+                        maxLength={500}
+                      />
+                    </div>
+
+                    <Button
+                      onClick={handleStart}
+                      disabled={startTimer.isPending}
+                      className="w-full"
+                    >
+                      {startTimer.isPending
+                        ? 'Starting...'
+                        : timerMode === 'pomodoro'
+                          ? 'Start Pomodoro Session'
+                          : 'Start Tracking'}
+                    </Button>
+                  </>
+                )}
+              </>
             )}
           </div>
-        ) : hasAnyActiveBreak ? (
-          <p className="text-sm text-muted-foreground">
-            Break is active on another activity. Complete or skip it first to start tracking here.
-          </p>
-        ) : (
-          <>
-            {/* Mode toggle - Technical style with icons */}
-            <div className="mb-4 flex items-center justify-between">
-              <div className="flex gap-0.5 bg-background rounded-md border border-border p-0.5">
-                <Button
-                  onClick={() => setTimerMode('stopwatch')}
-                  variant={timerMode === 'stopwatch' ? 'secondary' : 'ghost'}
-                  size="sm"
-                  className="h-7 px-3 text-xs font-medium flex items-center gap-1.5"
-                >
-                  <Timer size={14} /> Stopwatch
-                </Button>
-                <Button
-                  onClick={() => setTimerMode('pomodoro')}
-                  variant={timerMode === 'pomodoro' ? 'secondary' : 'ghost'}
-                  size="sm"
-                  className="h-7 px-3 text-xs font-medium flex items-center gap-1.5"
-                >
-                  <RotateCcw size={14} /> Pomodoro
-                </Button>
-              </div>
-
-              {timerMode === 'pomodoro' && (
-                <div className="flex items-center text-xs text-muted-foreground border border-border rounded-md px-3 py-1 bg-background gap-2">
-                  <span className="flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-primary" /> Session {pomodoroState.currentSession}
-                    {pomodoroState.currentSession > 1 && (
-                      <Button
-                        onClick={handleResetPomodoro}
-                        variant="ghost"
-                        size="icon-xs"
-                        className="h-5 w-5 p-0 hover:text-foreground"
-                        title="Reset to Session 1"
-                      >
-                        <RotateCcw size={14} />
-                      </Button>
-                    )}
-                  </span>
-                  <span className="w-px h-3 bg-border" />
-                  <span>{pomodoroSettings.workDuration}m / {pomodoroSettings.shortBreakDuration}m</span>
-                  <Button
-                    onClick={handleOpenPomodoroSettings}
-                    variant="ghost"
-                    size="icon-xs"
-                    className="h-5 w-5 p-0 hover:text-foreground"
-                    title="Pomodoro Settings"
-                  >
-                    <Settings2 size={14} />
-                  </Button>
-                </div>
-              )}
-            </div>
-
-            <div className="mb-4">
-              <Input
-                ref={intentionInputRef}
-                type="text"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    handleStart();
-                  }
-                }}
-                placeholder="What are your intention? (optional)"
-                maxLength={500}
-              />
-            </div>
-
-            <Button
-              onClick={handleStart}
-              disabled={startTimer.isPending}
-              className="w-full"
-            >
-              {startTimer.isPending
-                ? 'Starting...'
-                : timerMode === 'pomodoro'
-                  ? 'Start Pomodoro Session'
-                  : 'Start Tracking'}
-            </Button>
-          </>
-        )}
+        </div>
       </div>
 
       <PomodoroSettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} />

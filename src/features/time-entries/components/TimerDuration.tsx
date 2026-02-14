@@ -16,9 +16,17 @@ export function formatStoppedDuration(startedAt: string, stoppedAt: string): str
   return formatDurationBetween(startMs, stopMs);
 }
 
-export function TimerDuration({ startedAt }: { startedAt: string }) {
-  const startMs = new Date(startedAt).getTime();
+interface TimerDurationProps {
+  startedAt?: string;
+}
 
+export function TimerDuration({ startedAt }: TimerDurationProps) {
+  // When not started, show placeholder
+  if (!startedAt) {
+    return <span className="text-muted-foreground/30">00:00:00</span>;
+  }
+
+  const startMs = new Date(startedAt).getTime();
   const [nowMs, setNowMs] = useState(() => Date.now());
 
   useEffect(() => {

@@ -1,12 +1,24 @@
 import { useEffect, useState } from 'react';
 
 type PomodoroTimerProps = {
-  startedAt: string;
+  startedAt?: string;
   durationMinutes: number;
   onComplete: () => void;
 };
 
 export function PomodoroTimer({ startedAt, durationMinutes, onComplete }: PomodoroTimerProps) {
+  // When not started, show the full duration as placeholder
+  if (!startedAt) {
+    const hours = Math.floor(durationMinutes / 60);
+    const minutes = durationMinutes % 60;
+    return (
+      <span className="text-muted-foreground/30">
+        {hours > 0 && `${hours.toString().padStart(2, '0')}:`}
+        {minutes.toString().padStart(2, '0')}:00
+      </span>
+    );
+  }
+
   const startMs = new Date(startedAt).getTime();
   const durationMs = durationMinutes * 60 * 1000;
   const endMs = startMs + durationMs;

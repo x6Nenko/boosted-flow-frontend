@@ -45,7 +45,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { CalendarIcon, Plus, Minus, Timer, RotateCcw } from 'lucide-react';
+import { CalendarIcon, Plus, Minus, Timer, RotateCcw, Settings2 } from 'lucide-react';
 import { format } from 'date-fns';
 import {
   Dialog,
@@ -591,12 +591,32 @@ function ActivityPage() {
               </div>
 
               {timerMode === 'pomodoro' && (
-                <div className="flex items-center text-xs text-muted-foreground border border-border rounded-md px-2 py-1 bg-background gap-3">
+                <div className="flex items-center text-xs text-muted-foreground border border-border rounded-md px-3 py-1 bg-background gap-2">
                   <span className="flex items-center gap-1">
                     <span className="w-1.5 h-1.5 rounded-full bg-primary" /> Session {pomodoroState.currentSession}
+                    {pomodoroState.currentSession > 1 && (
+                      <Button
+                        onClick={handleResetPomodoro}
+                        variant="ghost"
+                        size="icon-xs"
+                        className="h-5 w-5 p-0 hover:text-foreground"
+                        title="Reset to Session 1"
+                      >
+                        <RotateCcw size={14} />
+                      </Button>
+                    )}
                   </span>
                   <span className="w-px h-3 bg-border" />
                   <span>{pomodoroSettings.workDuration}m / {pomodoroSettings.shortBreakDuration}m</span>
+                  <Button
+                    onClick={handleOpenPomodoroSettings}
+                    variant="ghost"
+                    size="icon-xs"
+                    className="h-5 w-5 p-0 hover:text-foreground"
+                    title="Pomodoro Settings"
+                  >
+                    <Settings2 size={14} />
+                  </Button>
                 </div>
               )}
             </div>
@@ -617,33 +637,6 @@ function ActivityPage() {
                 maxLength={500}
               />
             </div>
-
-            {/* Pomodoro settings preview */}
-            {timerMode === 'pomodoro' && (
-              <div className="mb-4 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <p className="text-xs text-muted-foreground">
-                    {pomodoroSettings.workDuration}m focus • {pomodoroSettings.shortBreakDuration}m short • {pomodoroSettings.longBreakDuration}m long • {pomodoroSettings.sessionsBeforeLongBreak} sessions
-                  </p>
-                  {pomodoroState.currentSession > 1 && (
-                    <button
-                      onClick={handleResetPomodoro}
-                      className="text-xs text-muted-foreground hover:text-foreground"
-                      title="Reset to Session 1"
-                    >
-                      ↺
-                    </button>
-                  )}
-                </div>
-                <button
-                  onClick={handleOpenPomodoroSettings}
-                  className="text-xs text-muted-foreground hover:text-foreground"
-                  title="Settings"
-                >
-                  ⚙
-                </button>
-              </div>
-            )}
 
             <Button
               onClick={handleStart}

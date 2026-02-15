@@ -64,14 +64,14 @@ function AnalyticsPage() {
       {/* Filters */}
       <div className="rounded-xl border border-border bg-card p-6 mb-6">
         <h2 className="text-base font-semibold text-foreground mb-4">Filters</h2>
-        <div className="flex flex-wrap gap-4">
+        <div className="flex max-sm:flex-col flex-wrap gap-4">
           <div>
             <Label className="block text-sm text-muted-foreground mb-2">From</Label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className="w-[200px] justify-start text-left font-normal"
+                  className="w-[200px] max-sm:w-full justify-start text-left font-normal"
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {fromDate ? format(fromDate, 'PPP') : <span>Pick a date</span>}
@@ -92,7 +92,7 @@ function AnalyticsPage() {
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className="w-[200px] justify-start text-left font-normal"
+                  className="w-[200px] max-sm:w-full justify-start text-left font-normal"
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {toDate ? format(toDate, 'PPP') : <span>Pick a date</span>}
@@ -110,7 +110,7 @@ function AnalyticsPage() {
           <div>
             <Label className="block text-sm text-muted-foreground mb-2">Activity</Label>
             <Select value={activityId} onValueChange={setActivityId}>
-              <SelectTrigger className="w-[200px]">
+              <SelectTrigger className="w-[200px] max-sm:w-full">
                 <SelectValue placeholder="All activities" />
               </SelectTrigger>
               <SelectContent>
@@ -133,7 +133,7 @@ function AnalyticsPage() {
       ) : (
         <>
           {/* Metrics Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
             <MetricCard
               label="Total Time"
               value={formatDuration(analytics.totalTimeMs)}

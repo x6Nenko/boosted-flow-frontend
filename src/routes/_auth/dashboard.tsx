@@ -9,7 +9,6 @@ import { TimeEntryList } from '@/features/time-entries/components/TimeEntryList'
 import { ActivityHeatmap } from '@/features/time-entries/components/ActivityHeatmap';
 import { getDateRangeForDays } from '@/features/analytics';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
@@ -17,6 +16,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Calendar } from '@/components/ui/calendar';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { CalendarIcon } from 'lucide-react';
+import { format } from 'date-fns';
 
 export const Route = createFileRoute('/_auth/dashboard')({
   component: DashboardPage,
@@ -147,10 +154,20 @@ function DashboardPage() {
 
       {/* Recent Entries */}
       <div className="rounded-xl border border-border bg-card p-6">
-        <div className="mb-4 flex items-center justify-between">
+        <div className="mb-4 flex max-sm:flex-col max-sm:gap-4 sm:items-center justify-between">
           <h2 className="text-base font-semibold text-foreground">Recent Entries</h2>
-          <Select value={period} onValueChange={setPeriod}>
-            <SelectTrigger className="w-[180px]">
+          <Select
+            value={period}
+            onValueChange={(value) => {
+              if (value === 'custom' && !customFrom && !customTo) {
+                const range = getDateRangeForDays(7);
+                setCustomFrom(range.from);
+                setCustomTo(range.to);
+              }
+              setPeriod(value);
+            }}
+          >
+            <SelectTrigger className="w-[180px] max-sm:w-full">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -163,17 +180,45 @@ function DashboardPage() {
           </Select>
         </div>
         {period === 'custom' && (
-          <div className="mb-3 flex gap-2">
-            <Input
-              type="date"
-              value={customFrom}
-              onChange={(e) => setCustomFrom(e.target.value)}
-            />
-            <Input
-              type="date"
-              value={customTo}
-              onChange={(e) => setCustomTo(e.target.value)}
-            />
+          <div className="mb-4 flex max-sm:flex-col gap-2">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="w-[200px] max-sm:w-full justify-start text-left font-normal"
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {customFrom ? format(new Date(customFrom), 'PPP') : <span>From date</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={customFrom ? new Date(customFrom) : undefined}
+                  onSelect={(date) => setCustomFrom(date ? format(date, 'yyyy-MM-dd') : '')}
+                  autoFocus
+                />
+              </PopoverContent>
+            </Popover>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="w-[200px] max-sm:w-full justify-start text-left font-normal"
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {customTo ? format(new Date(customTo), 'PPP') : <span>To date</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={customTo ? new Date(customTo) : undefined}
+                  onSelect={(date) => setCustomTo(date ? format(date, 'yyyy-MM-dd') : '')}
+                  autoFocus
+                />
+              </PopoverContent>
+            </Popover>
           </div>
         )}
         {entriesLoading ? (

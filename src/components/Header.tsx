@@ -1,11 +1,18 @@
 import { Link } from '@tanstack/react-router'
 import { useState, useEffect } from 'react'
-import { Menu, Search, X } from 'lucide-react'
+import { Menu, Search, X, User, LogOut } from 'lucide-react'
 import { commandPaletteStore } from '@/features/command-palette'
 import { useAuth } from '@/features/auth/hooks/use-auth'
+import { useLogout } from '@/features/auth/hooks'
 import { Button } from '@/components/ui/button'
 import { GlassContainer } from '@/components/primitives/glass-container'
 import { NavLink, MobileNavLink } from '@/components/primitives/nav-link'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 
 function SearchButton() {
   const [isMac, setIsMac] = useState(false);
@@ -32,6 +39,7 @@ function SearchButton() {
 
 export default function Header() {
   const { isAuthenticated } = useAuth();
+  const logout = useLogout();
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -69,7 +77,32 @@ export default function Header() {
         {/* Right Side: Actions */}
         <div className="flex items-center gap-6">
           {isAuthenticated ? (
-            <SearchButton />
+            <>
+              <SearchButton />
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    className="max-md:hidden hover:text-cream"
+                    aria-label="Profile menu"
+                  >
+                    <User size={20} />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem
+                    onClick={() => logout.mutate()}
+                    disabled={logout.isPending}
+                    variant="destructive"
+                    className='cursor-pointer'
+                  >
+                    <LogOut size={16} />
+                    {logout.isPending ? 'Logging out...' : 'Log out'}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
           ) : (
             <>
               <Button asChild variant="tertiary" className="hidden sm:block font-bold">
@@ -115,7 +148,7 @@ export default function Header() {
 
         <nav className="flex-1 p-4">
           {isAuthenticated ? (
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2 h-full">
               <MobileNavLink to="/dashboard" onClick={() => setIsOpen(false)}>
                 Dashboard
               </MobileNavLink>
@@ -125,6 +158,18 @@ export default function Header() {
               <MobileNavLink to="/analytics" onClick={() => setIsOpen(false)}>
                 Analytics
               </MobileNavLink>
+              <Button
+                onClick={() => {
+                  logout.mutate();
+                  setIsOpen(false);
+                }}
+                disabled={logout.isPending}
+                variant="secondary"
+                className="w-full mt-auto justify-start gap-2"
+              >
+                <LogOut size={16} />
+                {logout.isPending ? 'Logging out...' : 'Log out'}
+              </Button>
             </div>
           ) : (
             <div className="space-y-2">

@@ -440,14 +440,14 @@ export const TimeEntryRow = memo(function TimeEntryRow({
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={handleEditStart}>
+                  <DropdownMenuItem onClick={handleEditStart} className='cursor-pointer'>
                     <Edit2 size={14} />
                     Edit entry
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={handleDelete}
                     disabled={deleteEntry.isPending}
-                    className="text-destructive focus:text-destructive focus:bg-destructive/10"
+                    className="text-destructive focus:text-destructive focus:bg-destructive/10 cursor-pointer"
                   >
                     <Trash2 size={14} />
                     Delete entry

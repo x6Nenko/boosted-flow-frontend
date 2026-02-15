@@ -1,6 +1,5 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
-import { useLogout } from '@/features/auth/hooks';
 import { useActivities } from '@/features/activities/hooks';
 import { ActivityForm } from '@/features/activities/components/ActivityForm';
 import { usePomodoroState } from '@/features/pomodoro';
@@ -39,7 +38,6 @@ const PERIOD_OPTIONS = [
 
 function DashboardPage() {
   const navigate = useNavigate();
-  const logout = useLogout();
   const [period, setPeriod] = useState('7');
   const [customFrom, setCustomFrom] = useState('');
   const [customTo, setCustomTo] = useState('');
@@ -81,17 +79,7 @@ function DashboardPage() {
   if (activities.length === 0) {
     return (
       <div className="py-8">
-        <div className="mb-6 flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
-          <Button
-            onClick={() => logout.mutate()}
-            disabled={logout.isPending}
-            variant="secondary"
-            size="sm"
-          >
-            {logout.isPending ? 'Logging out...' : 'Log out'}
-          </Button>
-        </div>
+        <h1 className="mb-6 text-2xl font-bold text-foreground">Dashboard</h1>
         <div className="rounded-xl border border-border bg-card p-6">
           <h2 className="mb-3 text-base font-semibold text-foreground">Create your first activity</h2>
           <p className="mb-4 text-sm text-muted-foreground">
@@ -109,17 +97,7 @@ function DashboardPage() {
 
   return (
     <div className="py-8">
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
-        <Button
-          onClick={() => logout.mutate()}
-          disabled={logout.isPending}
-          variant="secondary"
-          size="sm"
-        >
-          {logout.isPending ? 'Logging out...' : 'Log out'}
-        </Button>
-      </div>
+      <h1 className="mb-6 text-2xl font-bold text-foreground">Dashboard</h1>
 
       {/* Current Tracking Indicator */}
       {currentEntry ? (

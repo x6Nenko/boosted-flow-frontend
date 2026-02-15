@@ -22,7 +22,7 @@ function SearchButton() {
       onClick={() => commandPaletteStore.open()}
       variant="ghost"
       size="sm"
-      className="gap-1 rounded-md"
+      className="gap-1 rounded-md max-sm:hidden"
     >
       <Search size={14} />
       <kbd className="text-xs">{isMac ? '⌘ + K' : 'Ctrl + K'}</kbd>

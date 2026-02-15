@@ -18,7 +18,7 @@ import { BreakTimer } from '@/features/pomodoro/components/BreakTimer';
 import { PomodoroTimer } from '@/features/pomodoro/components/PomodoroTimer';
 import { PomodoroSettingsModal } from '@/features/pomodoro/components/PomodoroSettingsModal';
 import { TimerDuration } from '@/features/time-entries/components/TimerDuration';
-import { TimeEntryRow } from '@/features/time-entries/components/TimeEntryRow';
+import { TimeEntryList } from '@/features/time-entries/components/TimeEntryList';
 import {
   useCurrentEntry,
   useCreateManualTimeEntry,
@@ -571,25 +571,8 @@ function ActivityPage() {
                       )}
                     </div>
 
-                {/* Break controls */}
-                {pomodoroState.isBreakActive && pomodoroState.breakStartedAt ? (
-                  <Button
-                    onClick={handleSkipBreak}
-                    variant="outline"
-                    className="w-full"
-                  >
-                    Skip Break
-                  </Button>
-                ) : (
-                  <>
-                    <Button
-                      onClick={handleStartBreak}
-                      variant="success"
-                      className="w-full"
-                    >
-                      Start Break
-                    </Button>
-                    <div className="mt-4">
+                    {/* Break controls */}
+                    {pomodoroState.isBreakActive && pomodoroState.breakStartedAt ? (
                       <Button
                         onClick={handleSkipBreak}
                         variant="outline"
@@ -597,9 +580,26 @@ function ActivityPage() {
                       >
                         Skip Break
                       </Button>
-                    </div>
-                  </>
-                )}
+                    ) : (
+                      <>
+                        <Button
+                          onClick={handleStartBreak}
+                          variant="success"
+                          className="w-full"
+                        >
+                          Start Break
+                        </Button>
+                        <div className="mt-4">
+                          <Button
+                            onClick={handleSkipBreak}
+                            variant="outline"
+                            className="w-full"
+                          >
+                            Skip Break
+                          </Button>
+                        </div>
+                      </>
+                    )}
                   </div>
                 ) : hasAnyActiveBreak ? (
                   <p className="text-sm text-muted-foreground">
@@ -781,18 +781,11 @@ function ActivityPage() {
         {entriesLoading ? (
           <p className="text-sm text-muted-foreground">Loading...</p>
         ) : entries && entries.length > 0 ? (
-          <div>
-            {entries
-              .filter((entry) => entry.stoppedAt)
-              .map((entry) => (
-                <TimeEntryRow
-                  key={entry.id}
-                  entry={entry}
-                  editable
-                  showDetails={showDetails}
-                />
-              ))}
-          </div>
+          <TimeEntryList
+            entries={entries}
+            editable
+            showDetails={showDetails}
+          />
         ) : (
           <p className="text-sm text-muted-foreground">No time entries yet.</p>
         )}

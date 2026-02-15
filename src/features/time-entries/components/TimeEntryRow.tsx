@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { memo, useState } from 'react';
 import { Link } from '@tanstack/react-router';
 import {
   Star, Trash2, Edit2, MessageSquare,
@@ -181,7 +181,7 @@ type TimeEntryRowProps = {
   showDetails?: boolean;
 };
 
-export function TimeEntryRow({
+export const TimeEntryRow = memo(function TimeEntryRow({
   entry,
   activity,
   showActivityName = false,
@@ -583,4 +583,4 @@ export function TimeEntryRow({
   );
 
   return <div className="">{activityContent}</div>;
-}
+});

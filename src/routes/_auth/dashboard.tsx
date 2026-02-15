@@ -1,11 +1,11 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useLogout } from '@/features/auth/hooks';
 import { useActivities } from '@/features/activities/hooks';
 import { ActivityForm } from '@/features/activities/components/ActivityForm';
 import { usePomodoroState } from '@/features/pomodoro';
 import { useCurrentEntry, useTimeEntries } from '@/features/time-entries/hooks';
-import { TimeEntryRow } from '@/features/time-entries/components/TimeEntryRow';
+import { TimeEntryList } from '@/features/time-entries/components/TimeEntryList';
 import { ActivityHeatmap } from '@/features/time-entries/components/ActivityHeatmap';
 import { getDateRangeForDays } from '@/features/analytics';
 import { Button } from '@/components/ui/button';
@@ -52,6 +52,11 @@ function DashboardPage() {
 
   const activities = activitiesData || [];
   const currentEntry = currentData?.entry ?? null;
+
+  const activitiesMap = useMemo(
+    () => new Map(activities.map((a) => [a.id, a])),
+    [activities],
+  );
 
   const handleActivityCreated = (id: string) => {
     navigate({ to: '/activities/$activityId', params: { activityId: id } });
@@ -174,18 +179,12 @@ function DashboardPage() {
         {entriesLoading ? (
           <p className="text-sm text-muted-foreground">Loading...</p>
         ) : entries && entries.length > 0 ? (
-          <div>
-            {entries
-              .filter((entry) => entry.stoppedAt)
-              .map((entry) => (
-                <TimeEntryRow
-                  key={entry.id}
-                  entry={entry}
-                  activity={activities.find((a) => a.id === entry.activityId)}
-                  showActivityName
-                />
-              ))}
-          </div>
+          <TimeEntryList
+            entries={entries}
+            activitiesMap={activitiesMap}
+            showActivityName
+            emptyMessage="No time entries yet. Select an activity to start tracking."
+          />
         ) : (
           <p className="text-sm text-muted-foreground">No time entries yet. Select an activity to start tracking.</p>
         )}

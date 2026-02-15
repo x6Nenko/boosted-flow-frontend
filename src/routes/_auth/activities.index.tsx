@@ -74,7 +74,9 @@ function ActivitiesPage() {
               >
                 <span className="text-foreground">{activity.name}</span>
                 {activity.archivedAt && (
-                  <span className="text-xs text-muted-foreground">(archived)</span>
+                  <span className="ml-2 rounded-full border border-yellow-500/20 bg-yellow-500/10 px-2.5 py-0.5 text-xs font-medium text-yellow-500">
+                    Archived
+                  </span>
                 )}
               </Link>
             ))}

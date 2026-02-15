@@ -45,7 +45,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { CalendarIcon, Plus, Minus, Timer, RotateCcw, Settings2 } from 'lucide-react';
+import { CalendarIcon, Plus, Minus, Timer, RotateCcw, Settings2, Edit3, Archive, Trash2, ChevronLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import {
@@ -54,6 +54,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 type TimerMode = 'stopwatch' | 'pomodoro';
 
@@ -92,6 +102,7 @@ function ActivityPage() {
   const [createStartedTime, setCreateStartedTime] = useState('');
   const [createStoppedDate, setCreateStoppedDate] = useState<Date | undefined>(new Date());
   const [createStoppedTime, setCreateStoppedTime] = useState('');
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const intentionInputRef = useRef<HTMLInputElement>(null);
 
   // Parse dates for Calendar component
@@ -352,11 +363,14 @@ function ActivityPage() {
   };
 
   const handleDelete = () => {
-    if (confirm('Delete this activity and all its time entries? This cannot be undone.')) {
-      deleteActivity.mutate(activityId, {
-        onSuccess: () => navigate({ to: '/activities' }),
-      });
-    }
+    setIsDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = () => {
+    deleteActivity.mutate(activityId, {
+      onSuccess: () => navigate({ to: '/activities' }),
+    });
+    setIsDeleteDialogOpen(false);
   };
 
   if (activityLoading) {
@@ -381,8 +395,12 @@ function ActivityPage() {
   return (
     <div className="py-8">
       <div className="mb-6">
-        <Link to="/activities" className="text-sm text-primary hover:text-primary/80">
-          ← Activities
+        <Link
+          to="/activities"
+          className="group w-fit flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <ChevronLeft className="size-4 text-muted-foreground transition-transform group-hover:-translate-x-0.5 group-hover:text-foreground" />
+          <span>Back to activities</span>
         </Link>
       </div>
 
@@ -396,25 +414,28 @@ function ActivityPage() {
               onChange={(e) => setEditName(e.target.value)}
               maxLength={255}
               className="flex-1"
+              autoFocus
             />
-            <Button
-              onClick={handleEditSave}
-              disabled={!editName.trim() || updateActivity.isPending}
-            >
-              Save
-            </Button>
             <Button
               onClick={() => setIsEditing(false)}
               variant="outline"
             >
               Cancel
             </Button>
+            <Button
+              onClick={handleEditSave}
+              disabled={!editName.trim() || updateActivity.isPending}
+            >
+              Save
+            </Button>
           </div>
         ) : (
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-bold text-foreground">{activity.name}</h1>
             {isArchived && (
-              <span className="text-xs text-muted-foreground">(archived)</span>
+              <span className="ml-2 rounded-full border border-yellow-500/20 bg-yellow-500/10 px-2.5 py-0.5 text-xs font-medium text-yellow-500">
+                Archived
+              </span>
             )}
           </div>
         )}
@@ -422,12 +443,14 @@ function ActivityPage() {
 
       {/* Activity Actions */}
       {!isEditing && (
-        <div className="mb-6 flex gap-2">
+        <div className="mb-6 flex flex-wrap gap-2">
           <Button
             onClick={handleEditStart}
             variant="outline"
             size="sm"
+            className='h-7 px-3 text-xs font-medium flex items-center gap-1.5'
           >
+            <Edit3 />
             Edit
           </Button>
           {isArchived ? (
@@ -436,7 +459,9 @@ function ActivityPage() {
               disabled={unarchiveActivity.isPending}
               variant="outline"
               size="sm"
+              className='h-7 px-3 text-xs font-medium flex items-center gap-1.5'
             >
+              <Archive />
               Unarchive
             </Button>
           ) : (
@@ -445,7 +470,9 @@ function ActivityPage() {
               disabled={archiveActivity.isPending || isRunningThisActivity || hasAnyActiveBreak}
               variant="outline"
               size="sm"
+              className='h-7 px-3 text-xs font-medium flex items-center gap-1.5'
             >
+              <Archive />
               Archive
             </Button>
           )}
@@ -454,7 +481,9 @@ function ActivityPage() {
             disabled={deleteActivity.isPending || isRunningThisActivity || hasAnyActiveBreak}
             variant="destructive"
             size="sm"
+            className='h-7 px-3 text-xs font-medium flex items-center gap-1.5'
           >
+            <Trash2 />
             Delete
           </Button>
         </div>
@@ -953,6 +982,27 @@ function ActivityPage() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Activity Alert Dialog */}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete activity?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete this activity and all its time entries.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              className="border border-destructive/30 text-destructive hover:bg-destructive/10 hover:text-destructive hover:border-destructive/50 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 bg-transparent"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

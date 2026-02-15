@@ -441,7 +441,7 @@ export const TimeEntryRow = memo(function TimeEntryRow({
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem onClick={handleEditStart}>
-                    <Edit2 size={14} className="mr-2" />
+                    <Edit2 size={14} />
                     Edit entry
                   </DropdownMenuItem>
                   <DropdownMenuItem
@@ -449,7 +449,7 @@ export const TimeEntryRow = memo(function TimeEntryRow({
                     disabled={deleteEntry.isPending}
                     className="text-destructive focus:text-destructive focus:bg-destructive/10"
                   >
-                    <Trash2 size={14} className="mr-2" />
+                    <Trash2 size={14} />
                     Delete entry
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -478,7 +478,7 @@ export const TimeEntryRow = memo(function TimeEntryRow({
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmDelete}
-              className="bg-dark-destructive/80 hover:bg-dark-destructive/90"
+              className="border border-destructive/30 text-destructive hover:bg-destructive/10 hover:text-destructive hover:border-destructive/50 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 bg-transparent"
             >
               Delete
             </AlertDialogAction>

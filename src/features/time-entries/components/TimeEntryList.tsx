@@ -65,7 +65,7 @@ const PaginationControls = memo(function PaginationControls({
   const pageNumbers = getPageNumbers(page, totalPages);
 
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-border/30 mt-4">
+    <div className="flex flex-col md:flex-row items-center justify-between gap-4 pt-4 border-t border-border/30 mt-4">
       {/* Page size selector */}
       <div className="flex items-center gap-2">
         <span className="text-xs text-muted-foreground">Rows</span>
@@ -92,7 +92,7 @@ const PaginationControls = memo(function PaginationControls({
       {/* Page navigation */}
       {totalPages > 1 && (
         <Pagination className="mx-0 w-auto">
-          <PaginationContent>
+          <PaginationContent className='flex max-sm:flex-wrap'>
             <PaginationItem>
               <PaginationPrevious
                 onClick={() => hasPrev && setPage(page - 1)}

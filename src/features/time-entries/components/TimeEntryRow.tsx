@@ -343,7 +343,7 @@ export const TimeEntryRow = memo(function TimeEntryRow({
     );
 
     return (
-      <div className="border-b border-border/40">
+      <div className="">
         <Link
           to="/activities/$activityId"
           params={{ activityId: entry.activityId }}

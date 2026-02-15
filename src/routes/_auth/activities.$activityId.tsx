@@ -481,7 +481,7 @@ function ActivityPage() {
               </p>
             ) : (
               <>
-                <div className="mb-4 flex items-center justify-between">
+                <div className="mb-4 flex max-sm:flex-col max-sm:gap-2 items-center justify-between">
                   <div className={cn("flex gap-0.5 bg-background rounded-md border border-border p-0.5", isModeControlsDisabled && "opacity-100")}>
                     <Button
                       onClick={() => setTimerMode('stopwatch')}
@@ -608,7 +608,7 @@ function ActivityPage() {
                 ) : (
                   <>
                     {/* Timer */}
-                    <div className="text-6xl font-mono font-medium tracking-tighter text-foreground mb-4 tabular-nums text-center">
+                    <div className="text-6xl max-[370px]:text-5xl font-mono font-medium tracking-tighter text-foreground mb-4 tabular-nums text-center">
                       {timerMode === 'pomodoro' ? (
                         <PomodoroTimer
                           startedAt={isRunningThisActivity ? currentEntry?.startedAt : undefined}

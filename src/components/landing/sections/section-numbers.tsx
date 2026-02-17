@@ -62,11 +62,11 @@ export function SectionNumbers() {
 
       <section className="pb-32 px-4 text-center">
         <p className="text-2xl md:text-3xl font-bold text-foreground mb-3">
-          Know yourself.{' '}
-          <span className="text-muted-foreground">Not your timesheet.</span>
+          Designed for you.{' '}
+          <span className="text-muted-foreground">Not your boss.</span>
         </p>
         <p className="text-sm text-muted-foreground/50 mb-10">
-          Designer for you. Not your boss.
+           Know yourself. Not your timesheet.
         </p>
         <Button asChild variant="primary" size="lg" className="px-8">
           <Link to="/register">Boost your flow</Link>

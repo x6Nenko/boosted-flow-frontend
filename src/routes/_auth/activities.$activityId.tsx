@@ -500,12 +500,18 @@ function ActivityPage() {
       {/* Timer Control */}
       <div className="bg-card border border-border rounded-xl p-1 shadow-sm mb-6">
         <div className="bg-background/30 rounded-lg border border-border/50 p-6 relative overflow-hidden">
-          {isRunningThisActivity && (
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-1/2 bg-primary/10 blur-3xl pointer-events-none" />
-          )}
-          {pomodoroState.isBreakActive && (
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-1/2 bg-clean/10 blur-3xl pointer-events-none" />
-          )}
+          <div
+            className={cn(
+              'absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-1/2 bg-primary/10 blur-3xl pointer-events-none transition-opacity duration-500',
+              isRunningThisActivity ? 'opacity-100' : 'opacity-0'
+            )}
+          />
+          <div
+            className={cn(
+              'absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-1/2 bg-clean/10 blur-3xl pointer-events-none transition-opacity duration-500',
+              pomodoroState.isBreakActive ? 'opacity-100' : 'opacity-0'
+            )}
+          />
 
           <div className="relative z-10">
             {isArchived ? (
@@ -518,7 +524,7 @@ function ActivityPage() {
               </p>
             ) : (
               <>
-                <div className="mb-4 flex max-sm:flex-col max-sm:gap-2 items-center justify-between">
+                <div className="mb-8 flex max-sm:flex-col max-sm:gap-2 items-center justify-between">
                   <div className={cn("flex gap-0.5 bg-background rounded-md border border-border p-0.5", isModeControlsDisabled && "opacity-100")}>
                     <Button
                       onClick={() => setTimerMode('stopwatch')}
@@ -645,7 +651,7 @@ function ActivityPage() {
                 ) : (
                   <>
                     {/* Timer */}
-                    <div className="text-6xl max-[370px]:text-5xl font-mono font-medium tracking-tighter text-foreground mb-4 tabular-nums text-center">
+                    <div className="text-6xl max-[370px]:text-5xl font-mono font-medium tracking-tighter text-foreground mb-8 tabular-nums text-center">
                       {timerMode === 'pomodoro' ? (
                         <PomodoroTimer
                           startedAt={isRunningThisActivity ? currentEntry?.startedAt : undefined}

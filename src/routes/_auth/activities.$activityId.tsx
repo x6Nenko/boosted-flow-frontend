@@ -64,6 +64,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { setAppTitle } from '@/lib/page-title';
 
 type TimerMode = 'stopwatch' | 'pomodoro';
 
@@ -123,6 +124,13 @@ function ActivityPage() {
   }, [timerMode, activityId]);
 
   const { data: activity, isLoading: activityLoading } = useActivity(activityId);
+
+  useEffect(() => {
+    if (activity?.name) {
+      setAppTitle(activity.name);
+    }
+  }, [activity?.name]);
+
   const { data: currentData } = useCurrentEntry();
   const dateRange =
     period === 'custom'

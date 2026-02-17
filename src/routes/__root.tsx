@@ -1,10 +1,12 @@
-import { Outlet, createRootRouteWithContext } from '@tanstack/react-router'
+import { Outlet, createRootRouteWithContext, useLocation } from '@tanstack/react-router'
+import { useEffect } from 'react'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 
 import Header from '../components/Header'
 import { CommandPalette } from '@/features/command-palette'
 import { useGlobalHotkeys } from '@/features/hotkeys'
+import { getDocumentTitleForPath } from '@/lib/page-title'
 
 import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
 
@@ -15,7 +17,13 @@ interface MyRouterContext {
 }
 
 function RootComponent() {
+  const { pathname } = useLocation();
+
   useGlobalHotkeys();
+
+  useEffect(() => {
+    document.title = getDocumentTitleForPath(pathname);
+  }, [pathname]);
 
   return (
     <div className="min-h-screen bg-background">

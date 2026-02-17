@@ -1,6 +1,7 @@
 {
-  "short_name": "TanStack App",
-  "name": "Create TanStack App Sample",
+  "short_name": "Boosted Flow",
+  "name": "Boosted Flow",
+  "description": "Boosted Flow helps solo developers, freelancers, and ADHD brains stay focused with dead simple time tracking.",
   "icons": [
     {
       "src": "favicon.ico",

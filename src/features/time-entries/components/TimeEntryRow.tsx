@@ -51,7 +51,7 @@ function RatingStars({
   const [hoverValue, setHoverValue] = useState<number | null>(null);
 
   return (
-    <div className="flex">
+    <div className="flex -ml-[5px]">
       {[1, 2, 3, 4, 5].map((star) => (
         <Button
           key={star}
@@ -366,11 +366,11 @@ export const TimeEntryRow = memo(function TimeEntryRow({
     <div className={cn(
       "group/row relative rounded-lg border border-transparent transition-all duration-200",
       "border-border/50 mb-2",
-      "hover:bg-secondary/50 hover:border-border/40 px-4",
+      "hover:bg-secondary/50 hover:border-border/40 max-sm:px-2 px-4",
       isDetailsOpen && "bg-secondary/50 border-border/40"
     )}>
       {/* Line 1: Date/time + actions + duration */}
-      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center max-sm:py-4 py-2 gap-x-2 gap-y-2 min-[861px]:flex min-[861px]:items-center min-[861px]:justify-between min-[861px]:gap-2">
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center py-2 gap-x-2 gap-y-2 min-[861px]:flex min-[861px]:items-center min-[861px]:justify-between min-[861px]:gap-2">
         <div className="flex max-[440px]:flex-col max-sm:mb-auto max-sm:items-start items-center gap-3 max-sm:gap-2 text-sm text-muted-foreground font-mono min-w-0 col-start-1 row-start-1 min-[861px]:col-auto min-[861px]:row-auto">
           <span className="flex items-center gap-1.5">
             <CalendarIcon size={14} className="opacity-60" />

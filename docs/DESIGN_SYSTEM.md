@@ -70,7 +70,22 @@ Source: `lucide-react`. Default stroke: `2px`.
 | `24px` | 1.5px | Feature icons, cards |
 | `48px` | 1.5px | Hero icons, streak indicators |
 
-## 7. Animation & Motion
+## 7. Loading Skeletons
+**Component:** `Skeleton` from `@/components/ui/skeleton`. Base: `bg-accent animate-pulse rounded-md`.
+
+| Pattern | Usage |
+|---------|-------|
+| **Page skeleton** | `Skeleton` for H1 (`h-8 w-40`) + card shells with inner skeletons. Mirrors the page layout. |
+| **List skeleton** | 3–4 row skeletons (`h-12 w-full rounded-lg`) inside `space-y-3`. |
+| **Metric skeleton** | Card shell + `Skeleton` for label (`h-4 w-20`) and value (`h-9 w-24`). |
+| **Heatmap skeleton** | Title skeleton + full-width block (`h-[120px]`) + legend row of small squares. |
+
+**Rules:**
+- Match skeleton shapes to the content they replace (height, width, border-radius).
+- Use `rounded-lg` for list rows, `rounded-md` for inputs/buttons, `rounded-sm` for small elements.
+- Prefer 3 placeholder rows for lists; 6 cards for metric grids.
+
+## 8. Animation & Motion
 **Rule:** Feedback < 200ms. Transitions < 300ms.
 
 | Token | Value | Usage |
@@ -81,7 +96,7 @@ Source: `lucide-react`. Default stroke: `2px`.
 | `ease-out` | cubic-bezier(0, 0, 0.2, 1) | Standard for incoming elements |
 | `ease-in-out` | cubic-bezier(0.4, 0, 0.2, 1) | Symmetric transitions (toggles) |
 
-## 8. Border Radius Hierarchy
+## 9. Border Radius Hierarchy
 
 | Token | Value | Usage |
 |-------|-------|-------|
@@ -91,7 +106,7 @@ Source: `lucide-react`. Default stroke: `2px`.
 | `rounded-sm` | 2px | Heatmap cells, tiny elements |
 | `rounded-full` | 9999px | Pills, avatars, circular buttons |
 
-## 9. Primitives Reference
+## 10. Primitives Reference
 *New primitives must use `cn()` for class merging and `forwardRef` for DOM refs.*
 
 * **GlassContainer:** Floating wrapper. `bg-surface-low/80 backdrop-blur-md border border-border rounded-2xl`.

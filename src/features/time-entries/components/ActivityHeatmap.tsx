@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { Flame } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useTimeEntries } from '../hooks';
 import { buildHeatmapData, calculateCurrentStreak } from './activity-heatmap.utils';
 
@@ -49,7 +50,19 @@ export function ActivityHeatmap() {
   );
 
   if (isLoading) {
-    return <div className="text-sm text-muted-foreground">Loading...</div>;
+    return (
+      <div>
+        <Skeleton className="h-5 w-20 mb-6" />
+        <Skeleton className="h-[120px] w-full rounded-md" />
+        <div className="flex items-center gap-1 mt-2">
+          <Skeleton className="h-3 w-8" />
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Skeleton key={i} className="rounded-sm" style={{ width: CELL_SIZE, height: CELL_SIZE }} />
+          ))}
+          <Skeleton className="h-3 w-8" />
+        </div>
+      </div>
+    );
   }
 
   return (

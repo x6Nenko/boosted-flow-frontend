@@ -46,6 +46,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { CalendarIcon, Plus, Minus, Timer, RotateCcw, Settings2, Edit3, Archive, Trash2, ChevronLeft } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import {
@@ -384,7 +385,21 @@ function ActivityPage() {
   if (activityLoading) {
     return (
       <div className="py-8">
-        <p className="text-sm text-muted-foreground">Loading...</p>
+        <Skeleton className="h-4 w-32 mb-6" />
+        <Skeleton className="h-8 w-48 mb-6" />
+        <div className="flex gap-2 mb-6">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Skeleton key={i} className="h-7 w-20 rounded-md" />
+          ))}
+        </div>
+        <div className="rounded-xl border border-border bg-card max-sm:p-4 p-6">
+          <Skeleton className="h-5 w-28 mb-4" />
+          <div className="space-y-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <Skeleton key={i} className="h-12 w-full rounded-lg" />
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
@@ -822,7 +837,11 @@ function ActivityPage() {
           </div>
         )}
         {entriesLoading ? (
-          <p className="text-sm text-muted-foreground">Loading...</p>
+          <div className="space-y-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <Skeleton key={i} className="h-12 w-full rounded-lg" />
+            ))}
+          </div>
         ) : entries && entries.length > 0 ? (
           <TimeEntryList
             entries={entries}

@@ -21,6 +21,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -127,7 +128,14 @@ function AnalyticsPage() {
       </div>
 
       {isLoading ? (
-        <p className="text-sm text-muted-foreground">Loading...</p>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="rounded-xl border border-border bg-card max-sm:p-4 p-6">
+              <Skeleton className="h-4 w-20 mb-2" />
+              <Skeleton className="h-9 w-24" />
+            </div>
+          ))}
+        </div>
       ) : !analytics ? (
         <p className="text-sm text-muted-foreground">No data</p>
       ) : (

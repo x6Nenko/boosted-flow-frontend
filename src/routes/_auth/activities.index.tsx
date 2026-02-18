@@ -4,6 +4,7 @@ import { useActivities } from '@/features/activities/hooks';
 import { ActivityForm } from '@/features/activities/components/ActivityForm';
 import { useRegisterCommands } from '@/features/command-palette';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export const Route = createFileRoute('/_auth/activities/')({
   component: ActivitiesPage,
@@ -36,7 +37,19 @@ function ActivitiesPage() {
   if (isLoading) {
     return (
       <div className="py-8">
-        <p className="text-sm text-muted-foreground">Loading...</p>
+        <Skeleton className="h-8 w-32 mb-6" />
+        <div className="rounded-xl border border-border bg-card max-sm:p-4 p-6 mb-6">
+          <Skeleton className="h-5 w-32 mb-4" />
+          <Skeleton className="h-10 w-full rounded-md" />
+        </div>
+        <div className="rounded-xl border border-border bg-card max-sm:p-4 p-6">
+          <Skeleton className="h-5 w-28 mb-4" />
+          <div className="space-y-2">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <Skeleton key={i} className="h-12 w-full rounded-lg" />
+            ))}
+          </div>
+        </div>
       </div>
     );
   }

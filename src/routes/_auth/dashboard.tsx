@@ -23,6 +23,7 @@ import {
 } from '@/components/ui/popover';
 import { CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export const Route = createFileRoute('/_auth/dashboard')({
   component: DashboardPage,
@@ -70,7 +71,19 @@ function DashboardPage() {
   if (activitiesLoading) {
     return (
       <div className="py-8">
-        <p className="text-sm text-muted-foreground">Loading...</p>
+        <Skeleton className="h-8 w-40 mb-6" />
+        <div className="rounded-xl border border-border bg-card max-sm:p-4 p-6 mb-6">
+          <Skeleton className="h-5 w-20 mb-6" />
+          <Skeleton className="h-[120px] w-full rounded-md" />
+        </div>
+        <div className="rounded-xl border border-border bg-card max-sm:p-4 p-6">
+          <Skeleton className="h-5 w-32 mb-4" />
+          <div className="space-y-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <Skeleton key={i} className="h-12 w-full rounded-lg" />
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
@@ -200,7 +213,11 @@ function DashboardPage() {
           </div>
         )}
         {entriesLoading ? (
-          <p className="text-sm text-muted-foreground">Loading...</p>
+          <div className="space-y-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <Skeleton key={i} className="h-12 w-full rounded-lg" />
+            ))}
+          </div>
         ) : entries && entries.length > 0 ? (
           <TimeEntryList
             entries={entries}

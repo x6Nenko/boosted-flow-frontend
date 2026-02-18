@@ -42,6 +42,7 @@ src/routes/_auth/
 2. Cache key: `['activities', { includeArchived }]`
 3. Returns `Activity[]` — sorted by `createdAt DESC` from backend
 4. 60min `staleTime` — activities rarely change
+5. Dashboard & analytics pass `includeArchived: true` — ensures historical time entries resolve to correct names
 
 ### **Loading Single Activity**
 1. `useActivity(id)` fetches `GET /activities/:id`

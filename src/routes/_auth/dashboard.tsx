@@ -42,7 +42,7 @@ function DashboardPage() {
   const [period, setPeriod] = useState('7');
   const [customFrom, setCustomFrom] = useState('');
   const [customTo, setCustomTo] = useState('');
-  const { data: activitiesData, isLoading: activitiesLoading } = useActivities();
+  const { data: activitiesData, isLoading: activitiesLoading } = useActivities(true);
   const { data: currentData } = useCurrentEntry();
 
   const dateRange =

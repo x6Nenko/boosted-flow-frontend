@@ -39,7 +39,7 @@ function AnalyticsPage() {
   const fromDate = from ? new Date(from) : undefined;
   const toDate = to ? new Date(to) : undefined;
 
-  const { data: activities } = useActivities();
+  const { data: activities } = useActivities(true);
   const { data: analytics, isLoading } = useAnalytics({
     from: from ? new Date(from).toISOString() : undefined,
     to: to ? new Date(to + 'T23:59:59').toISOString() : undefined,

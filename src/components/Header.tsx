@@ -105,11 +105,11 @@ export default function Header() {
             </>
           ) : (
             <>
-              <Button asChild variant="tertiary" className="hidden sm:block font-bold">
+              <Button asChild variant="tertiary" className="hidden md:block font-bold">
                 <NavLink to="/login">Log in</NavLink>
               </Button>
 
-              <Button asChild variant="primary" className="hidden sm:inline-flex">
+              <Button asChild variant="primary" className="hidden md:inline-flex">
                 <Link to="/register">Get Started</Link>
               </Button>
             </>

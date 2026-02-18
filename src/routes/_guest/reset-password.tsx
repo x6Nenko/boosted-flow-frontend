@@ -13,7 +13,7 @@ function ResetPasswordPage() {
 
   if (!token) {
     return (
-      <div className="flex min-h-[calc(100vh-200px)] items-center justify-center px-4 py-12">
+      <div className="flex min-h-[calc(100vh-200px)] items-center justify-center max-sm:px-2 px-4 py-12">
         <div className="w-full max-w-md space-y-8 text-center">
           <h1 className="text-2xl font-bold text-foreground">Invalid reset link</h1>
           <p className="text-muted-foreground">This password reset link is invalid or has expired.</p>
@@ -26,7 +26,7 @@ function ResetPasswordPage() {
   }
 
   return (
-    <div className="flex min-h-[calc(100vh-200px)] items-center justify-center px-4 py-12">
+    <div className="flex min-h-[calc(100vh-200px)] items-center justify-center max-sm:px-2 px-4 py-12">
       <ResetPasswordForm token={token} />
     </div>
   );

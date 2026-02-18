@@ -62,7 +62,7 @@ function AnalyticsPage() {
       <h1 className="text-2xl font-bold text-foreground mb-6">Analytics</h1>
 
       {/* Filters */}
-      <div className="rounded-xl border border-border bg-card p-6 mb-6">
+      <div className="rounded-xl border border-border bg-card max-sm:p-4 p-6 mb-6">
         <h2 className="text-base font-semibold text-foreground mb-4">Filters</h2>
         <div className="flex max-sm:flex-col flex-wrap gap-4">
           <div>
@@ -175,7 +175,7 @@ function AnalyticsPage() {
 
           {/* Time by Activity */}
           {activityId === 'all' && Object.keys(analytics.timeByActivity).length > 0 && (
-            <div className="rounded-xl border border-border bg-card p-6 mb-6">
+            <div className="rounded-xl border border-border bg-card max-sm:p-4 p-6 mb-6">
               <h2 className="text-base font-semibold text-foreground mb-4">
                 Time per Activity
               </h2>
@@ -198,7 +198,7 @@ function AnalyticsPage() {
 
           {/* Peak Hours Breakdown */}
           {Object.keys(analytics.peakHours).length > 0 && (
-            <div className="rounded-xl border border-border bg-card p-6">
+            <div className="rounded-xl border border-border bg-card max-sm:p-4 p-6">
               <h2 className="text-base font-semibold text-foreground mb-4">
                 Hours Breakdown
               </h2>
@@ -246,7 +246,7 @@ function MetricCard({
   subtitle?: string;
 }) {
   return (
-    <div className="rounded-xl border border-border bg-card p-6">
+    <div className="rounded-xl border border-border bg-card max-sm:p-4 p-6">
       <p className="text-sm text-muted-foreground">{label}</p>
       <p className="text-3xl font-bold text-foreground mt-1">{value}</p>
       {subtitle && <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>}

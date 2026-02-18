@@ -59,7 +59,7 @@ export function ForgotPasswordForm() {
         </p>
       </div>
 
-      <form className="mt-8 space-y-6 rounded-xl border border-border bg-card p-8" onSubmit={handleSubmit(onSubmit)}>
+      <form className="mt-8 space-y-6 rounded-xl border border-border bg-card max-sm:p-6 p-8" onSubmit={handleSubmit(onSubmit)}>
         <div>
           <Label htmlFor="email" className="sr-only">
             Email address

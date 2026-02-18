@@ -80,7 +80,7 @@ function DashboardPage() {
     return (
       <div className="py-8">
         <h1 className="mb-6 text-2xl font-bold text-foreground">Dashboard</h1>
-        <div className="rounded-xl border border-border bg-card p-6">
+        <div className="rounded-xl border border-border bg-card max-sm:p-4 p-6">
           <h2 className="mb-3 text-base font-semibold text-foreground">Create your first activity</h2>
           <p className="mb-4 text-sm text-muted-foreground">
             Activities are things you want to track time on.
@@ -126,12 +126,12 @@ function DashboardPage() {
       ) : null}
 
       {/* Activity Heatmap */}
-      <div className="rounded-xl border border-border bg-card p-6 mb-6">
+      <div className="rounded-xl border border-border bg-card max-sm:p-4 p-6 mb-6">
         <ActivityHeatmap />
       </div>
 
       {/* Recent Entries */}
-      <div className="rounded-xl border border-border bg-card p-6">
+      <div className="rounded-xl border border-border bg-card max-sm:p-4 p-6">
         <div className="mb-4 flex max-sm:flex-col max-sm:gap-4 sm:items-center justify-between">
           <h2 className="text-base font-semibold text-foreground">Recent Entries</h2>
           <Select

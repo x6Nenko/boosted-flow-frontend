@@ -28,7 +28,7 @@ function RootComponent() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="mx-auto w-full max-w-[1200px] px-4">
+      <main className="mx-auto w-full max-w-[1200px] max-sm:px-2 px-4">
         <Outlet />
       </main>
       <CommandPalette />

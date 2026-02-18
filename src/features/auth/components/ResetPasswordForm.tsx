@@ -63,7 +63,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
         </p>
       </div>
 
-      <form className="mt-8 space-y-6 rounded-xl border border-border bg-card p-8" onSubmit={handleSubmit(onSubmit)}>
+      <form className="mt-8 space-y-6 rounded-xl border border-border bg-card max-sm:p-6 p-8" onSubmit={handleSubmit(onSubmit)}>
         <div className="space-y-4">
           <div>
             <Label htmlFor="password" className="sr-only">

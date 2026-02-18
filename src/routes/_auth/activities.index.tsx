@@ -46,13 +46,13 @@ function ActivitiesPage() {
       <h1 className="text-2xl font-bold text-foreground mb-6">Activities</h1>
 
       {/* Create Activity */}
-      <div className="rounded-xl border border-border bg-card p-6 mb-6">
+      <div className="rounded-xl border border-border bg-card max-sm:p-4 p-6 mb-6">
         <h2 className="mb-4 text-base font-semibold text-foreground">Create Activity</h2>
         <ActivityForm onCreated={handleActivityCreated} />
       </div>
 
       {/* Activities List */}
-      <div className="rounded-xl border border-border bg-card p-6">
+      <div className="rounded-xl border border-border bg-card max-sm:p-4 p-6">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-base font-semibold text-foreground">All Activities</h2>
           <label className="flex items-center gap-2 text-sm text-muted-foreground">

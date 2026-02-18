@@ -499,7 +499,7 @@ function ActivityPage() {
 
       {/* Timer Control */}
       <div className="bg-card border border-border rounded-xl p-1 shadow-sm mb-6">
-        <div className="bg-background/30 rounded-lg border border-border/50 p-6 relative overflow-hidden">
+        <div className="bg-background/30 rounded-lg border border-border/50 max-sm:p-4 p-6 relative overflow-hidden">
           <div
             className={cn(
               'absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-1/2 bg-primary/10 blur-3xl pointer-events-none transition-opacity duration-500',
@@ -730,7 +730,7 @@ function ActivityPage() {
       <PomodoroSettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} />
 
       {/* Entries List */}
-      <div className="rounded-xl border border-border bg-card p-6">
+      <div className="rounded-xl border border-border bg-card max-sm:p-4 p-6">
         <div className="mb-4 flex max-sm:flex-col gap-y-4 items-center justify-between">
           <div className="flex items-center gap-2 max-sm:w-full max-sm:justify-between sm:mr-auto">
             <h2 className="text-base font-semibold text-foreground">History</h2>

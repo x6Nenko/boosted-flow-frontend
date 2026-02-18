@@ -6,8 +6,8 @@ import { resetPasswordSchema } from '@/features/auth/auth.schema';
 import { useResetPassword } from '@/features/auth/hooks';
 import { ApiError } from '@/lib/api-client';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { PasswordInput } from '@/components/primitives/password-input';
 
 type ResetPasswordFormProps = {
   token: string;
@@ -69,9 +69,8 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
             <Label htmlFor="password" className="sr-only">
               New Password
             </Label>
-            <Input
+            <PasswordInput
               id="password"
-              type="password"
               autoComplete="new-password"
               placeholder="New password (8-72 characters)"
               className="focus-visible:border-white/50 focus-visible:outline-white/50"
@@ -85,9 +84,8 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
             <Label htmlFor="confirmPassword" className="sr-only">
               Confirm Password
             </Label>
-            <Input
+            <PasswordInput
               id="confirmPassword"
-              type="password"
               autoComplete="new-password"
               placeholder="Confirm new password"
               className="focus-visible:border-white/50 focus-visible:outline-white/50"

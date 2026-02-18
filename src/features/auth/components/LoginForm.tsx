@@ -8,6 +8,7 @@ import { ApiError } from '@/lib/api-client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { PasswordInput } from '@/components/primitives/password-input';
 
 import { GoogleSignInButton } from './GoogleSignInButton';
 
@@ -60,9 +61,8 @@ export function LoginForm() {
             <Label htmlFor="password" className="sr-only">
               Password
             </Label>
-            <Input
+            <PasswordInput
               id="password"
-              type="password"
               autoComplete="current-password"
               placeholder="Password"
               className="focus-visible:border-white/50 focus-visible:outline-white/50"

@@ -57,7 +57,7 @@ function AuthCallbackPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center">
-      <p>Completing sign in...</p>
+      <p>Just a moment more...</p>
     </div>
   );
 }

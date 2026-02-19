@@ -1,3 +1,5 @@
+import { useRef, useState } from 'react';
+import { Turnstile, type TurnstileInstance } from '@marsidev/react-turnstile';
 import { NavLink } from '@/components/primitives/nav-link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -11,6 +13,8 @@ import { Label } from '@/components/ui/label';
 
 export function ForgotPasswordForm() {
   const forgotPassword = useForgotPassword();
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const turnstileRef = useRef<TurnstileInstance>(null);
   const {
     register: registerField,
     handleSubmit,
@@ -19,8 +23,14 @@ export function ForgotPasswordForm() {
     resolver: zodResolver(forgotPasswordSchema),
   });
 
-  const onSubmit = (data: ForgotPasswordFormData) => {
-    forgotPassword.mutate(data);
+  const onSubmit = async (data: ForgotPasswordFormData) => {
+    if (!turnstileToken) return;
+    try {
+      await forgotPassword.mutateAsync({ ...data, turnstileToken });
+    } catch {
+      turnstileRef.current?.reset();
+      setTurnstileToken(null);
+    }
   };
 
   const apiErrorMessage =
@@ -83,11 +93,22 @@ export function ForgotPasswordForm() {
           </div>
         )}
 
+        <div className="w-fit mx-auto">
+          <Turnstile
+            ref={turnstileRef}
+            siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY}
+            onSuccess={setTurnstileToken}
+            onExpire={() => setTurnstileToken(null)}
+            onError={() => setTurnstileToken(null)}
+            options={{ theme: 'dark', size: 'flexible', appearance: 'interaction-only' }}
+          />
+        </div>
+
         <div>
           <Button
             type="submit"
             variant="primary"
-            disabled={isSubmitting || forgotPassword.isPending}
+            disabled={isSubmitting || forgotPassword.isPending || !turnstileToken}
             className="w-full cursor-pointer"
           >
             {forgotPassword.isPending ? 'Sending...' : 'Send reset link'}

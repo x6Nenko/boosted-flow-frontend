@@ -139,6 +139,15 @@ src/
 - **Client-side validation**: Email format, password requirements, confirmation matching
 - **Server-side error display**: Extracted from `ApiError.data.message`
 
+### **Turnstile CAPTCHA**
+- **Package**: `@marsidev/react-turnstile` — Cloudflare's recommended React wrapper
+- **Protected forms**: Login, Register, Forgot Password, Reset Password
+- **Token flow**: Widget auto-solves → token stored in component state → sent as `turnstileToken` in request body → backend validates via Cloudflare API
+- **Widget config**: Dark theme, flexible size, `appearance: 'interaction-only'` — renders invisibly and only shows a challenge when Cloudflare requires human verification; each widget is wrapped in `<div className="w-full">` so `size: 'flexible'` (100% of container) works correctly when the widget surfaces
+- **Submit gating**: Button disabled until Turnstile token is available
+- **Error recovery**: Widget resets on submission failure (`mutateAsync` + catch), token cleared on expiry/error
+- **Dev testing**: Use Cloudflare's always-pass site key `1x00000000000000000000AA` with secret `1x0000000000000000000000000000000AA`
+
 ### **Auth Patterns**
 - **Dual-token strategy**: Access token (in-memory, short-lived) + Refresh token (HttpOnly cookie, long-lived)
 - **Pub-sub reactivity**: `authStore.subscribe()` for cross-component updates
@@ -302,6 +311,7 @@ void | throws redirect({ to: '/' })
 ### **Environment Config**
 - `VITE_API_URL` in `.env.development` / `.env.production`
 - Fallback: `http://localhost:3000`
+- `VITE_TURNSTILE_SITE_KEY` — Cloudflare Turnstile site key (required for CAPTCHA)
 - Accessed via `import.meta.env.VITE_API_URL`
 
 ### **QueryClient Integration**
@@ -315,3 +325,10 @@ void | throws redirect({ to: '/' })
 - **Code consumed immediately** - `exchangeCode` mutation called on mount, code deleted on backend after use
 - **Error handling** - OAuth errors redirect to login page with error display
 - **Google branding** - `GoogleSignInButton` follows Google's identity branding guidelines
+
+### **Turnstile CAPTCHA Rules**
+- **Token is NOT in Zod schemas** — captured programmatically, not user input
+- **Token is single-use** — backend consumes it; widget must reset on failure for retry
+- **No custom hook extraction** — integration is trivial per-form wiring (state + ref + widget)
+- **Google OAuth bypasses CAPTCHA** — OAuth flow has its own bot protection
+- **Always-pass keys for dev** — Site key: `1x00000000000000000000AA`, Secret: `1x0000000000000000000000000000000AA`

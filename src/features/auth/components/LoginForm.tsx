@@ -1,3 +1,5 @@
+import { useRef, useState } from 'react';
+import { Turnstile, type TurnstileInstance } from '@marsidev/react-turnstile';
 import { NavLink } from '@/components/primitives/nav-link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -14,6 +16,8 @@ import { GoogleSignInButton } from './GoogleSignInButton';
 
 export function LoginForm() {
   const login = useLogin();
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const turnstileRef = useRef<TurnstileInstance>(null);
   const {
     register: registerField,
     handleSubmit,
@@ -22,8 +26,14 @@ export function LoginForm() {
     resolver: zodResolver(loginSchema),
   });
 
-  const onSubmit = (data: LoginFormData) => {
-    login.mutate(data);
+  const onSubmit = async (data: LoginFormData) => {
+    if (!turnstileToken) return;
+    try {
+      await login.mutateAsync({ ...data, turnstileToken });
+    } catch {
+      turnstileRef.current?.reset();
+      setTurnstileToken(null);
+    }
   };
 
   const apiErrorMessage =
@@ -86,11 +96,22 @@ export function LoginForm() {
           </div>
         )}
 
+        <div className="w-fit mx-auto">
+          <Turnstile
+            ref={turnstileRef}
+            siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY}
+            onSuccess={setTurnstileToken}
+            onExpire={() => setTurnstileToken(null)}
+            onError={() => setTurnstileToken(null)}
+            options={{ theme: 'dark', size: 'flexible', appearance: 'interaction-only' }}
+          />
+        </div>
+
         <div>
           <Button
             type="submit"
             variant="primary"
-            disabled={isSubmitting || login.isPending}
+            disabled={isSubmitting || login.isPending || !turnstileToken}
             className="w-full cursor-pointer"
           >
             {login.isPending ? 'Signing in...' : 'Sign in'}

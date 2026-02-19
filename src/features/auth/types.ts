@@ -11,11 +11,13 @@ export type MessageResponse = {
 export type LoginRequest = {
   email: string;
   password: string;
+  turnstileToken: string;
 };
 
 export type RegisterRequest = {
   email: string;
   password: string;
+  turnstileToken: string;
 };
 
 export type ExchangeCodeRequest = {
@@ -24,11 +26,13 @@ export type ExchangeCodeRequest = {
 
 export type ForgotPasswordRequest = {
   email: string;
+  turnstileToken: string;
 };
 
 export type ResetPasswordRequest = {
   token: string;
   password: string;
+  turnstileToken: string;
 };
 
 // Auth State

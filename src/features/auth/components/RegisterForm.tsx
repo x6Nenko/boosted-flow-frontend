@@ -1,3 +1,5 @@
+import { useRef, useState } from 'react';
+import { Turnstile, type TurnstileInstance } from '@marsidev/react-turnstile';
 import { NavLink } from '@/components/primitives/nav-link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -14,6 +16,8 @@ import { GoogleSignInButton } from './GoogleSignInButton';
 
 export function RegisterForm() {
   const register = useRegister();
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const turnstileRef = useRef<TurnstileInstance>(null);
   const {
     register: registerField,
     handleSubmit,
@@ -22,8 +26,14 @@ export function RegisterForm() {
     resolver: zodResolver(registerSchema),
   });
 
-  const onSubmit = (data: RegisterFormData) => {
-    register.mutate({ email: data.email, password: data.password });
+  const onSubmit = async (data: RegisterFormData) => {
+    if (!turnstileToken) return;
+    try {
+      await register.mutateAsync({ email: data.email, password: data.password, turnstileToken });
+    } catch {
+      turnstileRef.current?.reset();
+      setTurnstileToken(null);
+    }
   };
 
   const apiErrorMessage =
@@ -95,11 +105,22 @@ export function RegisterForm() {
           </div>
         )}
 
+        <div className="w-fit mx-auto">
+          <Turnstile
+            ref={turnstileRef}
+            siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY}
+            onSuccess={setTurnstileToken}
+            onExpire={() => setTurnstileToken(null)}
+            onError={() => setTurnstileToken(null)}
+            options={{ theme: 'dark', size: 'flexible', appearance: 'interaction-only' }}
+          />
+        </div>
+
         <div>
           <Button
             type="submit"
             variant="primary"
-            disabled={isSubmitting || register.isPending}
+            disabled={isSubmitting || register.isPending || !turnstileToken}
             className="w-full cursor-pointer"
           >
             {register.isPending ? 'Creating account...' : 'Register'}

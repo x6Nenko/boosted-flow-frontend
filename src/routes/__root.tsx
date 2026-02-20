@@ -4,6 +4,7 @@ import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 
 import Header from '../components/Header'
+import Footer from '../components/Footer'
 import { CommandPalette } from '@/features/command-palette'
 import { useGlobalHotkeys } from '@/features/hotkeys'
 import { getDocumentTitleForPath } from '@/lib/page-title'
@@ -26,11 +27,12 @@ function RootComponent() {
   }, [pathname]);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       <Header />
-      <main className="mx-auto w-full max-w-[1200px] max-sm:px-2 px-4">
+      <main className="mx-auto w-full max-w-[1200px] max-sm:px-2 px-4 flex-1">
         <Outlet />
       </main>
+      <Footer />
       <CommandPalette />
       <TanStackDevtools
         config={{

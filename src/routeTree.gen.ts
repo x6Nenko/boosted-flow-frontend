@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as LegalRouteImport } from './routes/legal'
 import { Route as GuestRouteImport } from './routes/_guest'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as IndexRouteImport } from './routes/index'
@@ -22,6 +23,11 @@ import { Route as AuthAnalyticsRouteImport } from './routes/_auth/analytics'
 import { Route as AuthActivitiesIndexRouteImport } from './routes/_auth/activities.index'
 import { Route as AuthActivitiesActivityIdRouteImport } from './routes/_auth/activities.$activityId'
 
+const LegalRoute = LegalRouteImport.update({
+  id: '/legal',
+  path: '/legal',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GuestRoute = GuestRouteImport.update({
   id: '/_guest',
   getParentRoute: () => rootRouteImport,
@@ -84,6 +90,7 @@ const AuthActivitiesActivityIdRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/legal': typeof LegalRoute
   '/analytics': typeof AuthAnalyticsRoute
   '/dashboard': typeof AuthDashboardRoute
   '/forgot-password': typeof GuestForgotPasswordRoute
@@ -96,6 +103,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/legal': typeof LegalRoute
   '/analytics': typeof AuthAnalyticsRoute
   '/dashboard': typeof AuthDashboardRoute
   '/forgot-password': typeof GuestForgotPasswordRoute
@@ -111,6 +119,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_auth': typeof AuthRouteWithChildren
   '/_guest': typeof GuestRouteWithChildren
+  '/legal': typeof LegalRoute
   '/_auth/analytics': typeof AuthAnalyticsRoute
   '/_auth/dashboard': typeof AuthDashboardRoute
   '/_guest/forgot-password': typeof GuestForgotPasswordRoute
@@ -125,6 +134,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/legal'
     | '/analytics'
     | '/dashboard'
     | '/forgot-password'
@@ -137,6 +147,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/legal'
     | '/analytics'
     | '/dashboard'
     | '/forgot-password'
@@ -151,6 +162,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_auth'
     | '/_guest'
+    | '/legal'
     | '/_auth/analytics'
     | '/_auth/dashboard'
     | '/_guest/forgot-password'
@@ -166,11 +178,19 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRouteWithChildren
   GuestRoute: typeof GuestRouteWithChildren
+  LegalRoute: typeof LegalRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/legal': {
+      id: '/legal'
+      path: '/legal'
+      fullPath: '/legal'
+      preLoaderRoute: typeof LegalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_guest': {
       id: '/_guest'
       path: ''
@@ -294,6 +314,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRouteWithChildren,
   GuestRoute: GuestRouteWithChildren,
+  LegalRoute: LegalRoute,
   AuthCallbackRoute: AuthCallbackRoute,
 }
 export const routeTree = rootRouteImport

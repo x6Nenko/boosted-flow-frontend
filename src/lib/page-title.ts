@@ -9,6 +9,7 @@ const STATIC_PAGE_LABELS: Record<string, string> = {
   '/forgot-password': 'Forgot Password',
   '/reset-password': 'Reset Password',
   '/auth/callback': 'Auth Callback',
+  '/legal': 'Legal & Policies',
 };
 
 export function formatAppTitle(pageLabel?: string): string {

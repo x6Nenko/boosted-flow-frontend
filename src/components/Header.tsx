@@ -13,6 +13,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet'
 
 function SearchButton() {
   const [isMac, setIsMac] = useState(false);
@@ -129,72 +136,59 @@ export default function Header() {
       </GlassContainer>
 
       {/* Mobile Sidebar */}
-      <aside
-        className={`fixed top-0 left-0 h-full w-64 bg-background border-r border-border shadow-xl z-60 transform transition-transform duration-200 flex flex-col md:hidden ${isOpen ? 'translate-x-0' : '-translate-x-full'
-          }`}
-      >
-        <div className="flex items-center justify-between p-4 border-b border-border">
-          <span className="font-semibold text-foreground">Menu</span>
-          <Button
-            onClick={() => setIsOpen(false)}
-            variant="ghost"
-            size="icon-sm"
-            className="hover:text-cream"
-            aria-label="Close menu"
-          >
-            <X size={20} />
-          </Button>
-        </div>
-
-        <nav className="flex-1 p-4">
-          {isAuthenticated ? (
-            <div className="flex flex-col gap-2 h-full">
-              <MobileNavLink to="/dashboard" onClick={() => setIsOpen(false)}>
-                Dashboard
-              </MobileNavLink>
-              <MobileNavLink to="/activities" onClick={() => setIsOpen(false)}>
-                Activities
-              </MobileNavLink>
-              <MobileNavLink to="/analytics" onClick={() => setIsOpen(false)}>
-                Analytics
-              </MobileNavLink>
-              <Button
-                onClick={() => {
-                  logout.mutate();
-                  setIsOpen(false);
-                }}
-                disabled={logout.isPending}
-                variant="secondary"
-                className="w-full mt-auto justify-start gap-2"
-              >
-                <LogOut size={16} />
-                {logout.isPending ? 'Logging out...' : 'Log out'}
+      <Sheet open={isOpen} onOpenChange={setIsOpen}>
+        <SheetContent side="left" showCloseButton={false} className="gap-0">
+          <SheetHeader className="flex-row items-center justify-between border-b border-border">
+            <SheetTitle>Menu</SheetTitle>
+            <SheetClose asChild>
+              <Button variant="ghost" size="icon-sm" className="hover:text-cream" aria-label="Close menu">
+                <X size={20} />
               </Button>
-            </div>
-          ) : (
-            <div className="space-y-2">
-              <Button asChild variant="tertiary" className="w-full font-bold">
-                <MobileNavLink to="/login" onClick={() => setIsOpen(false)}>
-                  Log in
+            </SheetClose>
+          </SheetHeader>
+
+          <nav className="flex-1 p-4">
+            {isAuthenticated ? (
+              <div className="flex flex-col gap-2 h-full">
+                <MobileNavLink to="/dashboard" onClick={() => setIsOpen(false)}>
+                  Dashboard
                 </MobileNavLink>
-              </Button>
-              <Button asChild variant="primary" className="w-full">
-                <Link to="/register" onClick={() => setIsOpen(false)}>
-                  Get Started
-                </Link>
-              </Button>
-            </div>
-          )}
-        </nav>
-      </aside>
-
-      {/* Overlay */}
-      {isOpen && (
-        <div
-          className="fixed inset-0 bg-black/50 z-50 md:hidden"
-          onClick={() => setIsOpen(false)}
-        />
-      )}
+                <MobileNavLink to="/activities" onClick={() => setIsOpen(false)}>
+                  Activities
+                </MobileNavLink>
+                <MobileNavLink to="/analytics" onClick={() => setIsOpen(false)}>
+                  Analytics
+                </MobileNavLink>
+                <Button
+                  onClick={() => {
+                    logout.mutate();
+                    setIsOpen(false);
+                  }}
+                  disabled={logout.isPending}
+                  variant="secondary"
+                  className="w-full mt-auto justify-start gap-2"
+                >
+                  <LogOut size={16} />
+                  {logout.isPending ? 'Logging out...' : 'Log out'}
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <Button asChild variant="tertiary" className="w-full font-bold">
+                  <MobileNavLink to="/login" onClick={() => setIsOpen(false)}>
+                    Log in
+                  </MobileNavLink>
+                </Button>
+                <Button asChild variant="primary" className="w-full">
+                  <Link to="/register" onClick={() => setIsOpen(false)}>
+                    Get Started
+                  </Link>
+                </Button>
+              </div>
+            )}
+          </nav>
+        </SheetContent>
+      </Sheet>
     </>
   )
 }

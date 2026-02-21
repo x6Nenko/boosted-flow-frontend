@@ -19,7 +19,7 @@ export function SectionHero() {
   const time = useMockTimer();
 
   return (
-    <section className="flex flex-col items-center justify-center min-h-[calc(100vh-120px)] relative px-4">
+    <section className="flex flex-col items-center justify-center min-h-[calc(100vh-120px)] relative px-4 overflow-hidden">
       {/* Cream glow behind timer */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] bg-cream/10 blur-[150px] rounded-full pointer-events-none" />
 
@@ -34,7 +34,7 @@ export function SectionHero() {
       </p> */}
 
       {/* Stats */}
-      <div className="flex items-center gap-6 mb-8">
+      <div className="flex max-[360px]:flex-col max-[360px]:gap-2 items-center gap-6 mb-8">
         {/* Rating */}
         <div className="flex items-center gap-2 px-4 py-2 rounded-lg border border-border/50 bg-card/50">
           <div className="flex">
@@ -55,7 +55,7 @@ export function SectionHero() {
 
       {/* The Clock */}
       <div className="relative mb-16">
-        <h1 className="text-7xl sm:text-8xl md:text-[10rem] font-mono font-medium tracking-tighter tabular-nums text-foreground leading-none select-none">
+        <h1 className="max-[360px]:text-6xl text-7xl sm:text-8xl md:text-[10rem] font-mono font-medium tracking-tighter tabular-nums text-foreground leading-none select-none">
           {time}
         </h1>
         {/* Subtle pulse dot */}
@@ -65,7 +65,7 @@ export function SectionHero() {
       </div>
 
       {/* Tagline */}
-      <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-foreground/80 mb-10 leading-[1.1]">
+      <h1 className="text-center text-4xl md:text-6xl font-bold tracking-tight text-foreground/80 mb-10 leading-[1.1]">
         Track what
         <span className="bg-clip-text text-transparent bg-linear-to-r from-cream to-cream/60"> matters</span>.
       </h1>

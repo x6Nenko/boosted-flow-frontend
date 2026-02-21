@@ -132,7 +132,9 @@ function LegalPage() {
         {/* Refund Policy */}
         <section className="rounded-xl border border-border bg-card p-6">
           <h2 className="text-base font-semibold mb-4">3. Refund Policy</h2>
-          <p className="text-base mb-4">We want you to be happy with Boosted Flow.</p>
+          <p className="text-base text-foreground/60 mb-4">
+            Our order process is conducted by our online reseller & Merchant of Record, Paddle.com, who handles all sales-related inquiries.
+          </p>
 
           <div className="flex flex-col gap-4">
             <div>
@@ -147,8 +149,8 @@ function LegalPage() {
             <div>
               <h3 className="font-semibold mb-2">3.2 14-Day Money-Back Guarantee</h3>
               <p className="text-foreground/60">
-                If you are not satisfied with your purchase, we offer a full refund within the first
-                14 days of your initial payment.
+                If you are not satisfied with your purchase, we offer a full refund within 14 days of your purchase date. 
+                This applies to all purchases, including subscription renewals.
               </p>
             </div>
 
@@ -160,15 +162,15 @@ function LegalPage() {
                   support@boosted-flow.com
                 </a>{' '}
                 with your account email and receipt. Refunds will be processed back to your original
-                payment method via our payment processor, Paddle.
-              </p>
-            </div>
-
-            <div>
-              <h3 className="font-semibold mb-2">3.4 Exceptions</h3>
-              <p className="text-foreground/60">
-                Refunds are generally not provided for renewal payments or after the 14-day window has
-                passed, unless required by local law.
+                payment method via our payment processor, Paddle, in accordance with{' '}
+                <a 
+                  href="https://www.paddle.com/legal/invoiced-consumer-terms" 
+                  target="_blank" 
+                  rel="noreferrer" 
+                  className="underline hover:text-foreground transition-colors duration-150"
+                >
+                  Paddle's Consumer Terms
+                </a>.
               </p>
             </div>
           </div>

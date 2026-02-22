@@ -35,12 +35,12 @@ export function SectionPricing() {
 
           <div
             className={cn(
-              'relative rounded-2xl border border-cream/15 bg-card/60 backdrop-blur-sm p-8 transition-all duration-700',
+              'relative rounded-2xl border border-cream/15 bg-card/60 backdrop-blur-sm p-6 sm:p-8 transition-all duration-700',
               isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
             )}
           >
             {/* Header */}
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex flex-wrap gap-y-2 items-center justify-between mb-8">
               <div>
                 <p className="text-base font-semibold text-foreground">Yearly plan</p>
               </div>

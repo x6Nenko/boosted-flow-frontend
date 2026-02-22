@@ -190,6 +190,7 @@ export const TimeEntryRow = memo(function TimeEntryRow({
 }: TimeEntryRowProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [isActionsOpen, setIsActionsOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [comment, setComment] = useState(entry.comment || '');
   const [distractionCount, setDistractionCount] = useState(entry.distractionCount);
@@ -367,7 +368,7 @@ export const TimeEntryRow = memo(function TimeEntryRow({
       "group/row relative rounded-lg border border-transparent transition-all duration-200",
       "border-border/50 mb-2",
       "hover:bg-secondary/50 hover:border-border/40 max-sm:px-2 px-4",
-      isDetailsOpen && "bg-secondary/50 border-border/40"
+      (isDetailsOpen || isActionsOpen) && "bg-secondary/50 border-border/40"
     )}>
       {/* Line 1: Date/time + actions + duration */}
       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center py-2 gap-x-2 gap-y-2 min-[861px]:flex min-[861px]:items-center min-[861px]:justify-between min-[861px]:gap-2">
@@ -421,7 +422,7 @@ export const TimeEntryRow = memo(function TimeEntryRow({
               </Button>
             )}
             {editable && (
-              <DropdownMenu>
+              <DropdownMenu open={isActionsOpen} onOpenChange={setIsActionsOpen}>
                 <DropdownMenuTrigger asChild>
                   <Button
                     type="button"

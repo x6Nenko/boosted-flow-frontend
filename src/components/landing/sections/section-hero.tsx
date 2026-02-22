@@ -75,7 +75,7 @@ export function SectionHero() {
         <Link to="/register">Start tracking</Link>
       </Button>
       <p className="mt-4 text-xs text-muted-foreground">
-        Solo devs <span className="mx-1.5 text-border">·</span> Freelancers <span className="mx-1.5 text-border">·</span> ADHD brains
+        Solo devs <span className="mx-1.5 text-border">·</span> Students <span className="mx-1.5 text-border">·</span> ADHD brains
       </p>
     </section>
   );

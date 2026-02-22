@@ -2,6 +2,7 @@ import { createFileRoute, redirect } from '@tanstack/react-router';
 import { authStore } from '@/features/auth/auth-store';
 import { SectionHero } from '@/components/landing/sections/section-hero';
 import { SectionNumbers } from '@/components/landing/sections/section-numbers';
+import { SectionPricing } from '@/components/landing/sections/section-pricing';
 
 export const Route = createFileRoute('/')({
   beforeLoad: () => {
@@ -17,6 +18,7 @@ function App() {
     <>
       <SectionHero />
       <SectionNumbers />
+      <SectionPricing />
     </>
   );
 }

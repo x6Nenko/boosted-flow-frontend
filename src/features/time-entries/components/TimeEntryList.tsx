@@ -134,6 +134,8 @@ const PaginationControls = memo(function PaginationControls({
 /* ── Main list component ── */
 type TimeEntryListProps = {
   entries: TimeEntry[];
+  /** Single activity for activity-page mode */
+  activity?: Activity;
   /** Map of activityId → Activity for dashboard mode */
   activitiesMap?: Map<string, Activity>;
   showActivityName?: boolean;
@@ -144,6 +146,7 @@ type TimeEntryListProps = {
 
 export const TimeEntryList = memo(function TimeEntryList({
   entries,
+  activity,
   activitiesMap,
   showActivityName = false,
   editable = false,
@@ -169,7 +172,7 @@ export const TimeEntryList = memo(function TimeEntryList({
           <div key={entry.id} style={{ contentVisibility: 'auto', containIntrinsicSize: 'auto 64px' }}>
             <TimeEntryRow
               entry={entry}
-              activity={activitiesMap?.get(entry.activityId)}
+              activity={activity ?? activitiesMap?.get(entry.activityId)}
               showActivityName={showActivityName}
               editable={editable}
               showDetails={showDetails}

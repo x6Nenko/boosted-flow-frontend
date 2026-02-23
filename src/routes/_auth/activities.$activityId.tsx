@@ -845,6 +845,7 @@ function ActivityPage() {
         ) : entries && entries.length > 0 ? (
           <TimeEntryList
             entries={entries}
+            activity={activity}
             editable
             showDetails={showDetails}
           />

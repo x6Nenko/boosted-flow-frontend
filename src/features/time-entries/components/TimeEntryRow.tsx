@@ -1,7 +1,7 @@
 import { memo, useState } from 'react';
 import { Link } from '@tanstack/react-router';
 import {
-  Star, Trash2, Edit2, MessageSquare,
+  Star, Trash2, Edit2, MessageSquare, Share2,
   Clock, Calendar as CalendarIcon, Plus, Minus, ChevronRight, ChevronDown, Lightbulb, MoreVertical,
 } from 'lucide-react';
 import { useUpdateTimeEntry, useDeleteTimeEntry } from '../hooks';
@@ -38,6 +38,8 @@ import {
 import { format } from 'date-fns';
 import type { TimeEntry } from '../types';
 import type { Activity } from '@/features/activities/types';
+import { ShareEntryDialog } from './share/ShareEntryDialog';
+import { formatDateEn } from './share/shared';
 
 function RatingStars({
   value,
@@ -191,6 +193,7 @@ export const TimeEntryRow = memo(function TimeEntryRow({
   const [isEditing, setIsEditing] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [isActionsOpen, setIsActionsOpen] = useState(false);
+  const [isShareOpen, setIsShareOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [comment, setComment] = useState(entry.comment || '');
   const [distractionCount, setDistractionCount] = useState(entry.distractionCount);
@@ -269,6 +272,12 @@ export const TimeEntryRow = memo(function TimeEntryRow({
     e.preventDefault();
     e.stopPropagation();
     setIsDetailsOpen((open) => !open);
+  };
+
+  const handleShareStart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsShareOpen(true);
   };
 
   const detailsContent = (
@@ -441,6 +450,10 @@ export const TimeEntryRow = memo(function TimeEntryRow({
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={handleShareStart} className='cursor-pointer'>
+                    <Share2 size={14} />
+                    Share entry
+                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleEditStart} className='cursor-pointer'>
                     <Edit2 size={14} />
                     Edit entry
@@ -486,6 +499,20 @@ export const TimeEntryRow = memo(function TimeEntryRow({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Share Dialog */}
+      <ShareEntryDialog
+        open={isShareOpen}
+        onOpenChange={setIsShareOpen}
+        data={{
+          activityName: activity?.name || 'Unknown',
+          date: formatDateEn(entry.startedAt),
+          timeRange: `${formatTime(entry.startedAt)} – ${formatTime(entry.stoppedAt!)}`,
+          duration: formatStoppedDuration(entry.startedAt, entry.stoppedAt!),
+          rating: entry.rating,
+          distractionCount: entry.distractionCount,
+        }}
+      />
 
       {/* Edit Dialog */}
       <Dialog open={isEditing} onOpenChange={setIsEditing}>

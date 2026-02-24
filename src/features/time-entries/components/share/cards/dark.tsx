@@ -3,7 +3,7 @@ import { Stars, distractionLabel } from '../shared';
 
 export function DarkCard({ data }: ShareCardProps) {
   return (
-    <div className="w-full min-[450px]:w-[380px] mx-auto rounded-xl bg-card p-6 text-center border border-border">
+    <div className="w-full mx-auto rounded-xl bg-card p-6 text-center border border-border">
       {/* <p className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground mb-6">
         Session Complete
       </p> */}

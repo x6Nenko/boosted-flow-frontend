@@ -83,7 +83,7 @@ export function ShareEntryDialog({ open, onOpenChange, data }: ShareEntryDialogP
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="max-sm:max-w-md sm:max-w-md">
         <DialogHeader>
           <DialogTitle className='text-center'>Share Entry</DialogTitle>
         </DialogHeader>
@@ -117,7 +117,7 @@ export function ShareEntryDialog({ open, onOpenChange, data }: ShareEntryDialogP
 
         <div className="min-h-[300px] flex items-start justify-center py-2">
           {mode === 'image' ? (
-            <div ref={cardRef} className='w-full min-[450px]:w-fit'>
+            <div ref={cardRef} className='w-full'>
               <DarkCard data={data} />
             </div>
           ) : (

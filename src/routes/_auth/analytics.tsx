@@ -5,6 +5,8 @@ import {
   useAnalytics,
   formatDuration,
   getDefaultDateRange,
+  buildAnalyticsCsv,
+  downloadCsv,
 } from '@/features/analytics';
 import { Label } from '@/components/ui/label';
 import {
@@ -22,7 +24,7 @@ import {
 } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { CalendarIcon } from 'lucide-react';
+import { CalendarIcon, Download } from 'lucide-react';
 import { format } from 'date-fns';
 
 export const Route = createFileRoute('/_auth/analytics')({
@@ -58,9 +60,41 @@ function AnalyticsPage() {
       )
       : null;
 
+  const handleExportCsv = () => {
+    if (!analytics) return;
+
+    const selectedActivityName =
+      activityId === 'all'
+        ? 'All activities'
+        : activityMap.get(activityId) || activityId;
+
+    const csv = buildAnalyticsCsv({
+      analytics,
+      from: from || 'Start',
+      to: to || 'Now',
+      activityName: selectedActivityName,
+      activityMap,
+    });
+
+    downloadCsv(csv, `analytics-${from}-${to}.csv`);
+  };
+
   return (
     <div className="py-8">
-      <h1 className="text-2xl font-bold text-foreground mb-6">Analytics</h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold text-foreground">Analytics</h1>
+        {analytics && (
+          <Button 
+            className='h-7 px-3 text-xs font-medium flex items-center gap-1.5' 
+            variant="outline" 
+            size="sm" 
+            onClick={handleExportCsv}
+          >
+            <Download />
+            Export CSV
+          </Button>
+        )}
+      </div>
 
       {/* Filters */}
       <div className="rounded-xl border border-border bg-card max-sm:p-4 p-6 mb-6">

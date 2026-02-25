@@ -107,6 +107,15 @@ Formats milliseconds as human-readable string (e.g., "2h 30m").
 #### `getDefaultDateRange(): { from: string; to: string }`
 Returns last 30 days as date strings (YYYY-MM-DD format).
 
+#### `buildAnalyticsCsv(params): string`
+Builds a CSV string from analytics data. Includes report header (period, activity filter), summary metrics, time-per-activity breakdown, and peak hours breakdown.
+```typescript
+Params: { analytics: AnalyticsData, from: string, to: string, activityName: string, activityMap: Map<string, string> }
+```
+
+#### `downloadCsv(content: string, filename: string): void`
+Triggers a browser file download from a CSV string.
+
 ---
 
 ## 6. Metrics Breakdown

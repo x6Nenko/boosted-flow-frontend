@@ -81,3 +81,89 @@ export function getDateRangeForDays(days: number): { from: string; to: string } 
     to: to.toISOString().split('T')[0],
   };
 }
+
+function escapeCsvValue(value: string): string {
+  if (value.includes(',') || value.includes('"') || value.includes('\n')) {
+    return `"${value.replace(/"/g, '""')}"`;
+  }
+  return value;
+}
+
+function csvRow(...values: string[]): string {
+  return values.map(escapeCsvValue).join(',');
+}
+
+export function buildAnalyticsCsv(params: {
+  analytics: AnalyticsData;
+  from: string;
+  to: string;
+  activityName: string;
+  activityMap: Map<string, string>;
+}): string {
+  const { analytics, from, to, activityName, activityMap } = params;
+  const lines: string[] = [];
+
+  // Header
+  lines.push(csvRow('Boosted Flow Analytics Report'));
+  lines.push(csvRow('Period', `${from} to ${to}`));
+  lines.push(csvRow('Activity', activityName));
+  lines.push('');
+
+  // Summary metrics
+  lines.push(csvRow('Metric', 'Value'));
+  lines.push(csvRow('Total Time', formatDuration(analytics.totalTimeMs)));
+  lines.push(csvRow('Session Count', analytics.sessionCount.toString()));
+  lines.push(csvRow('Avg Session', formatDuration(analytics.averageSessionMs)));
+  lines.push(
+    csvRow(
+      'Avg Rating',
+      analytics.averageRating !== null
+        ? `${analytics.averageRating.toFixed(1)} (${analytics.ratedSessionCount} rated)`
+        : 'No ratings',
+    ),
+  );
+  lines.push(csvRow('Total Distractions', analytics.totalDistractions.toString()));
+  lines.push(csvRow('Avg Distractions', analytics.averageDistractions.toFixed(1)));
+
+  const peakHour =
+    Object.keys(analytics.peakHours).length > 0
+      ? Number(
+        Object.entries(analytics.peakHours).reduce((a, b) => (a[1] > b[1] ? a : b))[0],
+      )
+      : null;
+  lines.push(csvRow('Peak Hour', peakHour !== null ? `${peakHour}:00` : 'No data'));
+
+  // Time per activity
+  const activityEntries = Object.entries(analytics.timeByActivity).sort((a, b) => b[1] - a[1]);
+  if (activityEntries.length > 0) {
+    lines.push('');
+    lines.push(csvRow('Activity', 'Time'));
+    for (const [id, ms] of activityEntries) {
+      lines.push(csvRow(activityMap.get(id) || id, formatDuration(ms)));
+    }
+  }
+
+  // Peak hours breakdown
+  const hourEntries = Object.entries(analytics.peakHours)
+    .map(([h, ms]) => [Number(h), ms] as const)
+    .sort((a, b) => a[0] - b[0]);
+  if (hourEntries.length > 0) {
+    lines.push('');
+    lines.push(csvRow('Hour', 'Time'));
+    for (const [hour, ms] of hourEntries) {
+      lines.push(csvRow(`${hour}:00`, formatDuration(ms)));
+    }
+  }
+
+  return lines.join('\n');
+}
+
+export function downloadCsv(content: string, filename: string): void {
+  const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(url);
+}

@@ -11,3 +11,6 @@ count.txt
 .vscode
 .github
 reverse-engineer
+/.agents
+skills-lock.json
+.impeccable.md

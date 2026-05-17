@@ -5,13 +5,11 @@ import { TanStackDevtools } from '@tanstack/react-devtools'
 
 import Header from '../components/Header'
 import Footer from '../components/Footer'
+import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
+import type { QueryClient } from '@tanstack/react-query'
 import { CommandPalette } from '@/features/command-palette'
 import { useGlobalHotkeys } from '@/features/hotkeys'
 import { getDocumentTitleForPath } from '@/lib/page-title'
-
-import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
-
-import type { QueryClient } from '@tanstack/react-query'
 
 interface MyRouterContext {
   queryClient: QueryClient

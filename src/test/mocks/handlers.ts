@@ -1,6 +1,7 @@
-import { http, HttpResponse } from 'msw';
-import { API_ENDPOINTS } from '@/lib/api-endpoints';
+import { HttpResponse, http } from 'msw';
+import type { BillingStatus } from '@/features/billing/types';
 import type { TimeEntry } from '@/features/time-entries/types';
+import { API_ENDPOINTS } from '@/lib/api-endpoints';
 
 const API_BASE_URL = 'http://localhost:3000';
 
@@ -9,13 +10,60 @@ export const MOCK_ACCESS_TOKEN =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyLTEyMyIsImV4cCI6OTk5OTk5OTk5OX0.signature';
 
 // Mock time entries state
-let mockTimeEntries: TimeEntry[] = [];
+let mockTimeEntries: Array<TimeEntry> = [];
 let entryIdCounter = 1;
+let mockBillingStatus: BillingStatus = createActiveTrialBillingStatus();
+let checkoutRequestCount = 0;
 
 export const resetMockTimeEntries = () => {
   mockTimeEntries = [];
   entryIdCounter = 1;
 };
+
+function createActiveTrialBillingStatus(): BillingStatus {
+  return {
+    hasActiveSubscription: false,
+    hasActiveTrial: true,
+    hasActiveAccess: true,
+    trial: {
+      status: 'active',
+      startedAt: '2026-05-01T00:00:00.000Z',
+      endsAt: '2026-05-15T00:00:00.000Z',
+    },
+    subscription: null,
+  };
+}
+
+function cloneBillingStatus(status: BillingStatus): BillingStatus {
+  return {
+    ...status,
+    trial: { ...status.trial },
+    subscription: status.subscription ? { ...status.subscription } : null,
+  };
+}
+
+export const createExpiredBillingStatus = (): BillingStatus => ({
+  hasActiveSubscription: false,
+  hasActiveTrial: false,
+  hasActiveAccess: false,
+  trial: {
+    status: 'expired',
+    startedAt: '2026-04-01T00:00:00.000Z',
+    endsAt: '2026-04-15T00:00:00.000Z',
+  },
+  subscription: null,
+});
+
+export const resetMockBilling = () => {
+  mockBillingStatus = createActiveTrialBillingStatus();
+  checkoutRequestCount = 0;
+};
+
+export const setMockBillingStatus = (status: BillingStatus) => {
+  mockBillingStatus = cloneBillingStatus(status);
+};
+
+export const getCheckoutRequestCount = () => checkoutRequestCount;
 
 export const handlers = [
   // Login
@@ -49,6 +97,15 @@ export const handlers = [
   // Logout
   http.post(`${API_BASE_URL}${API_ENDPOINTS.AUTH.LOGOUT}`, () => {
     return new HttpResponse(null, { status: 204 });
+  }),
+
+  http.get(`${API_BASE_URL}${API_ENDPOINTS.BILLING.STATUS}`, () => {
+    return HttpResponse.json(cloneBillingStatus(mockBillingStatus));
+  }),
+
+  http.post(`${API_BASE_URL}${API_ENDPOINTS.BILLING.CHECKOUT}`, () => {
+    checkoutRequestCount += 1;
+    return HttpResponse.json({ transactionId: 'txn_test_01' });
   }),
 
   // Time Entries - Start

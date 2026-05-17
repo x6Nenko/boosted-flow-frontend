@@ -1,12 +1,12 @@
 import { Link } from '@tanstack/react-router'
-import { useState, useEffect } from 'react'
-import { Menu, Search, X, User, LogOut } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { CreditCard, LogOut, Menu, Search, User, X } from 'lucide-react'
 import { commandPaletteStore } from '@/features/command-palette'
 import { useAuth } from '@/features/auth/hooks/use-auth'
 import { useLogout } from '@/features/auth/hooks'
 import { Button } from '@/components/ui/button'
 import { GlassContainer } from '@/components/primitives/glass-container'
-import { NavLink, MobileNavLink } from '@/components/primitives/nav-link'
+import { MobileNavLink, NavLink } from '@/components/primitives/nav-link'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -98,6 +98,12 @@ export default function Header() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem asChild className="cursor-pointer">
+                    <Link to="/billing">
+                      <CreditCard size={16} />
+                      Billing
+                    </Link>
+                  </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => logout.mutate()}
                     disabled={logout.isPending}
@@ -158,6 +164,9 @@ export default function Header() {
                 </MobileNavLink>
                 <MobileNavLink to="/analytics" onClick={() => setIsOpen(false)}>
                   Analytics
+                </MobileNavLink>
+                <MobileNavLink to="/billing" onClick={() => setIsOpen(false)}>
+                  Billing
                 </MobileNavLink>
                 <Button
                   onClick={() => {

@@ -19,6 +19,7 @@ import { Route as GuestRegisterRouteImport } from './routes/_guest/register'
 import { Route as GuestLoginRouteImport } from './routes/_guest/login'
 import { Route as GuestForgotPasswordRouteImport } from './routes/_guest/forgot-password'
 import { Route as AuthDashboardRouteImport } from './routes/_auth/dashboard'
+import { Route as AuthBillingRouteImport } from './routes/_auth/billing'
 import { Route as AuthAnalyticsRouteImport } from './routes/_auth/analytics'
 import { Route as AuthActivitiesIndexRouteImport } from './routes/_auth/activities.index'
 import { Route as AuthActivitiesActivityIdRouteImport } from './routes/_auth/activities.$activityId'
@@ -71,6 +72,11 @@ const AuthDashboardRoute = AuthDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthRoute,
 } as any)
+const AuthBillingRoute = AuthBillingRouteImport.update({
+  id: '/billing',
+  path: '/billing',
+  getParentRoute: () => AuthRoute,
+} as any)
 const AuthAnalyticsRoute = AuthAnalyticsRouteImport.update({
   id: '/analytics',
   path: '/analytics',
@@ -92,6 +98,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/legal': typeof LegalRoute
   '/analytics': typeof AuthAnalyticsRoute
+  '/billing': typeof AuthBillingRoute
   '/dashboard': typeof AuthDashboardRoute
   '/forgot-password': typeof GuestForgotPasswordRoute
   '/login': typeof GuestLoginRoute
@@ -105,6 +112,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/legal': typeof LegalRoute
   '/analytics': typeof AuthAnalyticsRoute
+  '/billing': typeof AuthBillingRoute
   '/dashboard': typeof AuthDashboardRoute
   '/forgot-password': typeof GuestForgotPasswordRoute
   '/login': typeof GuestLoginRoute
@@ -121,6 +129,7 @@ export interface FileRoutesById {
   '/_guest': typeof GuestRouteWithChildren
   '/legal': typeof LegalRoute
   '/_auth/analytics': typeof AuthAnalyticsRoute
+  '/_auth/billing': typeof AuthBillingRoute
   '/_auth/dashboard': typeof AuthDashboardRoute
   '/_guest/forgot-password': typeof GuestForgotPasswordRoute
   '/_guest/login': typeof GuestLoginRoute
@@ -136,6 +145,7 @@ export interface FileRouteTypes {
     | '/'
     | '/legal'
     | '/analytics'
+    | '/billing'
     | '/dashboard'
     | '/forgot-password'
     | '/login'
@@ -149,6 +159,7 @@ export interface FileRouteTypes {
     | '/'
     | '/legal'
     | '/analytics'
+    | '/billing'
     | '/dashboard'
     | '/forgot-password'
     | '/login'
@@ -164,6 +175,7 @@ export interface FileRouteTypes {
     | '/_guest'
     | '/legal'
     | '/_auth/analytics'
+    | '/_auth/billing'
     | '/_auth/dashboard'
     | '/_guest/forgot-password'
     | '/_guest/login'
@@ -254,6 +266,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthDashboardRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_auth/billing': {
+      id: '/_auth/billing'
+      path: '/billing'
+      fullPath: '/billing'
+      preLoaderRoute: typeof AuthBillingRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/_auth/analytics': {
       id: '/_auth/analytics'
       path: '/analytics'
@@ -280,6 +299,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthRouteChildren {
   AuthAnalyticsRoute: typeof AuthAnalyticsRoute
+  AuthBillingRoute: typeof AuthBillingRoute
   AuthDashboardRoute: typeof AuthDashboardRoute
   AuthActivitiesActivityIdRoute: typeof AuthActivitiesActivityIdRoute
   AuthActivitiesIndexRoute: typeof AuthActivitiesIndexRoute
@@ -287,6 +307,7 @@ interface AuthRouteChildren {
 
 const AuthRouteChildren: AuthRouteChildren = {
   AuthAnalyticsRoute: AuthAnalyticsRoute,
+  AuthBillingRoute: AuthBillingRoute,
   AuthDashboardRoute: AuthDashboardRoute,
   AuthActivitiesActivityIdRoute: AuthActivitiesActivityIdRoute,
   AuthActivitiesIndexRoute: AuthActivitiesIndexRoute,

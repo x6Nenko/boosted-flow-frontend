@@ -19,4 +19,8 @@ export const API_ENDPOINTS = {
     LIST: '/time-entries',
     CURRENT: '/time-entries/current',
   },
+  BILLING: {
+    STATUS: '/billing/status',
+    CHECKOUT: '/billing/checkout',
+  },
 } as const;

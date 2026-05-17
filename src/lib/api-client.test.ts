@@ -1,9 +1,9 @@
-import { describe, it, expect, beforeAll, afterAll, afterEach } from 'vitest';
-import { http, HttpResponse } from 'msw';
+import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
+import { HttpResponse, http } from 'msw';
 import { setupServer } from 'msw/node';
-import { apiClient, ApiError } from './api-client';
-import { authStore } from '@/features/auth/auth-store';
+import { ApiError, apiClient } from './api-client';
 import { API_ENDPOINTS } from './api-endpoints';
+import { authStore } from '@/features/auth/auth-store';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 const MOCK_TOKEN = 'initial-token';

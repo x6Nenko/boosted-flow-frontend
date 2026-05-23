@@ -5,12 +5,17 @@ import { setupServer } from 'msw/node';
 import { billingApi } from './api';
 import { requireBillingAccess } from './billing-guard';
 import { openPaddleCheckout } from './paddle';
+import { redirectToPortal } from './portal';
 import type React from 'react';
 import { BillingPage } from '@/routes/_auth/billing';
 import { authStore } from '@/features/auth/auth-store';
 import {
+  MOCK_PORTAL_SESSION_URL,
+  createActiveSubscriptionBillingStatus,
   createExpiredBillingStatus,
+  failMockPortalSession,
   getCheckoutRequestCount,
+  getPortalSessionRequestCount,
   handlers,
   resetMockBilling,
   setMockBillingStatus,
@@ -29,6 +34,10 @@ vi.mock('@tanstack/react-router', async () => {
 
 vi.mock('./paddle', () => ({
   openPaddleCheckout: vi.fn(() => Promise.resolve(vi.fn())),
+}));
+
+vi.mock('./portal', () => ({
+  redirectToPortal: vi.fn(),
 }));
 
 const server = setupServer(...handlers);
@@ -77,6 +86,13 @@ describe('billingApi', () => {
     });
     expect(getCheckoutRequestCount()).toBe(1);
   });
+
+  it('creates portal sessions', async () => {
+    await expect(billingApi.createPortalSession()).resolves.toEqual({
+      url: MOCK_PORTAL_SESSION_URL,
+    });
+    expect(getPortalSessionRequestCount()).toBe(1);
+  });
 });
 
 describe('requireBillingAccess', () => {
@@ -116,5 +132,33 @@ describe('BillingPage', () => {
       expect(getCheckoutRequestCount()).toBe(1);
       expect(openPaddleCheckout).toHaveBeenCalledWith('txn_test_01', expect.any(Function));
     });
+  });
+
+  it('opens the Paddle portal from an active subscription', async () => {
+    setMockBillingStatus(createActiveSubscriptionBillingStatus());
+    renderWithQueryClient(<BillingPage />);
+
+    const manageButton = await screen.findByRole('button', { name: /manage subscription/i });
+    expect((manageButton as HTMLButtonElement).disabled).toBe(false);
+    fireEvent.click(manageButton);
+
+    await waitFor(() => {
+      expect(getPortalSessionRequestCount()).toBe(1);
+      expect(redirectToPortal).toHaveBeenCalledWith(MOCK_PORTAL_SESSION_URL);
+    });
+  });
+
+  it('shows an error when the portal session request fails', async () => {
+    setMockBillingStatus(createActiveSubscriptionBillingStatus());
+    failMockPortalSession('Portal is unavailable');
+    renderWithQueryClient(<BillingPage />);
+
+    const manageButton = await screen.findByRole('button', { name: /manage subscription/i });
+    fireEvent.click(manageButton);
+
+    const alert = await screen.findByRole('alert');
+    expect(alert.textContent).toBe('Portal is unavailable');
+    expect(getPortalSessionRequestCount()).toBe(1);
+    expect(redirectToPortal).not.toHaveBeenCalled();
   });
 });

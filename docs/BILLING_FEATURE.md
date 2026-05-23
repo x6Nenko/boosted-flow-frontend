@@ -2,7 +2,7 @@
 
 ## 1. High-Level Purpose
 
-Keeps authenticated app access aligned with backend billing status. The frontend shows trial/subscription state, redirects expired users to the billing page, and starts Paddle checkout without treating Paddle frontend events as proof of access.
+Keeps authenticated app access aligned with backend billing status. The frontend shows trial/subscription state, redirects expired users to the billing page, starts Paddle checkout, and opens the hosted Paddle portal for active subscribers.
 
 ---
 
@@ -10,18 +10,20 @@ Keeps authenticated app access aligned with backend billing status. The frontend
 
 ```
 src/features/billing/
-├── types.ts                         # BillingStatus, trial, subscription, checkout response types
-├── api.ts                           # GET /billing/status, POST /billing/checkout
+├── types.ts                         # Billing status, checkout, and portal response types
+├── api.ts                           # Billing status, checkout, and portal API calls
 ├── billing-guard.ts                 # Auth route billing access check
 ├── paddle.ts                        # Paddle.js initialization and checkout opening
+├── portal.ts                        # Current-tab portal redirect helper
 └── hooks/
     ├── index.ts                     # Hook exports
     ├── use-billing-status.ts        # TanStack Query status fetch
-    └── use-create-checkout.ts       # TanStack Mutation for checkout creation
+    ├── use-create-checkout.ts       # TanStack Mutation for checkout creation
+    └── use-create-portal-session.ts # TanStack Mutation for portal sessions
 
 routes/
 ├── _auth.tsx                        # Requires auth, then checks billing access
-└── _auth/billing.tsx                # Billing status, expired trial paywall, checkout CTA
+└── _auth/billing.tsx                # Billing status, checkout CTA, portal CTA
 ```
 
 **Page:**
@@ -46,6 +48,12 @@ routes/
 5. On Paddle checkout completion, frontend refetches `/billing/status` briefly
 6. App access is only restored after the backend status changes, usually from Paddle webhooks
 
+### **Customer Portal**
+1. Active subscriber clicks "Manage subscription"
+2. `useCreatePortalSession()` calls `POST /billing/portal-session`
+3. Backend returns `{ url }`
+4. Frontend redirects the current tab to that Paddle-hosted portal URL
+
 ---
 
 ## 4. Key Patterns & Configuration
@@ -57,7 +65,7 @@ routes/
 | **Route-Level Paywall** | `_auth` redirects expired users to `/billing` |
 | **Typed API Layer** | `api.ts` wraps billing endpoints through `apiClient` |
 | **Paddle Client Token** | Paddle.js uses `VITE_PADDLE_CLIENT_TOKEN`, not server API keys |
-| **Portal Deferred** | Manage/cancel UI is disabled until backend portal sessions exist |
+| **Hosted Portal** | Active subscribers get a fresh Paddle portal session before redirect |
 
 ### Environment Variables
 
@@ -82,11 +90,17 @@ Returns: UseQueryResult<BillingStatus>
 Returns: UseMutationResult<CheckoutResponse, Error, void>
 ```
 
+#### `useCreatePortalSession()`
+```typescript
+Returns: UseMutationResult<PortalSessionResponse, Error, void>
+```
+
 ### **API**
 
 ```typescript
-billingApi.getStatus()       // GET /billing/status
-billingApi.createCheckout()  // POST /billing/checkout
+billingApi.getStatus()             // GET /billing/status
+billingApi.createCheckout()        // POST /billing/checkout
+billingApi.createPortalSession()   // POST /billing/portal-session
 ```
 
 ### **Paddle**
@@ -103,6 +117,6 @@ Initializes Paddle.js lazily and opens checkout for a backend-created transactio
 
 1. **Do not trust Paddle frontend completion**: always wait for backend `/billing/status`
 2. **Do not add price IDs to the frontend**: backend creates the checkout transaction
-3. **Do not implement portal calls yet**: backend portal session endpoint is not available
+3. **Do not cache portal URLs**: create a fresh portal session for each manage action
 4. **Keep `/billing` reachable without active access**: expired users need it to subscribe
 5. **Product API 403s are backend enforcement**: frontend route checks are UX, not security

@@ -4,6 +4,7 @@ import type { TimeEntry } from '@/features/time-entries/types';
 import { API_ENDPOINTS } from '@/lib/api-endpoints';
 
 const API_BASE_URL = 'http://localhost:3000';
+export const MOCK_PORTAL_SESSION_URL = 'https://customer-portal.paddle.com/session/test';
 
 // Valid JWT for testing (payload: { sub: 'user-123', exp: far future })
 export const MOCK_ACCESS_TOKEN =
@@ -14,6 +15,8 @@ let mockTimeEntries: Array<TimeEntry> = [];
 let entryIdCounter = 1;
 let mockBillingStatus: BillingStatus = createActiveTrialBillingStatus();
 let checkoutRequestCount = 0;
+let portalSessionRequestCount = 0;
+let portalSessionErrorMessage: string | null = null;
 
 export const resetMockTimeEntries = () => {
   mockTimeEntries = [];
@@ -54,9 +57,28 @@ export const createExpiredBillingStatus = (): BillingStatus => ({
   subscription: null,
 });
 
+export const createActiveSubscriptionBillingStatus = (): BillingStatus => ({
+  hasActiveSubscription: true,
+  hasActiveTrial: false,
+  hasActiveAccess: true,
+  trial: {
+    status: 'expired',
+    startedAt: '2026-04-01T00:00:00.000Z',
+    endsAt: '2026-04-15T00:00:00.000Z',
+  },
+  subscription: {
+    status: 'active',
+    priceId: 'pri_test_yearly',
+    nextBilledAt: '2026-06-01T00:00:00.000Z',
+    canceledAt: null,
+  },
+});
+
 export const resetMockBilling = () => {
   mockBillingStatus = createActiveTrialBillingStatus();
   checkoutRequestCount = 0;
+  portalSessionRequestCount = 0;
+  portalSessionErrorMessage = null;
 };
 
 export const setMockBillingStatus = (status: BillingStatus) => {
@@ -64,6 +86,11 @@ export const setMockBillingStatus = (status: BillingStatus) => {
 };
 
 export const getCheckoutRequestCount = () => checkoutRequestCount;
+export const getPortalSessionRequestCount = () => portalSessionRequestCount;
+
+export const failMockPortalSession = (message = 'Unable to open billing portal') => {
+  portalSessionErrorMessage = message;
+};
 
 export const handlers = [
   // Login
@@ -106,6 +133,16 @@ export const handlers = [
   http.post(`${API_BASE_URL}${API_ENDPOINTS.BILLING.CHECKOUT}`, () => {
     checkoutRequestCount += 1;
     return HttpResponse.json({ transactionId: 'txn_test_01' });
+  }),
+
+  http.post(`${API_BASE_URL}${API_ENDPOINTS.BILLING.PORTAL_SESSION}`, () => {
+    portalSessionRequestCount += 1;
+
+    if (portalSessionErrorMessage) {
+      return HttpResponse.json({ message: portalSessionErrorMessage }, { status: 409 });
+    }
+
+    return HttpResponse.json({ url: MOCK_PORTAL_SESSION_URL });
   }),
 
   // Time Entries - Start

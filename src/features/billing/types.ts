@@ -22,3 +22,7 @@ export type BillingStatus = {
 export type CheckoutResponse = {
   transactionId: string;
 };
+
+export type PortalSessionResponse = {
+  url: string;
+};

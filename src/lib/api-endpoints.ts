@@ -22,5 +22,6 @@ export const API_ENDPOINTS = {
   BILLING: {
     STATUS: '/billing/status',
     CHECKOUT: '/billing/checkout',
+    PORTAL_SESSION: '/billing/portal-session',
   },
 } as const;

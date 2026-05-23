@@ -10,8 +10,14 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ApiError } from '@/lib/api-client';
 import { cn } from '@/lib/utils';
 import { billingApi } from '@/features/billing/api';
-import { billingStatusQueryKey, useBillingStatus, useCreateCheckout } from '@/features/billing/hooks';
+import {
+  billingStatusQueryKey,
+  useBillingStatus,
+  useCreateCheckout,
+  useCreatePortalSession,
+} from '@/features/billing/hooks';
 import { openPaddleCheckout } from '@/features/billing/paddle';
+import { redirectToPortal } from '@/features/billing/portal';
 
 export const Route = createFileRoute('/_auth/billing')({
   component: BillingPage,
@@ -191,8 +197,21 @@ function TrialView({ billingStatus }: { billingStatus: BillingStatus }) {
 
 function SubscriptionView({ billingStatus }: { billingStatus: BillingStatus }) {
   const subscription = billingStatus.subscription;
+  const createPortalSession = useCreatePortalSession();
+  const [portalError, setPortalError] = useState<string | null>(null);
 
   if (!subscription) return null;
+
+  const handleManageSubscription = async () => {
+    setPortalError(null);
+
+    try {
+      const { url } = await createPortalSession.mutateAsync();
+      redirectToPortal(url);
+    } catch (error) {
+      setPortalError(getApiErrorMessage(error));
+    }
+  };
 
   return (
     <div className="py-8">
@@ -217,10 +236,23 @@ function SubscriptionView({ billingStatus }: { billingStatus: BillingStatus }) {
           <StatusMetric label="Plan" value="Yearly plan" />
         </dl>
 
-        <Button disabled variant="secondary" className="gap-2">
-          Manage subscription
-          <ExternalLink size={14} />
+        <Button
+          type="button"
+          variant="secondary"
+          className="gap-2"
+          onClick={handleManageSubscription}
+          disabled={createPortalSession.isPending}
+        >
+          {createPortalSession.isPending && <Loader2 className="animate-spin" />}
+          {createPortalSession.isPending ? 'Opening...' : 'Manage subscription'}
+          {!createPortalSession.isPending && <ExternalLink size={14} />}
         </Button>
+
+        {portalError && (
+          <p role="alert" className="mt-3 text-sm text-destructive">
+            {portalError}
+          </p>
+        )}
       </div>
     </div>
   );
